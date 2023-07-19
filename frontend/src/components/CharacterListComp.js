@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
+import InlineClassListComp from "./InlineClassListComp";
 
-// Show user preliminary details about characters in list
+// Show user preliminary details about each character
 const CharacterListComp = ({ characters }) => {
   return (
     <>
@@ -11,7 +12,7 @@ const CharacterListComp = ({ characters }) => {
           to={`/${character.id}`}
         >
           <h2>{character.name}</h2>
-          <p>{character.player}</p>
+          <InlineClassListComp classes={character.classes} />
         </Link>
       ))}
     </>
