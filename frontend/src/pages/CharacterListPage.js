@@ -1,3 +1,4 @@
+import "../styling/CharacterListPage.css";
 import CharacterListComp from "../components/CharacterListComp";
 import characters from "../sample-data/CharactersContentSample";
 

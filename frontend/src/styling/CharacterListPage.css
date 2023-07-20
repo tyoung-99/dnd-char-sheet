@@ -1,0 +1,16 @@
+/* Link buttons to characters */
+
+.character-list-item {
+  text-decoration: none;
+  color: black;
+  padding: 10px 10px;
+  margin: 10px 10px;
+  border: 2px solid black;
+  text-align: center;
+  display: inline-block;
+}
+
+.character-list-item:hover {
+  color: darkblue;
+  border: 2px solid darkblue;
+}
