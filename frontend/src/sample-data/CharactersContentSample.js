@@ -2,8 +2,8 @@ const characters = [
   {
     // General
     id: 1,
-    name: "Name",
-    player: "Player",
+    name: "Character Name",
+    player: "Player Name",
     alignment: "Alignment",
     xp: "XP",
     inspiration: false,

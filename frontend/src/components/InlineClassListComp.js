@@ -1,3 +1,5 @@
+// Shows character's classes in format Class Level/Class Level...
+
 const InlineClassListComp = ({ classes }) => {
   return (
     <div>
