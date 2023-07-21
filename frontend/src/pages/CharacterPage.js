@@ -8,6 +8,7 @@ import InlineClassListComp from "../components/InlineClassListComp";
 import CharacterStatsTab from "./page-tabs/CharacterStatsTab";
 import CharacterBackgroundTab from "./page-tabs/CharacterBackgroundTab";
 import TabContentComp from "../components/TabContentComp";
+import DeathSavesComp from "../components/DeathSavesComp";
 import characters from "../sample-data/CharactersContentSample";
 
 const CharacterPage = () => {
@@ -18,16 +19,39 @@ const CharacterPage = () => {
 
   const [activeTab, setActiveTab] = useState("stats");
 
+  const currentHD = character.hit_dice.remaining.map(
+    (die) => `${die.number}d${die.faces}`
+  );
+  const totalHD = character.hit_dice.total.map(
+    (die) => `${die.number}d${die.faces}`
+  );
+
   return (
     <div>
-      <h1 className="character-name">{character.name}</h1>
-      <InlineClassListComp classes={character.classes} />
-      <div className="common-header">
-        <p>AC: {character.armor_class}</p>
-        <p>Initiative: {character.initiative}</p>
-        <p>Temp HP: {character.hp.temp}</p>
-        <p>Current HP: {character.hp.current}</p>
-        <p>Max HP: {character.hp.max}</p>
+      <div className="name-header">
+        <h1>{character.name}</h1>
+        <p>{character.alignment}</p>
+        <p>
+          {character.race.name}{" "}
+          {character.race.subrace !== null ? `(${character.race.subrace})` : ""}
+        </p>
+        <InlineClassListComp classes={character.classes} />
+      </div>
+      <div className="combat-header">
+        <div>
+          <p>AC: {character.armor_class}</p>
+          <p>Initiative: {character.initiative}</p>
+        </div>
+        <div>
+          <p>Temp HP: {character.hp.temp}</p>
+          <p>Current HP: {character.hp.current}</p>
+          <p>Max HP: {character.hp.max}</p>
+        </div>
+        <div>
+          <p>Current Hit Dice: {currentHD.join(", ")}</p>
+          <p>Total Hit Dice: {totalHD.join(", ")}</p>
+        </div>
+        <DeathSavesComp deathSaves={character.death_saves} />
       </div>
       <ul className="nav">
         <TabNavComp
@@ -43,7 +67,7 @@ const CharacterPage = () => {
           setActiveTab={setActiveTab}
         />
       </ul>
-      <div className="outlet">
+      <div>
         <TabContentComp id={"stats"} activeTab={activeTab}>
           <CharacterStatsTab character={character} />
         </TabContentComp>

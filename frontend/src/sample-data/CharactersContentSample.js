@@ -4,14 +4,14 @@ const characters = [
     id: 1,
     name: "Character Name",
     player: "Player Name",
-    alignment: "Alignment",
+    alignment: "Lawful Good",
     xp: "XP",
     inspiration: false,
 
     // Combat stats
     armor_class: 10,
     initiative: 2,
-    speeds: {
+    speed: {
       walk: 30,
       swim: 5,
       fly: 0,
@@ -44,74 +44,73 @@ const characters = [
       ],
     },
     death_saves: {
-      successes: 0,
-      failures: 0,
+      successes: 2,
+      failures: 1,
     },
 
     // Abilities/skills
     // For skill profs, 0 = normal, 1 = proficiency, 2 = expertise
     prof_bonus: 2,
-    stats: {
-      str: {
+    stats: [
+      {
+        name: "STR",
+        score: 8,
+        save_prof: true,
+        skill_profs: [{ name: "Athletics", proficiency: 2 }],
+      },
+      {
+        name: "DEX",
         score: 10,
-        save_prof: true,
-        skill_profs: {
-          athletics: 0,
-        },
-      },
-      dex: {
-        score: 11,
         save_prof: false,
-        skill_profs: {
-          acrobatics: 0,
-          sleight_of_hand: 0,
-          stealth: 0,
-        },
+        skill_profs: [
+          { name: "Acrobatics", proficiency: 1 },
+          { name: "Sleight of Hand", proficiency: 0 },
+          { name: "Stealth", proficiency: 0 },
+        ],
       },
-      con: {
-        score: 12,
-        save_prof: true,
-        skill_profs: {},
-      },
-      int: {
+      { name: "CON", score: 12, save_prof: true, skill_profs: [] },
+      {
+        name: "INT",
         score: 13,
         save_prof: false,
-        skill_profs: {
-          arcana: 0,
-          history: 0,
-          investigation: 0,
-          nature: 0,
-          religion: 0,
-        },
+        skill_profs: [
+          { name: "Arcana", proficiency: 0 },
+          { name: "History", proficiency: 0 },
+          { name: "Investigation", proficiency: 0 },
+          { name: "Nature", proficiency: 0 },
+          { name: "Religion", proficiency: 0 },
+        ],
       },
-      wis: {
+      {
+        name: "WIS",
         score: 14,
         save_prof: false,
-        skill_profs: {
-          animal_handling: 0,
-          insight: 0,
-          medicine: 0,
-          perception: 0,
-          survival: 0,
-        },
+        skill_profs: [
+          { name: "Animal Handling", proficiency: 0 },
+          { name: "Insight", proficiency: 0 },
+          { name: "Medicine", proficiency: 0 },
+          { name: "Perception", proficiency: 0 },
+          { name: "Survival", proficiency: 0 },
+        ],
       },
-      cha: {
-        score: 15,
+      {
+        name: "CHA",
+        score: 16,
         save_prof: false,
-        skill_profs: {
-          deception: 0,
-          intimidation: 0,
-          performance: 0,
-          persuasion: 0,
-        },
+        skill_profs: [
+          { name: "Deception", proficiency: 0 },
+          { name: "Intimidation", proficiency: 0 },
+          { name: "Performance", proficiency: 1 },
+          { name: "Persuasion", proficiency: 2 },
+        ],
       },
-    },
+    ],
     passive_perception: 12,
 
     // Other profs
-    weapons: ["Weapon 1", "Weapon 2"],
-    armor: ["Armor 1", "Armor 2"],
-    tools: ["Tool 1", "Tool 2"],
+    weapon_profs: ["Weapon 1", "Weapon 2"],
+    armor_profs: ["Armor 1", "Armor 2"],
+    tool_profs: ["Tool 1", "Tool 2"],
     languages: ["Language 1", "Language 2"],
 
     // Backstory
@@ -128,8 +127,8 @@ const characters = [
 
     // Race (only include traits that don't fall elsewhere - e.g. don't include speed, do include darkvision)
     race: {
-      name: "Race",
-      subrace: "Subrace",
+      name: "Human",
+      subrace: null,
       traits: [
         { name: "Race trait 1", description: "Race trait 1 description" },
         { name: "Race trait 2", description: "Race trait 2 description" },
