@@ -6,7 +6,6 @@
   border: 1px solid black;
   padding-left: 0px;
 }
-
 .nav li {
   width: 50%;
   padding: 1rem;
@@ -14,11 +13,9 @@
   text-align: center;
   cursor: pointer;
 }
-
 .nav li:hover {
   background: lightgray;
 }
-
 .nav li.active {
   background: black;
   color: white;
@@ -35,6 +32,12 @@
   display: inline-block;
   margin: 0.5rem;
 }
+/* XP total */
+.xp-header {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+}
 /* Combat-related info for easy reference */
 .combat-header {
   display: flex;
@@ -42,9 +45,57 @@
   line-height: 50%;
 }
 
-/* Distinct tile w/in sheet */
-.char-sheet-tile {
+/* Distinct tiles w/in sheet */
+.grid-container * {
+  box-sizing: border-box;
+}
+.grid-tile {
   border: 1px solid black;
+  padding: 0.25rem;
+  margin: 0.25rem;
+  /* B/c of margin collapse */
+  margin-bottom: 0.5rem;
+}
+/* For spacing tiles horizontally */
+[class*="col-"] {
+  float: left;
+}
+/* Tile width in 12ths */
+.col-1 {
+  width: calc(100% / 12 * 1);
+}
+.col-2 {
+  width: calc(100% / 12 * 2);
+}
+.col-3 {
+  width: calc(100% / 12 * 3);
+}
+.col-4 {
+  width: calc(100% / 12 * 4);
+}
+.col-5 {
+  width: calc(100% / 12 * 5);
+}
+.col-6 {
+  width: calc(100% / 12 * 6);
+}
+.col-7 {
+  width: calc(100% / 12 * 7);
+}
+.col-8 {
+  width: calc(100% / 12 * 8);
+}
+.col-9 {
+  width: calc(100% / 12 * 9);
+}
+.col-10 {
+  width: calc(100% / 12 * 10);
+}
+.col-11 {
+  width: calc(100% / 12 * 11);
+}
+.col-12 {
+  width: calc(100% / 12 * 12);
 }
 
 /* Death save section */
@@ -57,7 +108,44 @@
   display: inline-block;
   margin-left: 1px;
 }
-
 .filled {
   background-color: black;
+}
+
+/* Speeds list (inside speeds tile) */
+.speeds {
+  display: flex;
+}
+.speeds p {
+  padding: 0rem 0.5rem;
+}
+
+/* Proficiency markers */
+.not-proficient {
+  height: 0.75rem;
+  width: 0.75rem;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid black;
+  display: inline-block;
+  margin-left: 1px;
+}
+.proficient {
+  height: 0.75rem;
+  width: 0.75rem;
+  background-color: black;
+  border-radius: 50%;
+  border: 1px solid black;
+  display: inline-block;
+  margin-left: 1px;
+}
+.expert {
+  height: 0.75rem;
+  width: 0.75rem;
+  background-color: black;
+  /* border-radius: 50%; */
+  border: 1px solid black;
+  display: inline-block;
+  margin-left: 1px;
+  transform: rotate(45deg);
 }

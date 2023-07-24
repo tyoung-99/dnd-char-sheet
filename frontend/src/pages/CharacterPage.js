@@ -37,10 +37,14 @@ const CharacterPage = () => {
         </p>
         <InlineClassListComp classes={character.classes} />
       </div>
+      <div className="xp-header">XP: {character.xp}</div>
       <div className="combat-header">
         <div>
           <p>AC: {character.armor_class}</p>
-          <p>Initiative: {character.initiative}</p>
+          <p>
+            Initiative:{" "}
+            {(character.initiative >= 0 ? "+" : "") + character.initiative}
+          </p>
         </div>
         <div>
           <p>Temp HP: {character.hp.temp}</p>
