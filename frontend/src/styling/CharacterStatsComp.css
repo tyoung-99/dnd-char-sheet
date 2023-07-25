@@ -1,0 +1,28 @@
+/* Proficiency markers */
+.not-proficient {
+  height: 0.75rem;
+  width: 0.75rem;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid black;
+  display: inline-block;
+  margin-left: 1px;
+}
+.proficient {
+  height: 0.75rem;
+  width: 0.75rem;
+  background-color: black;
+  border-radius: 50%;
+  border: 1px solid black;
+  display: inline-block;
+  margin-left: 1px;
+}
+.expert {
+  height: 0.75rem;
+  width: 0.75rem;
+  background-color: black;
+  border: 1px solid black;
+  display: inline-block;
+  margin-left: 1px;
+  transform: rotate(45deg);
+}

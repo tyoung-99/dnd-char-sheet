@@ -5,9 +5,12 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import TabNavComp from "../components/TabNavComp";
 import InlineClassListComp from "../components/InlineClassListComp";
-import CharacterStatsTab from "./page-tabs/CharacterStatsTab";
-import CharacterBackgroundTab from "./page-tabs/CharacterBackgroundTab";
 import TabContentComp from "../components/TabContentComp";
+import CharacterMainTab from "./page-tabs/CharacterMainTab";
+import CharacterBackgroundTab from "./page-tabs/CharacterBackgroundTab";
+import CharacterAbilitiesTab from "./page-tabs/CharacterAbilitiesTab";
+import CharacterInventoryTab from "./page-tabs/CharacterInventoryTab";
+import CharacterSpellcastingTab from "./page-tabs/CharacterSpellcastingTab";
 import DeathSavesComp from "../components/DeathSavesComp";
 import characters from "../sample-data/CharactersContentSample";
 
@@ -17,7 +20,7 @@ const CharacterPage = () => {
     (character) => character.id === parseInt(characterID)
   );
 
-  const [activeTab, setActiveTab] = useState("stats");
+  const [activeTab, setActiveTab] = useState("main");
 
   const currentHD = character.hit_dice.remaining.map(
     (die) => `${die.number}d${die.faces}`
@@ -59,8 +62,8 @@ const CharacterPage = () => {
       </div>
       <ul className="nav">
         <TabNavComp
-          id={"stats"}
-          tabName={"Stats"}
+          id={"main"}
+          tabName={"Main"}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />
@@ -70,13 +73,40 @@ const CharacterPage = () => {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />
+        <TabNavComp
+          id={"abilities"}
+          tabName={"Abilities"}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
+        <TabNavComp
+          id={"inventory"}
+          tabName={"Inventory"}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
+        <TabNavComp
+          id={"spellcasting"}
+          tabName={"Spellcasting"}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
       </ul>
       <div>
-        <TabContentComp id={"stats"} activeTab={activeTab}>
-          <CharacterStatsTab character={character} />
+        <TabContentComp id={"main"} activeTab={activeTab}>
+          <CharacterMainTab character={character} />
         </TabContentComp>
         <TabContentComp id={"background"} activeTab={activeTab}>
           <CharacterBackgroundTab character={character} />
+        </TabContentComp>
+        <TabContentComp id={"abilities"} activeTab={activeTab}>
+          <CharacterAbilitiesTab character={character} />
+        </TabContentComp>
+        <TabContentComp id={"inventory"} activeTab={activeTab}>
+          <CharacterInventoryTab character={character} />
+        </TabContentComp>
+        <TabContentComp id={"spellcasting"} activeTab={activeTab}>
+          <CharacterSpellcastingTab character={character} />
         </TabContentComp>
       </div>
     </div>

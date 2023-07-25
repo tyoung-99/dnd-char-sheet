@@ -2,7 +2,7 @@
 
 const CharacterBackgroundTab = ({ character }) => {
   return (
-    <div className="backstory">
+    <div>
       {character.backstory.map((paragraph, i) => (
         <p key={i}>{paragraph}</p>
       ))}

@@ -11,6 +11,5 @@
 }
 
 .character-list-item:hover {
-  color: darkblue;
-  border: 2px solid darkblue;
+  background-color: lightgray;
 }

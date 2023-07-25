@@ -54,7 +54,7 @@ const characters = [
     stats: [
       {
         name: "STR",
-        score: 8,
+        score: 18,
         save_prof: true,
         skill_profs: [{ name: "Athletics", proficiency: 2 }],
       },
@@ -83,7 +83,7 @@ const characters = [
       },
       {
         name: "WIS",
-        score: 14,
+        score: 6,
         save_prof: false,
         skill_profs: [
           { name: "Animal Handling", proficiency: 0 },
@@ -108,7 +108,7 @@ const characters = [
     passive_perception: 12,
 
     // Other profs
-    weapon_profs: ["Weapon 1", "Weapon 2"],
+    weapon_profs: ["Dagger", "Shortsword", "Light Crossbow"],
     armor_profs: ["Armor 1", "Armor 2"],
     tool_profs: ["Tool 1", "Tool 2"],
     languages: ["Language 1", "Language 2"],
@@ -160,21 +160,78 @@ const characters = [
         ],
       },
     ],
+    class_modifiers: {},
 
-    // Shared features
+    // General features
     spellcasting: {
-      caster_level: 2,
+      level: 2,
       slots_max: [3, 0, 0, 0, 0, 0, 0, 0, 0],
       slots_current: [1, 0, 0, 0, 0, 0, 0, 0, 0],
     },
     pact_magic: {
-      pact_level: 0,
+      level: 0,
       slots_max: [0, 0, 0, 0, 0],
       slots_current: [0, 0, 0, 0, 0],
     },
 
     // Equipment/gp
-    equipment: [],
+    equipment: [
+      { name: "Backpack", count: 1 },
+      { name: "Tinderbox", count: 1 },
+      {
+        name: "Longsword",
+        prof_required: ["Longsword"],
+        count: 1,
+        type: "weapon",
+        subtypes: ["Melee", "Martial"],
+        properties: ["Versatile (1d10)"],
+        damage: { dice: 1, sides: 8, type: "slashing" },
+        equipped: true,
+      },
+      {
+        name: "Shortsword",
+        prof_required: ["Shortsword"],
+        count: 3,
+        type: "weapon",
+        subtypes: ["Melee", "Martial"],
+        properties: ["Finesse", "Light"],
+        damage: { dice: 1, sides: 6, type: "piercing" },
+        equipped: true,
+      },
+      {
+        name: "Flame Tongue Shortsword",
+        prof_required: ["Shortsword"],
+        count: 1,
+        type: "weapon",
+        subtypes: ["Melee", "Martial"],
+        properties: ["Finesse", "Light"],
+        damage: { dice: 1, sides: 6, type: "piercing" },
+        equipped: true,
+        activated: true,
+        activation: { damage: { dice: 2, sides: 6, type: "fire" } },
+      },
+      {
+        name: "Light Crossbow",
+        prof_required: ["Light Crossbow"],
+        count: 1,
+        type: "weapon",
+        subtypes: ["Ranged", "Simple"],
+        properties: ["Ammunition (Range 80/320)", "Loading", "Two-Handed"],
+        damage: { dice: 1, sides: 8, type: "piercing" },
+        equipped: true,
+      },
+      {
+        name: "Sun Blade",
+        prof_required: ["Longsword", "Shortsword"],
+        count: 1,
+        type: "weapon",
+        subtypes: ["Melee", "Martial"],
+        properties: ["Versatile (1d10)"],
+        damage: { dice: 1, sides: 8, type: "slashing" },
+        equipped: true,
+        bonus: 2,
+      },
+    ],
     coins: { cp: 0, sp: 1, ep: 2, gp: 3, pp: 4 },
   },
 ];

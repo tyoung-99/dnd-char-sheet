@@ -45,20 +45,39 @@
   line-height: 50%;
 }
 
-/* Distinct tiles w/in sheet */
+/* Death save section */
+.death-save-marker {
+  height: 0.75rem;
+  width: 0.75rem;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid black;
+  display: inline-block;
+  margin-left: 1px;
+}
+.filled {
+  background-color: black;
+}
+
+/* Distinct tiles w/in sheet tabs (here so functionality can be used by multiple tabs) */
 .grid-container * {
   box-sizing: border-box;
 }
 .grid-tile {
   border: 1px solid black;
   padding: 0.25rem;
+  padding-left: 1rem;
   margin: 0.25rem;
   /* B/c of margin collapse */
   margin-bottom: 0.5rem;
 }
-/* For spacing tiles horizontally */
-[class*="col-"] {
-  float: left;
+.grid-tile h1 {
+  font-weight: bold;
+  font-size: 1rem;
+}
+.grid-tile h2 {
+  font-weight: bold;
+  font-size: 0.75rem;
 }
 /* Tile width in 12ths */
 .col-1 {
@@ -96,56 +115,4 @@
 }
 .col-12 {
   width: calc(100% / 12 * 12);
-}
-
-/* Death save section */
-.death-save-marker {
-  height: 0.75rem;
-  width: 0.75rem;
-  background-color: white;
-  border-radius: 50%;
-  border: 1px solid black;
-  display: inline-block;
-  margin-left: 1px;
-}
-.filled {
-  background-color: black;
-}
-
-/* Speeds list (inside speeds tile) */
-.speeds {
-  display: flex;
-}
-.speeds p {
-  padding: 0rem 0.5rem;
-}
-
-/* Proficiency markers */
-.not-proficient {
-  height: 0.75rem;
-  width: 0.75rem;
-  background-color: white;
-  border-radius: 50%;
-  border: 1px solid black;
-  display: inline-block;
-  margin-left: 1px;
-}
-.proficient {
-  height: 0.75rem;
-  width: 0.75rem;
-  background-color: black;
-  border-radius: 50%;
-  border: 1px solid black;
-  display: inline-block;
-  margin-left: 1px;
-}
-.expert {
-  height: 0.75rem;
-  width: 0.75rem;
-  background-color: black;
-  /* border-radius: 50%; */
-  border: 1px solid black;
-  display: inline-block;
-  margin-left: 1px;
-  transform: rotate(45deg);
 }
