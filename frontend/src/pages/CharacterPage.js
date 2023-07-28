@@ -1,8 +1,9 @@
 // Full character sheet
 
 import "../styling/CharacterPage.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import axios from "axios";
 import TabNavComp from "../components/TabNavComp";
 import InlineClassListComp from "../components/InlineClassListComp";
 import TabContentComp from "../components/TabContentComp";
@@ -12,16 +13,26 @@ import CharacterAbilitiesTab from "./page-tabs/CharacterAbilitiesTab";
 import CharacterInventoryTab from "./page-tabs/CharacterInventoryTab";
 import CharacterSpellcastingTab from "./page-tabs/CharacterSpellcastingTab";
 import DeathSavesComp from "../components/DeathSavesComp";
-import characters from "../sample-data/CharactersContentSample";
 
 const CharacterPage = () => {
   const { characterID } = useParams();
-  const character = characters.find(
-    (character) => character.id === parseInt(characterID)
-  );
+  const [character, setCharacter] = useState();
+
+  useEffect(() => {
+    const loadCharacter = async () => {
+      const response = await axios.get(`/api/characters/${characterID}`);
+
+      setCharacter(response.data);
+    };
+
+    loadCharacter();
+  }, [characterID]);
 
   const [activeTab, setActiveTab] = useState("main");
 
+  if (!character) {
+    return <div>Loading...</div>;
+  }
   const currentHD = character.hit_dice.remaining.map(
     (die) => `${die.number}d${die.faces}`
   );
