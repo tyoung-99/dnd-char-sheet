@@ -1,13 +1,29 @@
 import "../styling/CharacterListPage.css";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import CharacterListComp from "../components/CharacterListComp";
-import characters from "../sample-data/CharactersContentSample";
 
 // Show user preliminary details about their characters
 const CharacterListPage = () => {
+  const [charList, setCharList] = useState([]);
+
+  useEffect(() => {
+    const loadCharList = async () => {
+      const response = await axios.get("/api/characters");
+      setCharList(response.data);
+    };
+
+    loadCharList();
+  }, []);
+
+  if (!charList) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <h1>Characters</h1>
-      <CharacterListComp characters={characters} />
+      <CharacterListComp characters={charList} />
     </>
   );
 };
