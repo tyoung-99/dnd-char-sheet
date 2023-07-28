@@ -1,6 +1,7 @@
 Next Steps
 
 1. Frontend only, display chars from hardcoded file
+   Very rudimentary - done
 2. Add backend, hardcoded file, allow editing/adding/removing sections
 3. Add db, remove hardcoding
 
