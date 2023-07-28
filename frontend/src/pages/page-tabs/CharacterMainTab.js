@@ -1,6 +1,6 @@
 // Character's stats/general combat abilities
 import CharacterStatsComp from "../../components/CharacterStatsComp";
-import CharacterWeaponsComp from "../../components/CharacterWeaponsComp";
+import CharacterQuickItemsComp from "../../components/CharacterQuickItemsComp";
 
 const CharacterMainTab = ({ character }) => {
   return (
@@ -9,7 +9,7 @@ const CharacterMainTab = ({ character }) => {
         <CharacterStatsComp character={character} />
       </div>
       <div className="col-6">
-        <CharacterWeaponsComp character={character} />
+        <CharacterQuickItemsComp character={character} />
       </div>
     </div>
   );
