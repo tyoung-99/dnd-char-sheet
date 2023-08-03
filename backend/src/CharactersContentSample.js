@@ -5,7 +5,7 @@ const characters = [
     name: "Character Name",
     player: "Player Name",
     alignment: "Lawful Good",
-    xp: "XP",
+    xp: "160",
     inspiration: false,
 
     // Combat stats
@@ -54,12 +54,14 @@ const characters = [
     stats: [
       {
         name: "STR",
+        name_long: "Strength",
         score: 18,
         save_prof: true,
         skill_profs: [{ name: "Athletics", proficiency: 2 }],
       },
       {
         name: "DEX",
+        name_long: "Dexterity",
         score: 10,
         save_prof: false,
         skill_profs: [
@@ -68,9 +70,16 @@ const characters = [
           { name: "Stealth", proficiency: 0 },
         ],
       },
-      { name: "CON", score: 12, save_prof: true, skill_profs: [] },
+      {
+        name: "CON",
+        name_long: "Constitution",
+        score: 12,
+        save_prof: true,
+        skill_profs: [],
+      },
       {
         name: "INT",
+        name_long: "Intelligence",
         score: 13,
         save_prof: false,
         skill_profs: [
@@ -83,6 +92,7 @@ const characters = [
       },
       {
         name: "WIS",
+        name_long: "Wisdom",
         score: 6,
         save_prof: false,
         skill_profs: [
@@ -95,6 +105,7 @@ const characters = [
       },
       {
         name: "CHA",
+        name_long: "Charisma",
         score: 16,
         save_prof: false,
         skill_profs: [

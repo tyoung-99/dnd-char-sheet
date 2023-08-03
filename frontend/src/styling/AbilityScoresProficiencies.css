@@ -1,0 +1,27 @@
+p {
+  margin: 0.5rem 0rem;
+}
+
+/* Column for ability scores/related proficiencies */
+.ability-column {
+  height: 100%;
+}
+
+/* Input boxes for ability scores */
+.ability-input {
+  width: 2em;
+}
+/* Line containing input box */
+.ability-line {
+  justify-content: center;
+}
+
+/* Div holding input button for skill profs */
+.skill-button-div {
+  justify-content: center;
+}
+
+/* Placeholder at bottom of other profs lists */
+.placeholder-textbox {
+  visibility: hidden;
+}
