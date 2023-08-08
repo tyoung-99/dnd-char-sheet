@@ -4,8 +4,8 @@ const InlineClassListComp = ({ classes }) => {
   return (
     <p>
       {classes.map((charClass, i) => (
-        <span key={charClass.className}>
-          {charClass.className} {charClass.classLevel}
+        <span key={charClass.class_name}>
+          {charClass.class_name} {charClass.class_level}
           {i === classes.length - 1 ? null : "/"}
         </span>
       ))}

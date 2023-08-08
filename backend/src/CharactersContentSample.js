@@ -149,8 +149,8 @@ const characters = [
     // Class(es)
     classes: [
       {
-        className: "Fighter",
-        classLevel: 3,
+        class_name: "Fighter",
+        class_level: 3,
         features: [
           {
             name: "Fighter trait 1",
@@ -163,8 +163,8 @@ const characters = [
         ],
       },
       {
-        className: "Wizard",
-        classLevel: 2,
+        class_name: "Wizard",
+        class_level: 2,
         features: [
           { name: "Wizard trait 1", description: "Wizard trait 1 description" },
           { name: "Wizard trait 2", description: "Wizard trait 2 description" },
