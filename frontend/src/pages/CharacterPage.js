@@ -12,10 +12,13 @@ import useCharacter from "../hooks/useCharacter";
 const CharacterPage = () => {
   const { characterID } = useParams();
   const [character, setCharacter] = useState();
-  const { editing, toggleEditing, saveCharacter } = useCharacter({
-    character,
-    setCharacter,
-  });
+  const {
+    editing,
+    toggleEditing,
+    updateCharacter,
+    saveCharacter,
+    savePending,
+  } = useCharacter(character, setCharacter);
 
   useEffect(() => {
     const loadCharacter = async () => {
@@ -25,6 +28,12 @@ const CharacterPage = () => {
 
     loadCharacter();
   }, [characterID, setCharacter]);
+
+  const [prompt, setPrompt] = useState(0);
+
+  const promptHeader = () => {
+    setPrompt(prompt + 1);
+  };
 
   if (!character) {
     return <div>Loading...</div>;
@@ -39,20 +48,24 @@ const CharacterPage = () => {
         <button onClick={toggleEditing}>
           {editing ? "View Character" : "Edit Character"}
         </button>
+        {savePending ? <button onClick={saveCharacter}>Save</button> : null}
       </div>
       <div className="name-header">
         <h1>{character.name}</h1>
-        <p>{character.alignment}</p>
-        <p>
-          {character.race.name}{" "}
-          {character.race.subrace !== null ? `(${character.race.subrace})` : ""}
-        </p>
+        {character.alignment ? <p>{character.alignment} </p> : null}
+        {character.race.name ? (
+          <p>
+            {character.race.name}{" "}
+            {character.race.subrace ? `(${character.race.subrace}) ` : ""}
+          </p>
+        ) : null}
         <InlineClassListComp classes={character.classes} />
       </div>
       {editing ? (
         <CharacterPageEdit
           character={character}
-          saveCharacter={saveCharacter}
+          updateCharacter={updateCharacter}
+          promptHeader={promptHeader}
         />
       ) : (
         <CharacterPagePlay character={character} />

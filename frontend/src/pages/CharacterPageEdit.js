@@ -1,5 +1,4 @@
 // Version of sheet for editing stats, abilities, level, etc.
-import "../styling/CharacterPageEdit.css";
 import { useState } from "react";
 import TabNavComp from "../components/TabNavComp";
 import TabContentComp from "../components/TabContentComp";
@@ -8,7 +7,7 @@ import AbilityScoresProficienciesTab from "./page-tabs/edit/AbilityScoresProfici
 import ClassTab from "./page-tabs/edit/Class";
 import FeatsTab from "./page-tabs/edit/Feats";
 
-const CharacterPageEdit = ({ character, saveCharacter }) => {
+const CharacterPageEdit = ({ character, updateCharacter, promptHeader }) => {
   const [activeTab, setActiveTab] = useState("general");
 
   return (
@@ -41,7 +40,11 @@ const CharacterPageEdit = ({ character, saveCharacter }) => {
       </ul>
       <div>
         <TabContentComp id={"general"} activeTab={activeTab}>
-          <GeneralTab character={character} />
+          <GeneralTab
+            character={character}
+            updateCharacter={updateCharacter}
+            promptHeader={promptHeader}
+          />
         </TabContentComp>
         <TabContentComp
           id={"ability-scores-proficiencies"}
@@ -49,7 +52,7 @@ const CharacterPageEdit = ({ character, saveCharacter }) => {
         >
           <AbilityScoresProficienciesTab
             character={character}
-            saveCharacter={saveCharacter}
+            updateCharacter={updateCharacter}
           />
         </TabContentComp>
         <TabContentComp id={"class"} activeTab={activeTab}>

@@ -4,7 +4,8 @@ const characters = [
     id: 1,
     name: "Character Name",
     player: "Player Name",
-    alignment: "Lawful Good",
+    alignment: null,
+    // "Lawful Good",
     xp: "160",
     inspiration: false,
 
@@ -119,7 +120,16 @@ const characters = [
     passive_perception: 12,
 
     // Other profs
-    weapon_profs: ["Dagger", "Shortsword", "Light Crossbow"],
+    weapon_profs: [
+      "Dagger",
+      "Shortsword",
+      "Light Crossbow",
+      "Weapon 1",
+      "Weapon 2",
+      "Weapon 3",
+      "Weapon 4",
+      "Weapon 5",
+    ],
     armor_profs: ["Armor 1", "Armor 2"],
     tool_profs: ["Tool 1", "Tool 2"],
     languages: ["Language 1", "Language 2"],
@@ -127,7 +137,8 @@ const characters = [
     // Backstory
     backstory: [`Backstory`, `multiple`, `paragraphs`],
     background: {
-      name: "Background",
+      name: null,
+      // "Background 1",
       feature: "Feature",
       trait_1: "Trait 1",
       trait_2: "Trait 2",
@@ -138,7 +149,8 @@ const characters = [
 
     // Race (only include traits that don't fall elsewhere - e.g. don't include speed, do include darkvision)
     race: {
-      name: "Human",
+      name: null,
+      // "Human",
       subrace: null,
       traits: [
         { name: "Race trait 1", description: "Race trait 1 description" },

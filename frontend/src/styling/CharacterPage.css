@@ -38,8 +38,7 @@
 }
 .grid-tile {
   border: 1px solid black;
-  padding: 0.25rem;
-  padding-left: 1rem;
+  padding: 0.25rem 1rem;
   margin: 0.25rem;
   /* B/c of margin collapse */
   margin-bottom: 0.5rem;

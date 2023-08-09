@@ -1,7 +1,14 @@
 // Tab w/in a page, toggles on if clicked
 
-const TabNavComp = ({ id, tabName, activeTab, setActiveTab }) => {
+const TabNavComp = ({
+  id,
+  tabName,
+  activeTab,
+  setActiveTab,
+  callback = () => {},
+}) => {
   const handleClick = () => {
+    callback();
     setActiveTab(id);
   };
 

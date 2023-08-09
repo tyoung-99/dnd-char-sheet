@@ -1,27 +1,21 @@
 // Character's ability scores and proficiencies
 import "../../../styling/AbilityScoresProficiencies.css";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-const AbilityScoresProficiencies = ({ character, saveCharacter }) => {
-  // Save occurs here to ensure useStates took effect
-  useEffect(() => {
-    saveCharacter();
-  });
-
+const AbilityScoresProficiencies = ({ character, updateCharacter }) => {
   // Ability scores/modifiers
-  const defaultModifiers = {};
+  const defaultScores = {};
   character.stats.forEach((ability) => {
-    defaultModifiers[ability.name] = Math.floor((ability.score - 10) / 2);
+    defaultScores[ability.name] = ability.score;
   });
 
-  const [abilityModifiers, setAbilityModifiers] = useState(defaultModifiers);
+  const [abilityScores, setAbilityScores] = useState(defaultScores);
 
-  const updateModifiers = (event) => {
-    const newModifiers = { ...abilityModifiers };
-    newModifiers[event.target.getAttribute("data-ability")] = Math.floor(
-      (event.target.value - 10) / 2
-    );
-    setAbilityModifiers(newModifiers);
+  const updateScores = (event) => {
+    const newScores = { ...abilityScores };
+    newScores[event.target.getAttribute("data-ability")] = event.target.value;
+    setAbilityScores(newScores);
+    updateCharacter({ ability_scores: newScores });
   };
 
   // Skill proficiencies
@@ -44,6 +38,7 @@ const AbilityScoresProficiencies = ({ character, saveCharacter }) => {
     }
 
     setSkillProfs(newSkills);
+    updateCharacter({ skill_profs: newSkills });
   };
 
   // HTML for ability scores/modifiers, skill profs
@@ -61,42 +56,40 @@ const AbilityScoresProficiencies = ({ character, saveCharacter }) => {
                   type="text"
                   name={ability.name}
                   defaultValue={ability.score}
-                  data-section={"stats"}
-                  data-type={"score"}
                   data-ability={ability.name}
-                  onChange={updateModifiers}
+                  onChange={updateScores}
                 ></input>
               </div>
             </div>
             <div className="col-6 col-flex">
               <p>
-                Modifier: {abilityModifiers[ability.name] >= 0 ? "+" : ""}
-                {abilityModifiers[ability.name]}
+                Modifier:{" "}
+                {Math.floor((abilityScores[ability.name] - 10) / 2) >= 0
+                  ? "+"
+                  : ""}
+                {Math.floor((abilityScores[ability.name] - 10) / 2)}
               </p>
             </div>
           </div>
           {ability.skill_profs.length === 0 ? null : (
             <div className="grid-container row-flex">
-              <div className="col-12 col-flex">
-                <div className="grid-container row-flex">
+              <ul className="col-12 col-flex">
+                <li className="grid-container row-flex">
                   <div className="col-8 col-flex">
                     <h2>Skill</h2>
                   </div>
                   <div className="col-4 col-flex">
                     <h2>Proficiency</h2>
                   </div>
-                </div>
+                </li>
                 {ability.skill_profs.map((skill) => (
-                  <div className="grid-container row-flex" key={skill.name}>
+                  <li className="grid-container row-flex" key={skill.name}>
                     <div className="col-8 col-flex">
                       <p>{skill.name}</p>
                     </div>
-                    <div className="col-4 col-flex skill-button-div">
+                    <div className="col-4 col-flex">
                       <input
                         type="button"
-                        data-section={"stats"}
-                        data-type={"skill"}
-                        data-ability={ability.name}
                         data-skill={skill.name}
                         value={
                           skillProfs[skill.name] === 0
@@ -108,9 +101,9 @@ const AbilityScoresProficiencies = ({ character, saveCharacter }) => {
                         onClick={updateSkills}
                       ></input>
                     </div>
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           )}
         </div>
@@ -124,148 +117,285 @@ const AbilityScoresProficiencies = ({ character, saveCharacter }) => {
   const [toolProfs, setToolProfs] = useState(character.tool_profs);
   const [languages, setLanguages] = useState(character.languages);
 
-  const [timer, setTimer] = useState(null);
+  const updateOtherProfs = (event, type) => {
+    let newProfs;
+    switch (type) {
+      case "weapon":
+        newProfs = [...weaponProfs];
+        break;
+      case "armor":
+        newProfs = [...armorProfs];
+        break;
+      case "tool":
+        newProfs = [...toolProfs];
+        break;
+      case "language":
+        newProfs = [...languages];
+        break;
+      default:
+        return;
+    }
 
-  const updateWeapons = (event) => {
-    // Only updates 500 ms after user finishes typing
-    clearTimeout(timer);
-    const newTimer = setTimeout(
-      (event) => {
-        const newWeaponProfs = [...weaponProfs];
-        const weaponField = event.target;
-        const updatedIndex = newWeaponProfs.findIndex(
-          (weapon) => weapon === weaponField.defaultValue
-        );
-        const newWeapon = weaponField.value;
+    const inputField = event.target;
+    const updatedIndex = inputField.id;
+    const newProf = inputField.value;
 
-        if (updatedIndex >= 0) {
-          newWeaponProfs[updatedIndex] = newWeapon;
-          console.log(weaponField.defaultValue);
-        }
+    newProfs[updatedIndex] = newProf;
 
-        setWeaponProfs(newWeaponProfs);
-        console.log(newWeaponProfs);
-      },
-      500,
-      event
-    );
-    setTimer(newTimer);
+    switch (type) {
+      case "weapon":
+        setWeaponProfs(newProfs);
+        updateCharacter({ weapon_profs: newProfs });
+        break;
+      case "armor":
+        setArmorProfs(newProfs);
+        updateCharacter({ armor_profs: newProfs });
+        break;
+      case "tool":
+        setToolProfs(newProfs);
+        updateCharacter({ tool_profs: newProfs });
+        break;
+      case "language":
+        setLanguages(newProfs);
+        updateCharacter({ languages: newProfs });
+        break;
+      default:
+        break;
+    }
   };
 
-  const addWeapon = () => {
-    const newWeaponProfs = [...weaponProfs];
-    newWeaponProfs.push("");
-    setWeaponProfs(newWeaponProfs);
+  const addOtherProf = (type) => {
+    let newProfs;
+    switch (type) {
+      case "weapon":
+        newProfs = [...weaponProfs];
+        newProfs.push("");
+        setWeaponProfs(newProfs);
+        updateCharacter({ weapon_profs: newProfs });
+        break;
+      case "armor":
+        newProfs = [...armorProfs];
+        newProfs.push("");
+        setArmorProfs(newProfs);
+        updateCharacter({ armor_profs: newProfs });
+        break;
+      case "tool":
+        newProfs = [...toolProfs];
+        newProfs.push("");
+        setToolProfs(newProfs);
+        updateCharacter({ tool_profs: newProfs });
+        break;
+      case "language":
+        newProfs = [...languages];
+        newProfs.push("");
+        setLanguages(newProfs);
+        updateCharacter({ languages: newProfs });
+        break;
+      default:
+        return;
+    }
   };
 
-  const removeWeapon = () => {
-    console.log("remove");
-  };
-
-  const updateArmor = () => {
-    console.log("armor");
-  };
-
-  const updateTools = () => {
-    console.log("tools");
-  };
-
-  const updateLanguages = () => {
-    console.log("languages");
+  const removeOtherProf = (event, type) => {
+    let newProfs;
+    const removedIndex = event.target.id;
+    switch (type) {
+      case "weapon":
+        newProfs = [...weaponProfs];
+        newProfs.splice(removedIndex, 1);
+        setWeaponProfs(newProfs);
+        updateCharacter({ weapon_profs: newProfs });
+        break;
+      case "armor":
+        newProfs = [...armorProfs];
+        newProfs.splice(removedIndex, 1);
+        setArmorProfs(newProfs);
+        updateCharacter({ armor_profs: newProfs });
+        break;
+      case "tool":
+        newProfs = [...toolProfs];
+        newProfs.splice(removedIndex, 1);
+        setToolProfs(newProfs);
+        updateCharacter({ tool_profs: newProfs });
+        break;
+      case "language":
+        newProfs = [...languages];
+        newProfs.splice(removedIndex, 1);
+        setLanguages(newProfs);
+        updateCharacter({ languages: newProfs });
+        break;
+      default:
+        return;
+    }
   };
 
   const otherProfsSection = (
-    <div className="grid-tile">
+    <div className="grid-tile other-profs">
       <h1>Other Proficiencies</h1>
       <div className="grid-container row-flex">
         <div className="col-3 col-flex">
-          <div className="grid-tile borderless">
-            <h2>Weapons</h2>
-            {weaponProfs.map((weapon, i) => (
-              <div key={i}>
-                <input
-                  type="text"
-                  defaultValue={weapon}
-                  data-section={"other-profs"}
-                  data-type={"weapon-prof"}
-                  data-weapon={weapon}
-                  onChange={updateWeapons}
-                ></input>
-                <button onClick={removeWeapon}>x</button>
-              </div>
-            ))}
-            <input type="text" className="placeholder-textbox"></input>
-            <button onClick={addWeapon}>+</button>
-          </div>
+          <ul className="grid-tile borderless">
+            <li>
+              <h2>Weapons</h2>
+            </li>
+            {weaponProfs.map((weapon, i) => {
+              return (
+                <li key={i}>
+                  <input
+                    className="col-11"
+                    type="text"
+                    id={i}
+                    value={weapon}
+                    onChange={(event) => {
+                      updateOtherProfs(event, "weapon");
+                    }}
+                  ></input>
+                  <button
+                    className="col-1"
+                    id={i}
+                    onClick={(event) => {
+                      removeOtherProf(event, "weapon");
+                    }}
+                  >
+                    x
+                  </button>
+                </li>
+              );
+            })}
+            <li>
+              <button
+                className="col-12"
+                onClick={() => {
+                  addOtherProf("weapon");
+                }}
+              >
+                +
+              </button>
+            </li>
+          </ul>
         </div>
         <div className="col-3 col-flex">
-          <div className="grid-tile borderless">
-            <h2>Armor</h2>
-            {armorProfs.map((armor) => (
-              <input
-                key={armor}
-                type="text"
-                defaultValue={armor}
-                data-section={"other-profs"}
-                data-type={"armor-prof"}
-                data-armor={armor}
-                onChange={updateArmor}
-              ></input>
-            ))}
-            <input
-              type="text"
-              placeholder="Add Armor"
-              data-section={"other-profs"}
-              data-type={"armor-prof"}
-              onChange={updateArmor}
-            ></input>
-          </div>
+          <ul className="grid-tile borderless">
+            <li>
+              <h2>Armor</h2>
+            </li>
+            {armorProfs.map((armor, i) => {
+              return (
+                <li key={i}>
+                  <input
+                    className="col-11"
+                    type="text"
+                    id={i}
+                    value={armor}
+                    onChange={(event) => {
+                      updateOtherProfs(event, "armor");
+                    }}
+                  ></input>
+                  <button
+                    className="col-1"
+                    id={i}
+                    onClick={(event) => {
+                      removeOtherProf(event, "armor");
+                    }}
+                  >
+                    x
+                  </button>
+                </li>
+              );
+            })}
+            <li>
+              <button
+                className="col-12"
+                onClick={() => {
+                  addOtherProf("armor");
+                }}
+              >
+                +
+              </button>
+            </li>
+          </ul>
         </div>
         <div className="col-3 col-flex">
-          <div className="grid-tile borderless">
-            <h2>Tools</h2>
-            {toolProfs.map((tool) => (
-              <input
-                key={tool}
-                type="text"
-                defaultValue={tool}
-                data-section={"other-profs"}
-                data-type={"tool-prof"}
-                data-tool={tool}
-                onChange={updateTools}
-              ></input>
-            ))}
-            <input
-              type="text"
-              placeholder="Add Tool"
-              data-section={"other-profs"}
-              data-type={"tool-prof"}
-              onChange={updateTools}
-            ></input>
-          </div>
+          <ul className="grid-tile borderless">
+            <li>
+              <h2>Tools</h2>
+            </li>
+            {toolProfs.map((tool, i) => {
+              return (
+                <li key={i}>
+                  <input
+                    className="col-11"
+                    type="text"
+                    id={i}
+                    value={tool}
+                    onChange={(event) => {
+                      updateOtherProfs(event, "tool");
+                    }}
+                  ></input>
+                  <button
+                    className="col-1"
+                    id={i}
+                    onClick={(event) => {
+                      removeOtherProf(event, "tool");
+                    }}
+                  >
+                    x
+                  </button>
+                </li>
+              );
+            })}
+            <li>
+              <button
+                className="col-12"
+                onClick={() => {
+                  addOtherProf("tool");
+                }}
+              >
+                +
+              </button>
+            </li>
+          </ul>
         </div>
         <div className="col-3 col-flex">
-          <div className="grid-tile borderless">
-            <h2>Languages</h2>
-            {languages.map((language) => (
-              <input
-                key={language}
-                type="text"
-                defaultValue={language}
-                data-section={"other-profs"}
-                data-type={"language"}
-                data-language={language}
-                onChange={updateLanguages}
-              ></input>
-            ))}
-            <input
-              type="text"
-              placeholder="Add Language"
-              data-section={"other-profs"}
-              data-type={"language"}
-              onChange={updateLanguages}
-            ></input>
-          </div>
+          <ul className="grid-tile borderless">
+            <li>
+              <h2>Languages</h2>
+            </li>
+            {languages.map((language, i) => {
+              return (
+                <li key={i}>
+                  <input
+                    className="col-11"
+                    type="text"
+                    id={i}
+                    value={language}
+                    onChange={(event) => {
+                      updateOtherProfs(event, "language");
+                    }}
+                  ></input>
+                  <button
+                    className="col-1"
+                    id={i}
+                    onClick={(event) => {
+                      removeOtherProf(event, "language");
+                    }}
+                  >
+                    x
+                  </button>
+                </li>
+              );
+            })}
+            <li>
+              <button
+                className="col-12"
+                onClick={() => {
+                  addOtherProf("language");
+                }}
+              >
+                +
+              </button>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
