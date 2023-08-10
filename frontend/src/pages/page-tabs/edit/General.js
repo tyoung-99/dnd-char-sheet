@@ -1,4 +1,5 @@
 // General character info, such as name, alignment, race, background, plus all associated features
+import "../../../styling/General.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -17,10 +18,49 @@ const General = ({ character, updateCharacter, promptHeader }) => {
   const backgroundList = ["Background 1", "Background 2", "Background 3"];
 
   const [raceData, setRaceData] = useState();
-  const [raceDisplays, setRaceDisplays] = useState();
+  const [raceDropdownOptions, setRaceDropdownOptions] = useState();
 
-  const [race, setRace] = useState(character.race.name);
-  const [subrace, setSubrace] = useState(character.race.subrace);
+  let selectedRace = {
+    nameIndex: -1,
+    srcIndex: -1,
+    subrace: {
+      nameIndex: -1,
+      srcIndex: -1,
+    },
+  };
+
+  if (raceDropdownOptions && character.race.name) {
+    selectedRace.nameIndex = raceDropdownOptions.findIndex(
+      (checkRace) => checkRace.name === character.race.name
+    );
+
+    if (character.race.source) {
+      selectedRace.srcIndex = raceDropdownOptions[
+        selectedRace.nameIndex
+      ].sources.findIndex(
+        (checkSource) => checkSource.name === character.race.source
+      );
+
+      if (character.race.subrace.name) {
+        selectedRace.subrace.nameIndex = raceDropdownOptions[
+          selectedRace.nameIndex
+        ].sources[selectedRace.srcIndex].subraces.findIndex(
+          (checkSubrace) => checkSubrace.name === character.race.subrace.name
+        );
+
+        if (character.race.subrace.source) {
+          selectedRace.subrace.srcIndex = raceDropdownOptions[
+            selectedRace.nameIndex
+          ].sources[selectedRace.srcIndex].subraces[
+            selectedRace.subrace.nameIndex
+          ].sources.findIndex(
+            (checkSource) =>
+              checkSource.source === character.race.subrace.source
+          );
+        }
+      }
+    }
+  }
 
   useEffect(() => {
     const loadData = async () => {
@@ -29,100 +69,260 @@ const General = ({ character, updateCharacter, promptHeader }) => {
       const races = newRaceData.data.race;
       const subraces = newRaceData.data.subrace;
 
-      const newDisplayData = [];
+      const newDropdownOptions = [];
 
       races.forEach((race) => {
         if (race.traitTags && race.traitTags.includes("NPC Race")) {
           return;
         }
 
-        const index = newDisplayData.findIndex(
+        const index = newDropdownOptions.findIndex(
           (element) => element.name === race.name
         );
         if (index < 0) {
-          newDisplayData.push({
+          newDropdownOptions.push({
             name: race.name,
-            source: [race.source],
-            subrace: [],
+            sources: [{ name: race.source, subraces: [] }],
           });
         } else {
-          newDisplayData[index].source.push(race.source);
+          newDropdownOptions[index].sources.push({
+            name: race.source,
+            subraces: [],
+          });
         }
       });
 
       subraces.forEach((subrace) => {
-        const raceIndex = newDisplayData.findIndex(
+        const raceIndex = newDropdownOptions.findIndex(
           (element) => element.name === subrace.raceName
         );
-        const subraceIndex = newDisplayData[raceIndex].subrace.findIndex(
-          (element) => element.name === subrace.name
+        const raceSrcIndex = newDropdownOptions[raceIndex].sources.findIndex(
+          (element) => element.name === subrace.raceSource
         );
+        const subraceIndex = newDropdownOptions[raceIndex].sources[
+          raceSrcIndex
+        ].subraces.findIndex((element) => element.name === subrace.name);
 
         if (subraceIndex < 0) {
-          newDisplayData[raceIndex].subrace.push({
-            name: subrace.name,
-            source: [subrace.source],
+          newDropdownOptions[raceIndex].sources[raceSrcIndex].subraces.push({
+            name: subrace.name ? subrace.name : "None",
+            sources: [subrace.source],
           });
         } else {
-          newDisplayData[raceIndex].subrace[subraceIndex].source.push(
-            subrace.source
-          );
+          newDropdownOptions[raceIndex].sources[raceSrcIndex].subraces[
+            subraceIndex
+          ].sources.push(subrace.source);
         }
       });
 
       setRaceData(newRaceData);
-      setRaceDisplays(newDisplayData);
+      setRaceDropdownOptions(newDropdownOptions);
     };
     loadData();
   }, []);
 
   const updateRace = (event) => {
-    setRace(event.target.value);
-    promptHeader();
-    updateCharacter({ race: { name: event.target.value } });
-  };
+    let selection = event.target.value;
+    const newRace = { ...selectedRace };
+    switch (event.target.name) {
+      case "race-dropdown":
+        newRace.nameIndex = raceDropdownOptions.findIndex(
+          (checkRace) => checkRace.name === selection
+        );
 
-  let subraceList = [];
-  if (race && raceDisplays) {
-    subraceList =
-      raceDisplays[raceDisplays.findIndex((element) => element.name === race)]
-        .subrace;
-  }
+        if (raceDropdownOptions[newRace.nameIndex].sources.length === 1) {
+          newRace.srcIndex = 0;
+        } else {
+          newRace.srcIndex = -1;
+        }
+
+        newRace.subrace = { nameIndex: -1, srcIndex: -1 };
+        break;
+
+      case "race-src-dropdown":
+        newRace.srcIndex = raceDropdownOptions[
+          newRace.nameIndex
+        ].sources.findIndex((checkSrc) => checkSrc.name === selection);
+        newRace.subrace = { nameIndex: -1, srcIndex: -1 };
+        break;
+
+      case "subrace-dropdown":
+        newRace.subrace.nameIndex = raceDropdownOptions[
+          newRace.nameIndex
+        ].sources[newRace.srcIndex].subraces.findIndex((checkSubrace) => {
+          return (
+            checkSubrace.name === selection ||
+            (!checkSubrace.name && selection === "None")
+          );
+        });
+
+        if (
+          raceDropdownOptions[newRace.nameIndex].sources[newRace.srcIndex]
+            .subraces[newRace.subrace.nameIndex].sources.length === 1
+        ) {
+          newRace.subrace.srcIndex = 0;
+        } else {
+          newRace.subrace.srcIndex = -1;
+        }
+        break;
+
+      case "subrace-src-dropdown":
+        newRace.subrace.srcIndex = raceDropdownOptions[
+          newRace.nameIndex
+        ].sources[newRace.srcIndex].subraces[
+          newRace.subrace.nameIndex
+        ].sources.findIndex((checkSrc) => {
+          return checkSrc === selection;
+        });
+        break;
+
+      default:
+        return;
+    }
+
+    let charUpdate = {
+      race: {
+        name: raceDropdownOptions[newRace.nameIndex].name,
+        source: null,
+        subrace: { name: null, source: null },
+      },
+    };
+
+    if (newRace.srcIndex >= 0) {
+      charUpdate.race.source =
+        raceDropdownOptions[newRace.nameIndex].sources[newRace.srcIndex].name;
+
+      if (newRace.subrace.nameIndex >= 0) {
+        charUpdate.race.subrace.name =
+          raceDropdownOptions[newRace.nameIndex].sources[
+            newRace.srcIndex
+          ].subraces[newRace.subrace.nameIndex].name;
+
+        if (newRace.subrace.srcIndex >= 0) {
+          charUpdate.race.subrace.source =
+            raceDropdownOptions[newRace.nameIndex].sources[
+              newRace.srcIndex
+            ].subraces[newRace.subrace.nameIndex].sources[
+              newRace.subrace.srcIndex
+            ];
+        }
+      }
+    }
+
+    updateCharacter(charUpdate);
+    promptHeader();
+  };
 
   const raceSection = (
     <div className="grid-tile">
       <h1>Race</h1>
-      <select
-        defaultValue={character.race.name ? character.race.name : "Select Race"}
-        onChange={updateRace}
-      >
-        <option disabled hidden>
-          Select Race
-        </option>
-        {raceDisplays
-          ? raceDisplays.map((race, i) => (
-              <option key={i} value={race.name}>
-                {race.name}
+      {raceDropdownOptions ? (
+        <>
+          <div className="row-flex race-line">
+            <label className="col-1 race-label" htmlFor="race-dropdown">
+              Race:
+            </label>
+            <select
+              className="col-3"
+              name="race-dropdown"
+              value={character.race.name ? character.race.name : "Select Race"}
+              onChange={updateRace}
+            >
+              <option disabled hidden>
+                Select Race
               </option>
-            ))
-          : null}
-      </select>
-      {subraceList.length > 0 ? (
-        <select
-          defaultValue={
-            character.race.subrace ? character.race.subrace : "Select Subrace"
-          }
-          onChange={updateRace}
-        >
-          <option disabled hidden>
-            Select Subrace
-          </option>
-          {subraceList.map((subrace, i) => (
-            <option key={i} value={subrace.name}>
-              {subrace.name}
-            </option>
-          ))}
-        </select>
+              {raceDropdownOptions.map((race, i) => (
+                <option key={i}>{race.name}</option>
+              ))}
+            </select>
+            {selectedRace.nameIndex >= 0 ? (
+              <>
+                <label className="col-1 race-label" htmlFor="race-src-dropdown">
+                  Source:
+                </label>
+                <select
+                  className="col-3"
+                  name="race-src-dropdown"
+                  value={
+                    character.race.source
+                      ? character.race.source
+                      : "Select Race Source"
+                  }
+                  onChange={updateRace}
+                >
+                  <option disabled hidden>
+                    Select Race Source
+                  </option>
+                  {raceDropdownOptions[selectedRace.nameIndex].sources.map(
+                    (source, i) => (
+                      <option key={i}>{source.name}</option>
+                    )
+                  )}
+                </select>
+              </>
+            ) : null}
+          </div>
+          {selectedRace.srcIndex >= 0 &&
+          raceDropdownOptions[selectedRace.nameIndex].sources[
+            selectedRace.srcIndex
+          ].subraces.length > 0 ? (
+            <div className="row-flex race-line">
+              <label className="col-1 race-label" htmlFor="subrace-dropdown">
+                Subrace:
+              </label>
+              <select
+                className="col-3"
+                name="subrace-dropdown"
+                value={
+                  character.race.subrace.name
+                    ? character.race.subrace.name
+                    : "Select Subrace"
+                }
+                onChange={updateRace}
+              >
+                <option disabled hidden>
+                  Select Subrace
+                </option>
+                {raceDropdownOptions[selectedRace.nameIndex].sources[
+                  selectedRace.srcIndex
+                ].subraces.map((subrace, i) => (
+                  <option key={i}>{subrace.name}</option>
+                ))}
+              </select>
+              {selectedRace.subrace.nameIndex >= 0 ? (
+                <>
+                  <label
+                    className="col-1 race-label"
+                    htmlFor="subrace-src-dropdown"
+                  >
+                    Source:
+                  </label>
+                  <select
+                    className="col-3"
+                    name="subrace-src-dropdown"
+                    value={
+                      character.race.subrace.source
+                        ? character.race.subrace.source
+                        : "Select Subrace Source"
+                    }
+                    onChange={updateRace}
+                  >
+                    <option disabled hidden>
+                      Select Subrace Source
+                    </option>
+                    {raceDropdownOptions[selectedRace.nameIndex].sources[
+                      selectedRace.srcIndex
+                    ].subraces[selectedRace.subrace.nameIndex].sources.map(
+                      (source, i) => (
+                        <option key={i}>{source}</option>
+                      )
+                    )}
+                  </select>
+                </>
+              ) : null}
+            </div>
+          ) : null}
+        </>
       ) : null}
     </div>
   );
@@ -148,9 +348,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
             Select Background
           </option>
           {backgroundList.map((background) => (
-            <option key={background} value={background}>
-              {background}
-            </option>
+            <option key={background}>{background}</option>
           ))}
         </select>
       </div>
@@ -189,9 +387,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
                   Select Alignment
                 </option>
                 {alignmentList.map((alignment) => (
-                  <option key={alignment} value={alignment}>
-                    {alignment}
-                  </option>
+                  <option key={alignment}>{alignment}</option>
                 ))}
               </select>
             </div>

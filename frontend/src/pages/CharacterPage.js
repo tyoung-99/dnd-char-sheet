@@ -56,7 +56,10 @@ const CharacterPage = () => {
         {character.race.name ? (
           <p>
             {character.race.name}{" "}
-            {character.race.subrace ? `(${character.race.subrace}) ` : ""}
+            {character.race.subrace.name &&
+            character.race.subrace.name !== "None"
+              ? `(${character.race.subrace.name}) `
+              : ""}
           </p>
         ) : null}
         <InlineClassListComp classes={character.classes} />

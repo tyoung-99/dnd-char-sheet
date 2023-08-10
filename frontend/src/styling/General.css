@@ -1,0 +1,8 @@
+.race-line {
+  align-items: center;
+}
+.race-label {
+  text-align: right;
+  padding-right: 0.5rem;
+  font-size: 1rem;
+}

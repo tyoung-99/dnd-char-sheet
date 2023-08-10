@@ -151,7 +151,8 @@ const characters = [
     race: {
       name: null,
       // "Human",
-      subrace: null,
+      source: null,
+      subrace: { name: null, source: null },
       traits: [
         { name: "Race trait 1", description: "Race trait 1 description" },
         { name: "Race trait 2", description: "Race trait 2 description" },
