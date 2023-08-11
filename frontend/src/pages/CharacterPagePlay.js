@@ -8,7 +8,6 @@ import BackgroundTab from "./page-tabs/play/Background";
 import AbilitiesTab from "./page-tabs/play/Abilities";
 import InventoryTab from "./page-tabs/play/Inventory";
 import SpellcastingTab from "./page-tabs/play/Spellcasting";
-import DeathSavesComp from "../components/DeathSavesComp";
 
 const CharacterPagePlay = ({ character }) => {
   const [activeTab, setActiveTab] = useState("main");
@@ -19,6 +18,27 @@ const CharacterPagePlay = ({ character }) => {
   const totalHD = character.hit_dice.total.map(
     (die) => `${die.number}d${die.faces}`
   );
+
+  let deathSuccesses = [],
+    deathFailures = [];
+
+  for (let i = 0; i < 3; ++i) {
+    deathSuccesses.push(
+      character.death_saves.successes > i ? (
+        <span key={"success " + i} className="death-save-marker filled"></span>
+      ) : (
+        <span key={"success " + i} className="death-save-marker"></span>
+      )
+    );
+
+    deathFailures.push(
+      character.death_saves.failures > i ? (
+        <span key={"failure " + i} className="death-save-marker filled"></span>
+      ) : (
+        <span key={"failure " + i} className="death-save-marker"></span>
+      )
+    );
+  }
 
   return (
     <>
@@ -39,7 +59,11 @@ const CharacterPagePlay = ({ character }) => {
           <p>Current Hit Dice: {currentHD.join(", ")}</p>
           <p>Total Hit Dice: {totalHD.join(", ")}</p>
         </div>
-        <DeathSavesComp deathSaves={character.death_saves} />
+        <div>
+          <p>Death Saves</p>
+          <p>Successes: {deathSuccesses}</p>
+          <p>Failures: {deathFailures}</p>
+        </div>
       </div>
       <ul className="nav">
         <TabNavComp
