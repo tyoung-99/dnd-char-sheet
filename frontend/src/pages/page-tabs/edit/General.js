@@ -355,6 +355,10 @@ const General = ({ character, updateCharacter, promptHeader }) => {
     </div>
   );
 
+  const updateBackstory = (event) => {
+    updateCharacter({ backstory: event.target.value.split("\n") });
+  };
+
   return (
     <div className="grid-container row-flex">
       <div className="col-12 col-flex">
@@ -398,6 +402,12 @@ const General = ({ character, updateCharacter, promptHeader }) => {
         <div className="col-12 col-flex">
           <div className="grid-tile">
             <h1>Backstory</h1>
+            <textarea
+              className="col-12"
+              defaultValue={character.backstory.join("\n")}
+              onChange={updateBackstory}
+              rows={character.backstory.length}
+            />
           </div>
         </div>
       </div>

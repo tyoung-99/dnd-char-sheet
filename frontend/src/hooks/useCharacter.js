@@ -54,6 +54,9 @@ const useCharacter = (character, setCharacter) => {
     }
 
     // Backstory
+    else if (newData.backstory) {
+      character.backstory = newData.backstory;
+    }
 
     // ----------------------------------------
     // Ability Scores/Proficiencies Tab

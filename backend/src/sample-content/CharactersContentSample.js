@@ -4,8 +4,7 @@ const characters = [
     id: 1,
     name: "Character Name",
     player: "Player Name",
-    alignment: null,
-    // "Lawful Good",
+    alignment: "Lawful Good",
     xp: "160",
     inspiration: false,
 
@@ -149,10 +148,9 @@ const characters = [
 
     // Race (only include traits that don't fall elsewhere - e.g. don't include speed, do include darkvision)
     race: {
-      name: null,
-      // "Human",
-      source: null,
-      subrace: { name: null, source: null },
+      name: "Human",
+      source: "PHB",
+      subrace: { name: "Variant", source: "PHB" },
       traits: [
         { name: "Race trait 1", description: "Race trait 1 description" },
         { name: "Race trait 2", description: "Race trait 2 description" },
