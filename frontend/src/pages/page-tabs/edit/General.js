@@ -185,12 +185,46 @@ const General = ({ character, updateCharacter, promptHeader }) => {
         name: raceDropdownOptions[newRace.nameIndex].name,
         source: null,
         subrace: { name: null, source: null },
+        traits: [],
       },
     };
 
     if (newRace.srcIndex >= 0) {
       charUpdate.race.source =
         raceDropdownOptions[newRace.nameIndex].sources[newRace.srcIndex].name;
+
+      const dataIndex = raceData.data.race.findIndex(
+        (checkRace) =>
+          checkRace.name === charUpdate.race.name &&
+          checkRace.source === charUpdate.race.source
+      );
+
+      raceData.data.race[dataIndex].entries.forEach((trait) => {
+        if (trait.type === "list") {
+          // UA21GL races have Creature Type/Size misnamed/stored in unnecessary list, pull out of list/correct
+          trait.items.forEach((item) => {
+            charUpdate.race.traits.push({
+              type: "entries",
+              name:
+                item.name === "Type:"
+                  ? "Creature Type"
+                  : item.name === "Size:"
+                  ? "Size"
+                  : null,
+              entries: [item.entry],
+            });
+          });
+        } else {
+          // Some trait entries have info subcomponents unnecessary to include
+          const checkSubentries = trait.entries.filter(
+            (entry) => !entry.type || entry.type !== "inset"
+          );
+
+          trait.entries = checkSubentries;
+
+          charUpdate.race.traits.push(trait);
+        }
+      });
 
       if (newRace.subrace.nameIndex >= 0) {
         charUpdate.race.subrace.name =
@@ -205,6 +239,17 @@ const General = ({ character, updateCharacter, promptHeader }) => {
             ].subraces[newRace.subrace.nameIndex].sources[
               newRace.subrace.srcIndex
             ];
+
+          const dataIndex = raceData.data.subrace.findIndex(
+            (checkRace) =>
+              checkRace.name === charUpdate.race.subrace.name &&
+              checkRace.source === charUpdate.race.subrace.source &&
+              checkRace.raceName === charUpdate.race.name &&
+              checkRace.raceSource === charUpdate.race.source
+          );
+          raceData.data.subrace[dataIndex].entries.forEach((trait) => {
+            charUpdate.race.traits.push(trait);
+          });
         }
       }
     }

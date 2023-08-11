@@ -24,7 +24,8 @@ const useCharacter = (character, setCharacter) => {
     setSavePending(true);
     setCount(count + 1); // Counter forces timer in useEffect to reset
 
-    console.log(JSON.stringify(newData));
+    console.log(JSON.parse(JSON.stringify(newData)));
+    // console.log(JSON.stringify(newData));
 
     // ----------------------------------------
     // General Tab
@@ -46,6 +47,7 @@ const useCharacter = (character, setCharacter) => {
       character.race.source = newData.race.source;
       character.race.subrace.name = newData.race.subrace.name;
       character.race.subrace.source = newData.race.subrace.source;
+      character.race.traits = newData.race.traits;
     }
 
     // Background
