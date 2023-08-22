@@ -1,9 +1,13 @@
-import { readFile } from "fs/promises";
+import { writeFile, readFile } from "fs/promises";
 import express from "express";
-import sampleChars from "./sample-content/CharactersContentSample.js";
+import updateData from "./updateData.js";
 
 const app = express();
 app.use(express.json());
+
+const sampleChars = JSON.parse(
+  await readFile("./src/sample-content/CharactersContentSample.json")
+);
 
 // Character
 app.get("/api/characters", async (req, res) => {
@@ -38,6 +42,15 @@ app.put("/api/characters/:id/update", async (req, res) => {
 
   if (characterIndex >= 0) {
     sampleChars[characterIndex] = newChar;
+    try {
+      await writeFile(
+        "./src/sample-content/Output.json",
+        JSON.stringify([newChar])
+      );
+    } catch (error) {
+      console.log(error);
+      res.send("Couldn't write character to example file.");
+    }
     res.send("Character successfully updated.");
   } else {
     res.send("Character doesn't exist.");
@@ -45,14 +58,30 @@ app.put("/api/characters/:id/update", async (req, res) => {
 });
 
 // General Data
-app.get("/api/data/races", async (req, res) => {
-  const data = JSON.parse(await readFile("./src/sample-content/races.json"));
+app.get("/api/data/:type", async (req, res) => {
+  const { type } = req.params;
+  let data;
+
+  switch (type) {
+    case "races":
+      data = JSON.parse(await readFile("./src/sample-content/races.json"));
+      break;
+    default:
+      break;
+  }
 
   if (data) {
     res.json(data);
   } else {
     res.sendStatus(404);
   }
+});
+
+app.put("/api/data/:type/update", async (req, res) => {
+  const { type } = req.params;
+  const { newData } = req.body;
+
+  res.send(updateData(type, newData));
 });
 
 const PORT = process.env.PORT || 8000;
