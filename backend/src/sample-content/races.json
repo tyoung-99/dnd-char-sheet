@@ -70,5 +70,11 @@
         "subraces": []
       }
     ]
+  },
+  { "id": 5, "name": "New Race", "sources": [] },
+  {
+    "id": 6,
+    "name": "New Race",
+    "sources": [{ "name": "New Source", "traits": [], "subraces": [] }]
   }
 ]

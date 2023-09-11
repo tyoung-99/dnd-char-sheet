@@ -170,7 +170,7 @@ const EditRaceModal = ({ race, closeModal, updateRace }) => {
         <div className="footer">
           <button
             onClick={() => {
-              closeModal(race.name);
+              closeModal(race.id);
             }}
           >
             Cancel
@@ -178,7 +178,7 @@ const EditRaceModal = ({ race, closeModal, updateRace }) => {
           <button
             onClick={() => {
               updateRace(newRace);
-              closeModal(race.name);
+              closeModal(race.id);
             }}
           >
             Save

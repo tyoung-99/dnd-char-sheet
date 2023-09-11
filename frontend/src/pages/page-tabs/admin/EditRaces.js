@@ -12,9 +12,9 @@ const Races = () => {
       const newRaces = (await axios.get("/api/data/races")).data;
       setRaces(newRaces);
 
-      let defaultOpenModals = {};
+      let defaultOpenModals = [];
       newRaces.forEach((race) => {
-        defaultOpenModals[race.name] = false;
+        defaultOpenModals[race.id] = false;
       });
       setOpenModalsAll(defaultOpenModals);
     };
@@ -22,15 +22,15 @@ const Races = () => {
   }, []);
 
   const setOpenModalOne = (event) => {
-    const raceName = event.target.id;
+    const raceID = event.target.id;
     const newOpenModals = { ...openModals };
-    newOpenModals[raceName] = true;
+    newOpenModals[raceID] = true;
     setOpenModalsAll(newOpenModals);
   };
 
-  const closeModal = (openRaceName) => {
+  const closeModal = (openRaceID) => {
     const newOpenModals = { ...openModals };
-    newOpenModals[openRaceName] = false;
+    newOpenModals[openRaceID] = false;
     setOpenModalsAll(newOpenModals);
   };
 
@@ -46,9 +46,24 @@ const Races = () => {
     });
   };
 
-  const addRace = () => {
+  const addRace = async () => {
     const newRaces = [...races];
-    newRaces.push();
+    newRaces.push({
+      id: newRaces[newRaces.length - 1].id + 1,
+      name: "New Race",
+      sources: [
+        {
+          name: "New Source",
+          traits: [],
+          subraces: [],
+        },
+      ],
+    });
+    console.log(newRaces);
+    setRaces(newRaces);
+    await axios.put(`/api/data/races/update`, {
+      newData: newRaces,
+    });
   };
 
   if (!races) {
@@ -60,10 +75,10 @@ const Races = () => {
       <button onClick={addRace}>Add Race</button>
       {races.map((race) => (
         <div key={race.id}>
-          <h2 className="edit-link" id={race.name} onClick={setOpenModalOne}>
+          <h2 className="edit-link" id={race.id} onClick={setOpenModalOne}>
             {race.name}
           </h2>
-          {openModals[race.name] && (
+          {openModals[race.id] && (
             <EditRaceModal
               race={race}
               closeModal={closeModal}
