@@ -1,17 +1,15 @@
-import { writeFile, readFile } from "fs/promises";
 import express from "express";
-import updateData from "./updateData.js";
+import getCharacters from "./getCharacters.js";
+import setCharacterOne from "./setCharacterOne.js";
+import getData from "./getData.js";
+import setData from "./setData.js";
 
 const app = express();
 app.use(express.json());
 
-const sampleChars = JSON.parse(
-  await readFile("./src/sample-content/CharactersContentSample.json")
-);
-
 // Character
 app.get("/api/characters", async (req, res) => {
-  const characters = sampleChars;
+  const characters = await getCharacters();
 
   if (characters) {
     res.json(characters);
@@ -22,7 +20,9 @@ app.get("/api/characters", async (req, res) => {
 
 app.get("/api/characters/:id", async (req, res) => {
   const { id } = req.params;
-  const character = sampleChars.find(
+  const characters = await getCharacters();
+
+  const character = characters.find(
     (character) => character.id === parseInt(id)
   );
 
@@ -36,52 +36,27 @@ app.get("/api/characters/:id", async (req, res) => {
 app.put("/api/characters/:id/update", async (req, res) => {
   const { id } = req.params;
   const { newChar } = req.body;
-  const characterIndex = sampleChars.findIndex(
-    (character) => character.id === parseInt(id)
-  );
-
-  if (characterIndex >= 0) {
-    sampleChars[characterIndex] = newChar;
-    try {
-      await writeFile(
-        "./src/sample-content/Output.json",
-        JSON.stringify([newChar])
-      );
-    } catch (error) {
-      console.log(error);
-      res.send("Couldn't write character to example file.");
-    }
-    res.send("Character successfully updated.");
-  } else {
-    res.send("Character doesn't exist.");
-  }
+  res.send(await setCharacterOne(parseInt(id), newChar));
 });
 
-// General Data
+// General data on races, backgrounds, classes, etc.
 app.get("/api/data/:type", async (req, res) => {
   const { type } = req.params;
-  let data;
+  const data = getData(type);
 
-  switch (type) {
-    case "races":
-      data = JSON.parse(await readFile("./src/sample-content/races.json"));
-      break;
-    default:
-      break;
-  }
-
-  if (data) {
-    res.json(data);
-  } else {
-    res.sendStatus(404);
-  }
+  data.then((result) => {
+    if (result) {
+      res.json(result);
+    } else {
+      res.sendStatus(404);
+    }
+  });
 });
 
 app.put("/api/data/:type/update", async (req, res) => {
   const { type } = req.params;
   const { newData } = req.body;
-
-  res.send(updateData(type, newData));
+  res.send(await setData(newData, type));
 });
 
 const PORT = process.env.PORT || 8000;

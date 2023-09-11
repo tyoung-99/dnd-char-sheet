@@ -1,28 +1,20 @@
-// Allows updating data on races, classes, etc.
-import { useState } from "react";
-import axios from "axios";
+// Allows viewing/editing background data on races, classes, etc.
+import "../styling/AdminPage.css";
+import EditRaces from "./page-tabs/admin/EditRaces";
+import EditBackgrounds from "./page-tabs/admin/EditBackgrounds";
 
 const AdminPage = () => {
-  const uploadFile = async (event) => {
-    const file = event.target.files;
-    console.log(event.target.name);
-    const response = await axios.put(`/api/data/${event.target.name}/update`, {
-      newDataFile: file,
-    });
-    console.log(response);
-  };
-
   return (
-    <>
-      <h1>Update Data</h1>
-      <label htmlFor="races">Races</label>
-      <input
-        name="races"
-        type="file"
-        accept=".json"
-        onChange={uploadFile}
-      ></input>
-    </>
+    <div className="admin">
+      <div className="admin-col">
+        <h1>Races</h1>
+        <EditRaces />
+      </div>
+      <div className="admin-col">
+        <h1>Backgrounds</h1>
+        <EditBackgrounds />
+      </div>
+    </div>
   );
 };
 
