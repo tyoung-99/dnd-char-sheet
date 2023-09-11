@@ -2,7 +2,7 @@
 import "../styling/EditDataModal.css";
 import { useState } from "react";
 
-const EditRaceModal = ({ race, closeModal, updateRace }) => {
+const EditRaceModal = ({ race, closeModal, updateRace, removeRace }) => {
   const [newRace, setNewRace] = useState(race);
 
   const queueChange = (event) => {
@@ -182,6 +182,15 @@ const EditRaceModal = ({ race, closeModal, updateRace }) => {
             }}
           >
             Save
+          </button>
+          <button
+            className="warn-button"
+            onClick={() => {
+              removeRace(newRace);
+              closeModal(race.id);
+            }}
+          >
+            Delete
           </button>
         </div>
       </div>

@@ -53,10 +53,10 @@ app.get("/api/data/:type", async (req, res) => {
   });
 });
 
-app.put("/api/data/:type/update", async (req, res) => {
-  const { type } = req.params;
+app.put("/api/data/:dataType/:updateType", async (req, res) => {
+  const { dataType, updateType } = req.params;
   const { newData } = req.body;
-  res.send(await setData(newData, type));
+  res.send(await setData(newData, dataType, updateType));
 });
 
 const PORT = process.env.PORT || 8000;

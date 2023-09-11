@@ -10,6 +10,7 @@ const Races = () => {
   useEffect(() => {
     const loadData = async () => {
       const newRaces = (await axios.get("/api/data/races")).data;
+      newRaces.sort(sortRaces);
       setRaces(newRaces);
 
       let defaultOpenModals = [];
@@ -20,6 +21,16 @@ const Races = () => {
     };
     loadData();
   }, []);
+
+  const sortRaces = (first, second) => {
+    if (first.name < second.name) {
+      return -1;
+    }
+    if (first.name > second.name) {
+      return 1;
+    }
+    return 0;
+  };
 
   const setOpenModalOne = (event) => {
     const raceID = event.target.id;
@@ -35,35 +46,45 @@ const Races = () => {
   };
 
   const updateRace = async (newRace) => {
-    const newRaces = [...races];
-    const replaceIndex = newRaces.findIndex(
-      (element) => element.id === newRace.id
-    );
-    newRaces[replaceIndex] = newRace;
-    setRaces(newRaces);
-    await axios.put(`/api/data/races/update`, {
-      newData: newRaces,
+    const response = await axios.put(`/api/data/races/update`, {
+      newData: newRace,
     });
+
+    const newRaces = response.data;
+    console.log(newRaces);
+    newRaces.sort(sortRaces);
+    setRaces(newRaces);
   };
 
   const addRace = async () => {
     const newRaces = [...races];
-    newRaces.push({
-      id: newRaces[newRaces.length - 1].id + 1,
-      name: "New Race",
-      sources: [
-        {
-          name: "New Source",
-          traits: [],
-          subraces: [],
-        },
-      ],
+
+    const response = await axios.put(`/api/data/races/add`, {
+      newData: {
+        name: "New Race",
+        sources: [
+          {
+            name: "New Source",
+            traits: [],
+            subraces: [],
+          },
+        ],
+      },
     });
-    console.log(newRaces);
+
+    newRaces.push(response.data);
+    newRaces.sort(sortRaces);
     setRaces(newRaces);
-    await axios.put(`/api/data/races/update`, {
-      newData: newRaces,
+  };
+
+  const removeRace = async (remove) => {
+    const response = await axios.put(`/api/data/races/remove`, {
+      newData: remove,
     });
+
+    const newRaces = response.data;
+    newRaces.sort(sortRaces);
+    setRaces(newRaces);
   };
 
   if (!races) {
@@ -76,13 +97,14 @@ const Races = () => {
       {races.map((race) => (
         <div key={race.id}>
           <h2 className="edit-link" id={race.id} onClick={setOpenModalOne}>
-            {race.name}
+            {race.name !== "" ? race.name : "Unnamed Race"}
           </h2>
           {openModals[race.id] && (
             <EditRaceModal
               race={race}
               closeModal={closeModal}
               updateRace={updateRace}
+              removeRace={removeRace}
             />
           )}
         </div>

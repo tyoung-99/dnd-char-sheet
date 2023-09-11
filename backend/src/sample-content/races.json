@@ -1,80 +1,22 @@
 [
   {
-    "id": 0,
-    "name": "Race 12321",
-    "sources": [
-      {
-        "name": "SRC13",
-        "traits": [
-          { "name": "Trait 1", "description": "Trait 1 description" },
-          { "name": "Trait 2", "description": "Trait 2 description" }
-        ],
-        "subraces": []
-      },
-      {
-        "name": "SRC2",
-        "traits": [
-          { "name": "Trait 1", "description": "Trait 1 description" },
-          { "name": "Trait 2", "description": "Trait 2 description" }
-        ],
-        "subraces": []
-      }
-    ]
+    "name": "New Raceasfd",
+    "sources": [{ "name": "New Source", "traits": [], "subraces": [] }],
+    "id": 0
   },
   {
-    "id": 2,
-    "name": "Race 241342",
-    "sources": [
-      {
-        "name": "SRC12",
-        "traits": [
-          { "name": "Trait 1", "description": "Trait 1 description" },
-          {
-            "name": "Trait 2",
-            "description": "Trait 2 descriptionasdfasdfadsf"
-          }
-        ],
-        "subraces": []
-      },
-      {
-        "name": "SRC2",
-        "traits": [
-          { "name": "Trait 1", "description": "Trait 1 description" },
-          { "name": "Trait 2", "description": "Trait 2 description" }
-        ],
-        "subraces": []
-      }
-    ]
-  },
-  {
-    "id": 4,
-    "name": "Race 241331",
-    "sources": [
-      {
-        "name": "SRC12d",
-        "traits": [
-          { "name": "Trait 1", "description": "Trait 1 description" },
-          {
-            "name": "Trait 2",
-            "description": "Trait 2 descriptionasdfasdfadsf"
-          }
-        ],
-        "subraces": []
-      },
-      {
-        "name": "SRC2",
-        "traits": [
-          { "name": "Trait 1", "description": "Trait 1 description" },
-          { "name": "Trait 2", "description": "Trait 2 description" }
-        ],
-        "subraces": []
-      }
-    ]
-  },
-  { "id": 5, "name": "New Race", "sources": [] },
-  {
-    "id": 6,
     "name": "New Race",
-    "sources": [{ "name": "New Source", "traits": [], "subraces": [] }]
+    "sources": [{ "name": "New Source", "traits": [], "subraces": [] }],
+    "id": 3
+  },
+  {
+    "name": "New Race",
+    "sources": [{ "name": "New Source", "traits": [], "subraces": [] }],
+    "id": 4
+  },
+  {
+    "name": "New Race",
+    "sources": [{ "name": "New Source", "traits": [], "subraces": [] }],
+    "id": 5
   }
 ]
