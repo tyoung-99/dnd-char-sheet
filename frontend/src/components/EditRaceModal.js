@@ -60,11 +60,6 @@ const EditRaceModal = ({ race, closeModal, updateRace }) => {
     console.log(JSON.parse(JSON.stringify(raceChange)));
   };
 
-  const submitChanges = () => {
-    updateRace(newRace);
-    closeModal(race.name);
-  };
-
   return (
     <div className="modal-background">
       <div className="modal-container">
@@ -180,7 +175,14 @@ const EditRaceModal = ({ race, closeModal, updateRace }) => {
           >
             Cancel
           </button>
-          <button onClick={submitChanges}>Save</button>
+          <button
+            onClick={() => {
+              updateRace(newRace);
+              closeModal(race.name);
+            }}
+          >
+            Save
+          </button>
         </div>
       </div>
     </div>

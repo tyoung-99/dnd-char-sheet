@@ -36,11 +36,19 @@ const Races = () => {
 
   const updateRace = async (newRace) => {
     const newRaces = [...races];
-    newRaces[newRace.id] = newRace;
+    const replaceIndex = newRaces.findIndex(
+      (element) => element.id === newRace.id
+    );
+    newRaces[replaceIndex] = newRace;
     setRaces(newRaces);
     await axios.put(`/api/data/races/update`, {
       newData: newRaces,
     });
+  };
+
+  const addRace = () => {
+    const newRaces = [...races];
+    newRaces.push();
   };
 
   if (!races) {
@@ -49,8 +57,9 @@ const Races = () => {
 
   return (
     <div>
+      <button onClick={addRace}>Add Race</button>
       {races.map((race) => (
-        <div key={race.name}>
+        <div key={race.id}>
           <h2 className="edit-link" id={race.name} onClick={setOpenModalOne}>
             {race.name}
           </h2>
