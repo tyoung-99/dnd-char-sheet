@@ -1,0 +1,107 @@
+.modal-background {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(200, 200, 200, 0.75);
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-y: scroll;
+}
+
+.modal-container {
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+  margin: auto;
+  max-width: 90%;
+}
+
+.modal-container .header {
+  display: inline-block;
+  text-align: center;
+}
+.modal-container .header input {
+  font-weight: bold;
+  font-size: 2rem;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  text-align: center;
+}
+
+.modal-container .body {
+  flex: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-container .body input {
+  margin-top: 0.125rem;
+  margin-bottom: 0.125rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+.modal-container .body textarea {
+  margin-top: 0.125rem;
+  margin-bottom: 0.125rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-container .footer {
+  flex: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-container button {
+  border: none;
+  background-color: white;
+  color: black;
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.modal-container button:hover {
+  background-color: black;
+  color: white;
+}
+.modal-container .footer button {
+  width: 6rem;
+  height: 2rem;
+  margin: 1rem;
+}
+.modal-container .footer .warn-button {
+  background-color: rgb(255, 122, 122);
+  color: black;
+}
+.modal-container .footer .warn-button:hover {
+  background-color: red;
+  color: white;
+}
+
+.modal-container .delete-button {
+  border-radius: 0px;
+  margin: 1px;
+  width: 1rem;
+  height: 1rem;
+  font-size: 0.75rem;
+  padding: 0px;
+}
+.modal-container .delete-button:hover {
+  background-color: rgb(255, 122, 122);
+  color: black;
+}
+.modal-container .body div.deletable {
+  align-items: center;
+}

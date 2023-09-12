@@ -1,0 +1,20 @@
+.admin {
+  display: flex;
+}
+.admin-col {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+h1 {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+h2 {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.edit-link {
+  cursor: pointer;
+}
