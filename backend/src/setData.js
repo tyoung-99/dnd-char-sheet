@@ -3,8 +3,6 @@ import getData from "./getData.js";
 
 const setData = async (newData, dataType, updateType) => {
   const existing = await getData(dataType);
-  console.log("pre");
-  console.log(existing);
   switch (updateType) {
     case "update":
       const replaceIndex = existing.findIndex(
@@ -34,8 +32,6 @@ const setData = async (newData, dataType, updateType) => {
     default:
       return `Unknown update type: ${updateType}`;
   }
-  console.log("post");
-  console.log(existing);
 
   try {
     await writeFile(

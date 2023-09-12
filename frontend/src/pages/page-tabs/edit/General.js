@@ -54,7 +54,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
             selectedRace.subrace.nameIndex
           ].sources.findIndex(
             (checkSource) =>
-              checkSource.source === character.race.subrace.source
+              checkSource.name === character.race.subrace.source.name
           );
         }
       }
@@ -121,7 +121,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
         newRace.subrace.srcIndex = raceOptions[newRace.nameIndex].sources[
           newRace.srcIndex
         ].subraces[newRace.subrace.nameIndex].sources.findIndex((checkSrc) => {
-          return checkSrc === selection;
+          return checkSrc.name === selection;
         });
         break;
 
@@ -142,7 +142,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
       charUpdate.race.source =
         raceOptions[newRace.nameIndex].sources[newRace.srcIndex].name;
 
-      charUpdate.traits =
+      charUpdate.race.traits =
         raceOptions[newRace.nameIndex].sources[newRace.srcIndex].traits;
 
       if (newRace.subrace.nameIndex >= 0) {
@@ -155,14 +155,15 @@ const General = ({ character, updateCharacter, promptHeader }) => {
           charUpdate.race.subrace.source =
             raceOptions[newRace.nameIndex].sources[newRace.srcIndex].subraces[
               newRace.subrace.nameIndex
-            ].sources[newRace.subrace.srcIndex];
+            ].sources[newRace.subrace.srcIndex].name;
 
           console.log(charUpdate);
 
-          charUpdate.traits =
+          charUpdate.race.traits = charUpdate.race.traits.concat(
             raceOptions[newRace.nameIndex].sources[newRace.srcIndex].subraces[
               newRace.subrace.nameIndex
-            ].sources[newRace.subrace.srcIndex].traits;
+            ].sources[newRace.subrace.srcIndex].traits
+          );
         }
       }
     }
@@ -271,7 +272,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
                       selectedRace.srcIndex
                     ].subraces[selectedRace.subrace.nameIndex].sources.map(
                       (source, i) => (
-                        <option key={i}>{source}</option>
+                        <option key={i}>{source.name}</option>
                       )
                     )}
                   </select>

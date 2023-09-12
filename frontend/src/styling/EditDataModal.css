@@ -37,45 +37,21 @@
 .modal-container .body {
   flex: 50%;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  align-items: center;
-}
-
-.modal-container .body h1 {
-  margin-bottom: 0;
-}
-.modal-container .body h2 {
-  margin-bottom: 0;
 }
 
 .modal-container .body input {
   margin-top: 0.125rem;
   margin-bottom: 0.125rem;
   width: 100%;
+  box-sizing: border-box;
 }
 .modal-container .body textarea {
   margin-top: 0.125rem;
   margin-bottom: 0.125rem;
   width: 100%;
-}
-
-.modal-container .body .centered {
-  text-align: center;
-}
-
-.modal-container .body .subtitle-1 {
-  font-weight: bold;
-  font-size: 1.25rem;
-}
-.modal-container .body .subtitle-2 {
-  font-weight: bold;
-  font-size: 1rem;
-}
-.modal-container .body .subtitle-3 {
-  font-weight: bold;
-  font-size: 0.75rem;
+  box-sizing: border-box;
 }
 
 .modal-container .footer {
@@ -85,10 +61,7 @@
   align-items: center;
 }
 
-.modal-container .footer button {
-  width: 6rem;
-  height: 2rem;
-  margin: 1rem;
+.modal-container button {
   border: none;
   background-color: white;
   color: black;
@@ -99,9 +72,14 @@
   font-size: 1rem;
   cursor: pointer;
 }
-.modal-container .footer button:hover {
+.modal-container button:hover {
   background-color: black;
   color: white;
+}
+.modal-container .footer button {
+  width: 6rem;
+  height: 2rem;
+  margin: 1rem;
 }
 .modal-container .footer .warn-button {
   background-color: rgb(255, 122, 122);
@@ -110,4 +88,20 @@
 .modal-container .footer .warn-button:hover {
   background-color: red;
   color: white;
+}
+
+.modal-container .delete-button {
+  border-radius: 0px;
+  margin: 1px;
+  width: 1rem;
+  height: 1rem;
+  font-size: 0.75rem;
+  padding: 0px;
+}
+.modal-container .delete-button:hover {
+  background-color: rgb(255, 122, 122);
+  color: black;
+}
+.modal-container .body div.deletable {
+  align-items: center;
 }

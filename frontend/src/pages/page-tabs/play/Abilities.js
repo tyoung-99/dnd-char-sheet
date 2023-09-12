@@ -7,23 +7,7 @@ const CharacterAbilitiesTab = ({ character }) => {
       {character.race.traits.map((trait) => (
         <div key={trait.name}>
           <h2>{trait.name}</h2>
-
-          {trait.entries.map((entry) => {
-            if (entry.items) {
-              return (
-                <ul>
-                  {entry.items.map((item) => (
-                    <li key={item}>
-                      <h3>{item.name}</h3>
-                      <p>{item.entry}</p>
-                    </li>
-                  ))}
-                </ul>
-              );
-            }
-
-            return <p key={entry}>{entry}</p>;
-          })}
+          <p>{trait.description}</p>
         </div>
       ))}
     </div>
