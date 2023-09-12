@@ -24,7 +24,7 @@ const useCharacter = (character, setCharacter) => {
     setSavePending(true);
     setCount(count + 1); // Counter forces timer in useEffect to reset
 
-    console.log(JSON.parse(JSON.stringify(newData)));
+    // console.log(JSON.parse(JSON.stringify(newData)));
     // console.log(JSON.stringify(newData));
 
     // ----------------------------------------

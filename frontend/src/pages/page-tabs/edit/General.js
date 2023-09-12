@@ -40,7 +40,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
         (checkSource) => checkSource.name === character.race.source
       );
 
-      if (character.race.subrace.name) {
+      if (character.race.subrace.name || character.race.subrace.name === "") {
         selectedRace.subrace.nameIndex = raceOptions[
           selectedRace.nameIndex
         ].sources[selectedRace.srcIndex].subraces.findIndex(
@@ -64,9 +64,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
   useEffect(() => {
     const loadData = async () => {
       const newRaceOptions = (await axios.get("/api/data/races")).data;
-
       setRaceOptions(newRaceOptions);
-      console.log(newRaceOptions);
     };
     loadData();
   }, []);
@@ -74,7 +72,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
   const updateRace = (event) => {
     let selection = event.target.value;
     const newRace = { ...selectedRace };
-    switch (event.target.name) {
+    switch (event.target.id) {
       case "race-dropdown":
         newRace.nameIndex = raceOptions.findIndex(
           (checkRace) => checkRace.name === selection
@@ -102,7 +100,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
         ].subraces.findIndex((checkSubrace) => {
           return (
             checkSubrace.name === selection ||
-            (!checkSubrace.name && selection === "None")
+            (checkSubrace.name === "" && selection === "None")
           );
         });
 
@@ -157,8 +155,6 @@ const General = ({ character, updateCharacter, promptHeader }) => {
               newRace.subrace.nameIndex
             ].sources[newRace.subrace.srcIndex].name;
 
-          console.log(charUpdate);
-
           charUpdate.race.traits = charUpdate.race.traits.concat(
             raceOptions[newRace.nameIndex].sources[newRace.srcIndex].subraces[
               newRace.subrace.nameIndex
@@ -183,7 +179,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
             </label>
             <select
               className="col-3"
-              name="race-dropdown"
+              id="race-dropdown"
               value={character.race.name ? character.race.name : "Select Race"}
               onChange={updateRace}
             >
@@ -201,7 +197,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
                 </label>
                 <select
                   className="col-3"
-                  name="race-src-dropdown"
+                  id="race-src-dropdown"
                   value={
                     character.race.source
                       ? character.race.source
@@ -230,10 +226,12 @@ const General = ({ character, updateCharacter, promptHeader }) => {
               </label>
               <select
                 className="col-3"
-                name="subrace-dropdown"
+                id="subrace-dropdown"
                 value={
                   character.race.subrace.name
                     ? character.race.subrace.name
+                    : character.race.subrace.name === ""
+                    ? "None"
                     : "Select Subrace"
                 }
                 onChange={updateRace}
@@ -244,7 +242,9 @@ const General = ({ character, updateCharacter, promptHeader }) => {
                 {raceOptions[selectedRace.nameIndex].sources[
                   selectedRace.srcIndex
                 ].subraces.map((subrace, i) => (
-                  <option key={i}>{subrace.name}</option>
+                  <option key={i}>
+                    {subrace.name === "" ? "None" : subrace.name}
+                  </option>
                 ))}
               </select>
               {selectedRace.subrace.nameIndex >= 0 ? (
@@ -257,7 +257,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
                   </label>
                   <select
                     className="col-3"
-                    name="subrace-src-dropdown"
+                    id="subrace-src-dropdown"
                     value={
                       character.race.subrace.source
                         ? character.race.subrace.source
@@ -292,6 +292,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
       <div className="grid-tile">
         <h1>Background</h1>
         <select
+          name="background"
           defaultValue={
             character.background.name
               ? character.background.name
@@ -327,6 +328,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
               <input
                 className="col-12"
                 type="text"
+                name="char-name"
                 defaultValue={character.name}
                 onChange={(event) => {
                   promptHeader();
@@ -337,6 +339,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
             <div className="grid-tile">
               <h1>Alignment</h1>
               <select
+                name="alignment"
                 defaultValue={
                   character.alignment ? character.alignment : "Select Alignment"
                 }
@@ -361,6 +364,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
           <div className="grid-tile">
             <h1>Backstory</h1>
             <textarea
+              name="backstory"
               className="col-12"
               defaultValue={character.backstory.join("\n")}
               onChange={updateBackstory}

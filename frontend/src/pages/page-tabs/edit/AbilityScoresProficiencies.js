@@ -13,7 +13,7 @@ const AbilityScoresProficiencies = ({ character, updateCharacter }) => {
 
   const updateScores = (event) => {
     const newScores = { ...abilityScores };
-    newScores[event.target.getAttribute("data-ability")] = event.target.value;
+    newScores[event.target.id] = event.target.value;
     setAbilityScores(newScores);
     updateCharacter({ ability_scores: newScores });
   };
@@ -54,9 +54,8 @@ const AbilityScoresProficiencies = ({ character, updateCharacter }) => {
                 <input
                   className="ability-input"
                   type="text"
-                  name={ability.name}
+                  id={ability.name}
                   defaultValue={ability.score}
-                  data-ability={ability.name}
                   onChange={updateScores}
                 ></input>
               </div>
@@ -137,7 +136,7 @@ const AbilityScoresProficiencies = ({ character, updateCharacter }) => {
     }
 
     const inputField = event.target;
-    const updatedIndex = inputField.id;
+    const updatedIndex = inputField.getAttribute("data-index");
     const newProf = inputField.value;
 
     newProfs[updatedIndex] = newProf;
@@ -244,7 +243,8 @@ const AbilityScoresProficiencies = ({ character, updateCharacter }) => {
                   <input
                     className="col-11"
                     type="text"
-                    id={i}
+                    id={`weapon-${i}`}
+                    data-index={i}
                     value={weapon}
                     onChange={(event) => {
                       updateOtherProfs(event, "weapon");
@@ -285,7 +285,8 @@ const AbilityScoresProficiencies = ({ character, updateCharacter }) => {
                   <input
                     className="col-11"
                     type="text"
-                    id={i}
+                    id={`armor-${i}`}
+                    data-index={i}
                     value={armor}
                     onChange={(event) => {
                       updateOtherProfs(event, "armor");
@@ -326,7 +327,8 @@ const AbilityScoresProficiencies = ({ character, updateCharacter }) => {
                   <input
                     className="col-11"
                     type="text"
-                    id={i}
+                    id={`tool-${i}`}
+                    data-index={i}
                     value={tool}
                     onChange={(event) => {
                       updateOtherProfs(event, "tool");
@@ -367,7 +369,8 @@ const AbilityScoresProficiencies = ({ character, updateCharacter }) => {
                   <input
                     className="col-11"
                     type="text"
-                    id={i}
+                    id={`language-${i}`}
+                    data-index={i}
                     value={language}
                     onChange={(event) => {
                       updateOtherProfs(event, "language");

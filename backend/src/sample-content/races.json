@@ -17,6 +17,10 @@
                 "subraces": []
               }
             ]
+          },
+          {
+            "name": "",
+            "sources": [{ "name": "New Source", "traits": [], "subraces": [] }]
           }
         ]
       }
