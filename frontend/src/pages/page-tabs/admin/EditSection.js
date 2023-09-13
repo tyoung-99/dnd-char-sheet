@@ -10,7 +10,7 @@ const EditSection = ({ singular, plural, template, EditModal }) => {
     const loadData = async () => {
       const newItems = (await axios.get(`/api/data/${plural.toLowerCase()}`))
         .data;
-      if (typeof newItems === "string" || newItems instanceof String) {
+      if (!Array.isArray(newItems)) {
         setItems(newItems);
         return;
       }
@@ -91,8 +91,8 @@ const EditSection = ({ singular, plural, template, EditModal }) => {
     return <div>Loading...</div>;
   }
 
-  if (typeof items === "string" || items instanceof String) {
-    return <div>{items}</div>;
+  if (!Array.isArray(items)) {
+    return <div>File for {plural} not found, or file in wrong format.</div>;
   }
 
   return (
