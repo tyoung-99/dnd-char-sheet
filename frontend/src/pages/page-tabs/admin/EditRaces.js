@@ -1,9 +1,9 @@
 // Lists/allows editing of all possible races/associated abilities
 import axios from "axios";
 import { useState, useEffect } from "react";
-import EditRaceModal from "../../../components/EditRaceModal";
+import EditRaceModal from "../../../components/modals/EditRaceModal";
 
-const Races = () => {
+const EditRaces = () => {
   const [races, setRaces] = useState();
   const [openModals, setOpenModalsAll] = useState();
 
@@ -51,7 +51,6 @@ const Races = () => {
     });
 
     const newRaces = response.data;
-    console.log(newRaces);
     newRaces.sort(sortRaces);
     setRaces(newRaces);
   };
@@ -113,4 +112,4 @@ const Races = () => {
   );
 };
 
-export default Races;
+export default EditRaces;
