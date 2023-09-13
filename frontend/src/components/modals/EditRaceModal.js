@@ -6,8 +6,8 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { TreeView } from "@mui/x-tree-view/TreeView";
 import CustomTreeItem from "../CustomTreeItem";
 
-const EditRaceModal = ({ race, closeModal, updateRace, removeRace }) => {
-  const [newRace, setNewRace] = useState(race);
+const EditRaceModal = ({ item, closeModal, updateItem, removeItem }) => {
+  const [newRace, setNewRace] = useState(item);
 
   const queueChange = (event) => {
     const inputField = event.target;
@@ -203,7 +203,7 @@ const EditRaceModal = ({ race, closeModal, updateRace, removeRace }) => {
       )
     ) {
       if (button.name === "delete-race") {
-        removeRace(newRace);
+        removeItem(newRace);
         closeModal(newRace.id);
       } else {
         removeSection(event);
@@ -239,6 +239,7 @@ const EditRaceModal = ({ race, closeModal, updateRace, removeRace }) => {
             ></CustomTreeItem>
             {newRace.sources.map((src, i) => (
               <CustomTreeItem
+                key={`race-src-${i}`}
                 nodeId={`race-src-${i}`}
                 label={
                   <div className="row-flex deletable">
@@ -275,6 +276,7 @@ const EditRaceModal = ({ race, closeModal, updateRace, removeRace }) => {
                   ></CustomTreeItem>
                   {src.traits.map((trait, j) => (
                     <CustomTreeItem
+                      key={`race-src-${i}-trait-${j}`}
                       nodeId={`race-src-${i}-trait-${j}`}
                       label={
                         <div className="row-flex deletable">
@@ -329,6 +331,7 @@ const EditRaceModal = ({ race, closeModal, updateRace, removeRace }) => {
                   ></CustomTreeItem>
                   {src.subraces.map((subrace, j) => (
                     <CustomTreeItem
+                      key={`race-src-${i}-subrace-${j}`}
                       nodeId={`race-src-${i}-subrace-${j}`}
                       label={
                         <div className="row-flex deletable">
@@ -367,6 +370,7 @@ const EditRaceModal = ({ race, closeModal, updateRace, removeRace }) => {
                       ></CustomTreeItem>
                       {subrace.sources.map((subSrc, k) => (
                         <CustomTreeItem
+                          key={`race-src-${i}-subrace-${j}-src-${k}`}
                           nodeId={`race-src-${i}-subrace-${j}-src-${k}`}
                           label={
                             <div className="row-flex deletable">
@@ -408,6 +412,7 @@ const EditRaceModal = ({ race, closeModal, updateRace, removeRace }) => {
                           ></CustomTreeItem>
                           {subSrc.traits.map((subTrait, l) => (
                             <CustomTreeItem
+                              key={`race-src-${i}-subrace-${j}-src-${k}-trait-${l}`}
                               nodeId={`race-src-${i}-subrace-${j}-src-${k}-trait-${l}`}
                               label={
                                 <div className="row-flex deletable">
@@ -468,7 +473,7 @@ const EditRaceModal = ({ race, closeModal, updateRace, removeRace }) => {
           </button>
           <button
             onClick={() => {
-              updateRace(newRace);
+              updateItem(newRace);
               closeModal(newRace.id);
             }}
           >

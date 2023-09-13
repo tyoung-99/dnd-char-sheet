@@ -1,18 +1,48 @@
 // Allows viewing/editing background data on races, classes, etc.
 import "../styling/AdminPage.css";
-import EditRaces from "./page-tabs/admin/EditRaces";
-import EditBackgrounds from "./page-tabs/admin/EditBackgrounds";
+import EditSection from "./page-tabs/admin/EditSection";
+import EditAlignmentModal from "../components/modals/EditAlignmentModal";
+import EditRaceModal from "../components/modals/EditRaceModal";
+import EditBackgroundModal from "../components/modals/EditBackgroundModal";
 
 const AdminPage = () => {
   return (
     <div className="admin">
       <div className="admin-col">
+        <h1>Alignments</h1>
+        <EditSection
+          singular={"Alignment"}
+          plural={"Alignments"}
+          template={{ name: "New Alignment" }}
+          EditModal={EditAlignmentModal}
+        />
+      </div>
+      <div className="admin-col">
         <h1>Races</h1>
-        <EditRaces />
+        <EditSection
+          singular={"Race"}
+          plural={"Races"}
+          template={{
+            name: "New Race",
+            sources: [
+              {
+                name: "New Source",
+                traits: [],
+                subraces: [],
+              },
+            ],
+          }}
+          EditModal={EditRaceModal}
+        />
       </div>
       <div className="admin-col">
         <h1>Backgrounds</h1>
-        <EditBackgrounds />
+        <EditSection
+          singular={"Background"}
+          plural={"Backgrounds"}
+          template={{ name: "New Background" }}
+          EditModal={EditBackgroundModal}
+        />
       </div>
     </div>
   );
