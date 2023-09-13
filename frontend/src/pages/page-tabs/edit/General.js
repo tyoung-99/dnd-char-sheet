@@ -315,6 +315,8 @@ const General = ({ character, updateCharacter, promptHeader }) => {
   );
 
   const updateBackstory = (event) => {
+    event.target.style.height = "inherit";
+    event.target.style.height = `${event.target.scrollHeight}px`;
     updateCharacter({ backstory: event.target.value.split("\n") });
   };
 
@@ -365,10 +367,9 @@ const General = ({ character, updateCharacter, promptHeader }) => {
             <h1>Backstory</h1>
             <textarea
               name="backstory"
-              className="col-12"
+              className="col-12 locked-textarea"
               defaultValue={character.backstory.join("\n")}
               onChange={updateBackstory}
-              rows={character.backstory.length}
             />
           </div>
         </div>

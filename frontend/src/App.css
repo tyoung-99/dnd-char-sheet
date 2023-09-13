@@ -79,3 +79,8 @@
 .col-12 {
   width: calc(100% / 12 * 12);
 }
+
+.locked-textarea {
+  overflow: hidden;
+  resize: none;
+}
