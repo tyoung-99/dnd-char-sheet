@@ -2,6 +2,7 @@
 import "../../../styling/General.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import DynamicTextArea from "../../../components/DynamicTextArea";
 
 const General = ({ character, updateCharacter, promptHeader }) => {
   const alignmentList = [
@@ -315,8 +316,6 @@ const General = ({ character, updateCharacter, promptHeader }) => {
   );
 
   const updateBackstory = (event) => {
-    event.target.style.height = "inherit";
-    event.target.style.height = `${event.target.scrollHeight}px`;
     updateCharacter({ backstory: event.target.value.split("\n") });
   };
 
@@ -365,7 +364,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
         <div className="col-12 col-flex">
           <div className="grid-tile">
             <h1>Backstory</h1>
-            <textarea
+            <DynamicTextArea
               name="backstory"
               className="col-12 locked-textarea"
               defaultValue={character.backstory.join("\n")}

@@ -5,6 +5,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { TreeView } from "@mui/x-tree-view/TreeView";
 import CustomTreeItem from "../CustomTreeItem";
+import DynamicTextArea from "../DynamicTextArea";
 
 const EditRaceModal = ({ item, closeModal, updateItem, removeItem }) => {
   const [newRace, setNewRace] = useState(item);
@@ -289,14 +290,14 @@ const EditRaceModal = ({ item, closeModal, updateItem, removeItem }) => {
                               placeholder="Trait Name"
                               value={trait.name}
                             ></input>
-                            <textarea
+                            <DynamicTextArea
                               name="race-trait-desc"
                               data-race-src-index={i}
                               data-race-trait-index={j}
                               onChange={queueChange}
                               placeholder="Trait Description"
                               value={trait.description}
-                              rows={5}
+                              className="locked-textarea"
                             />
                           </div>
                           <button
@@ -427,7 +428,7 @@ const EditRaceModal = ({ item, closeModal, updateItem, removeItem }) => {
                                       placeholder="Trait Name"
                                       value={subTrait.name}
                                     ></input>
-                                    <textarea
+                                    <DynamicTextArea
                                       name="subrace-trait-desc"
                                       data-race-src-index={i}
                                       data-subrace-index={j}
@@ -436,7 +437,7 @@ const EditRaceModal = ({ item, closeModal, updateItem, removeItem }) => {
                                       onChange={queueChange}
                                       placeholder="Trait Description"
                                       value={subTrait.description}
-                                      rows={5}
+                                      className="locked-textarea"
                                     />
                                   </div>
                                   <button

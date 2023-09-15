@@ -40,7 +40,15 @@ const AdminPage = () => {
         <EditSection
           singular={"Background"}
           plural={"Backgrounds"}
-          template={{ name: "New Background" }}
+          template={{
+            name: "New Background",
+            source: "",
+            personalityTrait1: "",
+            personalityTrait2: "",
+            ideal: "",
+            bond: "",
+            flaw: "",
+          }}
           EditModal={EditBackgroundModal}
         />
       </div>
