@@ -5,19 +5,9 @@ import axios from "axios";
 import DynamicTextArea from "../../../components/DynamicTextArea";
 
 const General = ({ character, updateCharacter, promptHeader }) => {
-  const alignmentList = [
-    "Lawful Good",
-    "Lawful Neutral",
-    "Lawful Evil",
-    "Neutral Good",
-    "True Neutral",
-    "Neutral Evil",
-    "Chaotic Good",
-    "Chaotic Neutral",
-    "Chaotic Evil",
-  ];
   const backgroundList = ["Background 1", "Background 2", "Background 3"];
 
+  const [alignmentOptions, setAlignmentOptions] = useState();
   const [raceOptions, setRaceOptions] = useState();
 
   let selectedRace = {
@@ -64,11 +54,57 @@ const General = ({ character, updateCharacter, promptHeader }) => {
 
   useEffect(() => {
     const loadData = async () => {
+      const newAlignmentOptions = (await axios.get("api/data/alignments")).data;
+      setAlignmentOptions(newAlignmentOptions);
       const newRaceOptions = (await axios.get("/api/data/races")).data;
       setRaceOptions(newRaceOptions);
     };
     loadData();
   }, []);
+
+  const nameTile = (
+    <div className="grid-tile">
+      <h1>Name</h1>
+      <input
+        className="col-12"
+        type="text"
+        name="char-name"
+        defaultValue={character.name}
+        onChange={(event) => {
+          promptHeader();
+          updateCharacter({ name: event.target.value });
+        }}
+      ></input>
+    </div>
+  );
+
+  let alignmentTile;
+  if (alignmentOptions) {
+    alignmentTile = (
+      <div className="grid-tile">
+        <h1>Alignment</h1>
+        <select
+          name="alignment"
+          defaultValue={
+            character.alignment ? character.alignment : "Select Alignment"
+          }
+          onChange={(event) => {
+            promptHeader();
+            updateCharacter({ alignment: event.target.value });
+          }}
+        >
+          <option disabled hidden>
+            Select Alignment
+          </option>
+          {alignmentOptions.map((alignment) => (
+            <option key={alignment.name}>{alignment.name}</option>
+          ))}
+        </select>
+      </div>
+    );
+  } else {
+    alignmentTile = null;
+  }
 
   const updateRace = (event) => {
     let selection = event.target.value;
@@ -169,7 +205,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
     promptHeader();
   };
 
-  const raceSection = (
+  const raceTile = (
     <div className="grid-tile">
       <h1>Race</h1>
       {raceOptions ? (
@@ -288,7 +324,7 @@ const General = ({ character, updateCharacter, promptHeader }) => {
 
   const [, setBackground] = useState(character.background.name);
 
-  const backgroundSection = (
+  const backgroundTile = (
     <div className="col-6 col-flex">
       <div className="grid-tile">
         <h1>Background</h1>
@@ -319,59 +355,30 @@ const General = ({ character, updateCharacter, promptHeader }) => {
     updateCharacter({ backstory: event.target.value.split("\n") });
   };
 
+  const backstoryTile = (
+    <div className="grid-tile">
+      <h1>Backstory</h1>
+      <DynamicTextArea
+        name="backstory"
+        className="col-12 locked-textarea"
+        defaultValue={character.backstory.join("\n")}
+        onChange={updateBackstory}
+      />
+    </div>
+  );
+
   return (
     <div className="grid-container row-flex">
       <div className="col-12 col-flex">
         <div className="grid-container row-flex">
           <div className="col-6 col-flex">
-            <div className="grid-tile">
-              <h1>Name</h1>
-              <input
-                className="col-12"
-                type="text"
-                name="char-name"
-                defaultValue={character.name}
-                onChange={(event) => {
-                  promptHeader();
-                  updateCharacter({ name: event.target.value });
-                }}
-              ></input>
-            </div>
-            <div className="grid-tile">
-              <h1>Alignment</h1>
-              <select
-                name="alignment"
-                defaultValue={
-                  character.alignment ? character.alignment : "Select Alignment"
-                }
-                onChange={(event) => {
-                  promptHeader();
-                  updateCharacter({ alignment: event.target.value });
-                }}
-              >
-                <option disabled hidden>
-                  Select Alignment
-                </option>
-                {alignmentList.map((alignment) => (
-                  <option key={alignment}>{alignment}</option>
-                ))}
-              </select>
-            </div>
-            {raceSection}
+            {nameTile}
+            {alignmentTile}
+            {raceTile}
           </div>
-          {backgroundSection}
+          {backgroundTile}
         </div>
-        <div className="col-12 col-flex">
-          <div className="grid-tile">
-            <h1>Backstory</h1>
-            <DynamicTextArea
-              name="backstory"
-              className="col-12 locked-textarea"
-              defaultValue={character.backstory.join("\n")}
-              onChange={updateBackstory}
-            />
-          </div>
-        </div>
+        <div className="col-12 col-flex">{backstoryTile}</div>
       </div>
     </div>
   );
