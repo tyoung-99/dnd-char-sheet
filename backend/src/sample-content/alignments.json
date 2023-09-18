@@ -1,4 +1,1 @@
-[
-  { "id": 1, "name": "alignment 2" },
-  { "name": "s", "id": 2 }
-]
+[{"name":"Lawful Good","id":0},{"name":"Lawful Neutral","id":1},{"name":"Lawful Evil","id":2},{"name":"Neutral Good","id":3},{"name":"True Neutral","id":4},{"name":"Neutral Evil","id":5},{"name":"Chaotic Good","id":6},{"name":"Chaotic Neutral","id":7},{"name":"Chaotic Evil","id":8}]
