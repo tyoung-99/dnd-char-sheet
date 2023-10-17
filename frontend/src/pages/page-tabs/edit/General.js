@@ -5,10 +5,9 @@ import axios from "axios";
 import DynamicTextArea from "../../../components/DynamicTextArea";
 
 const General = ({ character, updateCharacter, promptHeader }) => {
-  const backgroundList = ["Background 1", "Background 2", "Background 3"];
-
   const [alignmentOptions, setAlignmentOptions] = useState();
   const [raceOptions, setRaceOptions] = useState();
+  const [backgroundOptions, setBackgroundOptions] = useState();
 
   let selectedRace = {
     nameIndex: -1,
@@ -58,6 +57,9 @@ const General = ({ character, updateCharacter, promptHeader }) => {
       setAlignmentOptions(newAlignmentOptions);
       const newRaceOptions = (await axios.get("/api/data/races")).data;
       setRaceOptions(newRaceOptions);
+      const newBackgroundOptions = (await axios.get("/api/data/backgrounds"))
+        .data;
+      setBackgroundOptions(newBackgroundOptions);
     };
     loadData();
   }, []);
@@ -78,11 +80,11 @@ const General = ({ character, updateCharacter, promptHeader }) => {
     </div>
   );
 
-  let alignmentTile;
-  if (alignmentOptions) {
-    alignmentTile = (
-      <div className="grid-tile">
-        <h1>Alignment</h1>
+  const alignmentTile = (
+    <div className="grid-tile">
+      <h1>Alignment</h1>
+
+      {alignmentOptions ? (
         <select
           name="alignment"
           defaultValue={
@@ -100,11 +102,9 @@ const General = ({ character, updateCharacter, promptHeader }) => {
             <option key={alignment.name}>{alignment.name}</option>
           ))}
         </select>
-      </div>
-    );
-  } else {
-    alignmentTile = null;
-  }
+      ) : null}
+    </div>
+  );
 
   const updateRace = (event) => {
     let selection = event.target.value;
@@ -328,25 +328,27 @@ const General = ({ character, updateCharacter, promptHeader }) => {
     <div className="col-6 col-flex">
       <div className="grid-tile">
         <h1>Background</h1>
-        <select
-          name="background"
-          defaultValue={
-            character.background.name
-              ? character.background.name
-              : "Select Background"
-          }
-          onChange={(event) => {
-            setBackground(event.target.value);
-            updateCharacter({ background: { name: event.target.value } });
-          }}
-        >
-          <option disabled hidden>
-            Select Background
-          </option>
-          {backgroundList.map((background) => (
-            <option key={background}>{background}</option>
-          ))}
-        </select>
+        {backgroundOptions ? (
+          <select
+            name="background"
+            defaultValue={
+              character.background.name
+                ? character.background.name
+                : "Select Background"
+            }
+            onChange={(event) => {
+              setBackground(event.target.value);
+              updateCharacter({ background: { name: event.target.value } });
+            }}
+          >
+            <option disabled hidden>
+              Select Background
+            </option>
+            {backgroundOptions.map((background) => (
+              <option key={background.name}>{background.name}</option>
+            ))}
+          </select>
+        ) : null}
       </div>
     </div>
   );

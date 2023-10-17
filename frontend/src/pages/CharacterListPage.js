@@ -1,5 +1,6 @@
 import "../styling/CharacterListPage.css";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import CharacterListComp from "../components/CharacterListComp";
 
@@ -22,6 +23,7 @@ const CharacterListPage = () => {
 
   return (
     <>
+      <Link to={"admin"}>Admin</Link>
       <h1>Characters</h1>
       <CharacterListComp characters={charList} />
     </>

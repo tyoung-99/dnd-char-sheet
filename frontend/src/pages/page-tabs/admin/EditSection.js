@@ -8,8 +8,9 @@ const EditSection = ({ singular, plural, template, EditModal }) => {
 
   useEffect(() => {
     const loadData = async () => {
-      const newItems = (await axios.get(`/api/data/${plural.toLowerCase()}`))
-        .data;
+      const newItems = (
+        await axios.get(`/api/data/${plural.toLowerCase().replace(/ /g, "-")}`)
+      ).data;
       if (!Array.isArray(newItems)) {
         setItems(newItems);
         return;
@@ -51,7 +52,7 @@ const EditSection = ({ singular, plural, template, EditModal }) => {
 
   const updateItem = async (newItem) => {
     const response = await axios.put(
-      `/api/data/${plural.toLowerCase()}/update`,
+      `/api/data/${plural.toLowerCase().replace(/ /g, "-")}/update`,
       {
         newData: newItem,
       }
@@ -65,9 +66,12 @@ const EditSection = ({ singular, plural, template, EditModal }) => {
   const addItem = async () => {
     const newItems = [...items];
 
-    const response = await axios.put(`/api/data/${plural.toLowerCase()}/add`, {
-      newData: template,
-    });
+    const response = await axios.put(
+      `/api/data/${plural.toLowerCase().replace(/ /g, "-")}/add`,
+      {
+        newData: template,
+      }
+    );
 
     newItems.push(response.data);
     newItems.sort(sortItems);
@@ -76,7 +80,7 @@ const EditSection = ({ singular, plural, template, EditModal }) => {
 
   const removeItem = async (remove) => {
     const response = await axios.put(
-      `/api/data/${plural.toLowerCase()}/remove`,
+      `/api/data/${plural.toLowerCase().replace(/ /g, "-")}/remove`,
       {
         newData: remove,
       }
@@ -92,7 +96,7 @@ const EditSection = ({ singular, plural, template, EditModal }) => {
   }
 
   if (!Array.isArray(items)) {
-    return <div>File for {plural} not found, or file in wrong format.</div>;
+    return <div>{items}</div>;
   }
 
   return (

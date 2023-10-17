@@ -26,7 +26,7 @@
   display: inline-block;
   text-align: center;
 }
-.modal-container .header input {
+.modal-container .header input[type="text"] {
   font-weight: bold;
   font-size: 2rem;
   margin-top: 0px;
@@ -37,17 +37,21 @@
 .modal-container .body {
   flex: 50%;
   display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.modal-container .body input {
+.modal-container .body input[type="text"] {
   margin-top: 0.125rem;
   margin-bottom: 0.125rem;
   width: 100%;
   box-sizing: border-box;
 }
 .modal-container .body textarea {
+  margin-top: 0.125rem;
+  margin-bottom: 0.125rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+.modal-container .body select {
   margin-top: 0.125rem;
   margin-bottom: 0.125rem;
   width: 100%;
@@ -93,15 +97,12 @@
 .modal-container .delete-button {
   border-radius: 0px;
   margin: 1px;
-  width: 1rem;
-  height: 1rem;
-  font-size: 0.75rem;
+  width: 1.4rem;
+  height: 1.4rem;
+  font-size: 1rem;
   padding: 0px;
 }
 .modal-container .delete-button:hover {
   background-color: rgb(255, 122, 122);
   color: black;
-}
-.modal-container .body div.deletable {
-  align-items: center;
 }

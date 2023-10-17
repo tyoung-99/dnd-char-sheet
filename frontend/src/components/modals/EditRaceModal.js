@@ -57,7 +57,7 @@ const EditRaceModal = ({ item, closeModal, updateItem, removeItem }) => {
         ].traits[subraceTraitIndex].description = inputField.value;
         break;
       default:
-        console.log(`Unexpected input field name: ${inputField.name}`);
+        window.alert(`Unexpected input field name: ${inputField.name}`);
         break;
     }
 
@@ -114,7 +114,7 @@ const EditRaceModal = ({ item, closeModal, updateItem, removeItem }) => {
         });
         break;
       default:
-        console.log(`Unexpected button name: ${button.name}`);
+        window.alert(`Unexpected button name: ${button.name}`);
     }
 
     setNewRace(raceChange);
@@ -152,7 +152,7 @@ const EditRaceModal = ({ item, closeModal, updateItem, removeItem }) => {
         ].traits.splice(subraceTraitIndex, 1);
         break;
       default:
-        console.log(`Unexpected button name: ${button.name}`);
+        window.alert(`Unexpected button name: ${button.name}`);
     }
 
     setNewRace(raceChange);
@@ -160,47 +160,10 @@ const EditRaceModal = ({ item, closeModal, updateItem, removeItem }) => {
 
   const confirmDelete = (event) => {
     const button = event.target;
-    const raceSrcIndex = button.getAttribute("data-race-src-index");
-    const raceTraitIndex = button.getAttribute("data-race-trait-index");
-    const subraceIndex = button.getAttribute("data-subrace-index");
-    const subraceSrcIndex = button.getAttribute("data-subrace-src-index");
-    const subraceTraitIndex = button.getAttribute("data-subrace-trait-index");
-
-    let componentName;
-    switch (button.name) {
-      case "delete-race":
-        componentName = newRace.name;
-        break;
-      case "race-src":
-        componentName = newRace.sources[raceSrcIndex].name;
-        break;
-      case "race-trait":
-        componentName =
-          newRace.sources[raceSrcIndex].traits[raceTraitIndex].name;
-        break;
-      case "subrace":
-        componentName =
-          newRace.sources[raceSrcIndex].subraces[subraceIndex].name;
-        break;
-      case "subrace-src":
-        componentName =
-          newRace.sources[raceSrcIndex].subraces[subraceIndex].sources[
-            subraceSrcIndex
-          ].name;
-        break;
-      case "subrace-trait":
-        componentName =
-          newRace.sources[raceSrcIndex].subraces[subraceIndex].sources[
-            subraceSrcIndex
-          ].traits[subraceTraitIndex].name;
-        break;
-      default:
-        console.log(`Unexpected component name: ${button.name}`);
-    }
 
     if (
       window.confirm(
-        `Are you sure you want to delete ${componentName} and all its contained data? This cannot be undone.`
+        `Are you sure you want to delete this item and all its contained data? This cannot be undone.`
       )
     ) {
       if (button.name === "delete-race") {
@@ -217,6 +180,7 @@ const EditRaceModal = ({ item, closeModal, updateItem, removeItem }) => {
       <div className="modal-container">
         <div className="header">
           <input
+            type="text"
             name="race-name"
             onChange={queueChange}
             placeholder="Race Name"
@@ -243,8 +207,9 @@ const EditRaceModal = ({ item, closeModal, updateItem, removeItem }) => {
                 key={`race-src-${i}`}
                 nodeId={`race-src-${i}`}
                 label={
-                  <div className="row-flex deletable">
+                  <div className="row-flex">
                     <input
+                      type="text"
                       name="race-src-name"
                       data-race-src-index={i}
                       onChange={queueChange}
@@ -280,9 +245,10 @@ const EditRaceModal = ({ item, closeModal, updateItem, removeItem }) => {
                       key={`race-src-${i}-trait-${j}`}
                       nodeId={`race-src-${i}-trait-${j}`}
                       label={
-                        <div className="row-flex deletable">
-                          <div className="">
+                        <div className="row-flex">
+                          <div>
                             <input
+                              type="text"
                               name="race-trait-name"
                               data-race-src-index={i}
                               data-race-trait-index={j}
@@ -335,8 +301,9 @@ const EditRaceModal = ({ item, closeModal, updateItem, removeItem }) => {
                       key={`race-src-${i}-subrace-${j}`}
                       nodeId={`race-src-${i}-subrace-${j}`}
                       label={
-                        <div className="row-flex deletable">
+                        <div className="row-flex">
                           <input
+                            type="text"
                             name="subrace-name"
                             data-race-src-index={i}
                             data-subrace-index={j}
@@ -374,8 +341,9 @@ const EditRaceModal = ({ item, closeModal, updateItem, removeItem }) => {
                           key={`race-src-${i}-subrace-${j}-src-${k}`}
                           nodeId={`race-src-${i}-subrace-${j}-src-${k}`}
                           label={
-                            <div className="row-flex deletable">
+                            <div className="row-flex">
                               <input
+                                type="text"
                                 name="subrace-src-name"
                                 data-race-src-index={i}
                                 data-subrace-index={j}
@@ -416,9 +384,10 @@ const EditRaceModal = ({ item, closeModal, updateItem, removeItem }) => {
                               key={`race-src-${i}-subrace-${j}-src-${k}-trait-${l}`}
                               nodeId={`race-src-${i}-subrace-${j}-src-${k}-trait-${l}`}
                               label={
-                                <div className="row-flex deletable">
+                                <div className="row-flex">
                                   <div>
                                     <input
+                                      type="text"
                                       name="subrace-trait-name"
                                       data-race-src-index={i}
                                       data-subrace-index={j}

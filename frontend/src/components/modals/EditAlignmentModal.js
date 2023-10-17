@@ -14,7 +14,7 @@ const EditAlignmentModal = ({ item, closeModal, updateItem, removeItem }) => {
   const confirmDelete = (event) => {
     if (
       window.confirm(
-        `Are you sure you want to delete ${newAlignment.name} and all its contained data? This cannot be undone.`
+        `Are you sure you want to delete this item and all its contained data? This cannot be undone.`
       )
     ) {
       removeItem(newAlignment);
@@ -27,6 +27,7 @@ const EditAlignmentModal = ({ item, closeModal, updateItem, removeItem }) => {
       <div className="modal-container">
         <div className="header">
           <input
+            type="text"
             name="alignment-name"
             onChange={queueChange}
             placeholder="Alignment Name"

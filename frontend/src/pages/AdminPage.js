@@ -1,58 +1,49 @@
 // Allows viewing/editing background data on races, classes, etc.
 import "../styling/AdminPage.css";
-import EditSection from "./page-tabs/admin/EditSection";
-import EditAlignmentModal from "../components/modals/EditAlignmentModal";
-import EditRaceModal from "../components/modals/EditRaceModal";
-import EditBackgroundModal from "../components/modals/EditBackgroundModal";
+import { useState } from "react";
+import TabNavComp from "../components/TabNavComp";
+import TabContentComp from "../components/TabContentComp";
+import Alignments from "./page-tabs/admin/Alignments";
+import Races from "./page-tabs/admin/Races";
+import Backgrounds from "./page-tabs/admin/Backgrounds";
 
 const AdminPage = () => {
+  const [activeTab, setActiveTab] = useState("alignments");
+
   return (
-    <div className="admin">
-      <div className="admin-col">
-        <h1>Alignments</h1>
-        <EditSection
-          singular={"Alignment"}
-          plural={"Alignments"}
-          template={{ name: "New Alignment" }}
-          EditModal={EditAlignmentModal}
+    <>
+      <ul className="nav">
+        <TabNavComp
+          id={"alignments"}
+          tabName={"Alignments"}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
         />
-      </div>
-      <div className="admin-col">
-        <h1>Races</h1>
-        <EditSection
-          singular={"Race"}
-          plural={"Races"}
-          template={{
-            name: "New Race",
-            sources: [
-              {
-                name: "New Source",
-                traits: [],
-                subraces: [],
-              },
-            ],
-          }}
-          EditModal={EditRaceModal}
+        <TabNavComp
+          id={"races"}
+          tabName={"Races"}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
         />
-      </div>
-      <div className="admin-col">
-        <h1>Backgrounds</h1>
-        <EditSection
-          singular={"Background"}
-          plural={"Backgrounds"}
-          template={{
-            name: "New Background",
-            source: "",
-            personalityTrait1: "",
-            personalityTrait2: "",
-            ideal: "",
-            bond: "",
-            flaw: "",
-          }}
-          EditModal={EditBackgroundModal}
+        <TabNavComp
+          id={"backgrounds"}
+          tabName={"Backgrounds"}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
         />
+      </ul>
+      <div>
+        <TabContentComp id={"alignments"} activeTab={activeTab}>
+          <Alignments />
+        </TabContentComp>
+        <TabContentComp id={"races"} activeTab={activeTab}>
+          <Races />
+        </TabContentComp>
+        <TabContentComp id={"backgrounds"} activeTab={activeTab}>
+          <Backgrounds />
+        </TabContentComp>
       </div>
-    </div>
+    </>
   );
 };
 
