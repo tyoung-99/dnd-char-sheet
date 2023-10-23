@@ -2,7 +2,7 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 
-const EditSection = ({ singular, plural, template, EditModal }) => {
+const AdminEditComp = ({ singular, plural, template, EditModal }) => {
   const [items, setItems] = useState();
   const [openModals, setOpenModalsAll] = useState();
 
@@ -121,4 +121,4 @@ const EditSection = ({ singular, plural, template, EditModal }) => {
   );
 };
 
-export default EditSection;
+export default AdminEditComp;

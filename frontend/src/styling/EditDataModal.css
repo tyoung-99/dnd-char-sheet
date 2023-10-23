@@ -45,6 +45,9 @@
   width: 100%;
   box-sizing: border-box;
 }
+.modal-container .body input[type="text"].labeled-text {
+  margin-left: 1rem;
+}
 .modal-container .body textarea {
   margin-top: 0.125rem;
   margin-bottom: 0.125rem;

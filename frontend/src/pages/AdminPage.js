@@ -1,49 +1,102 @@
 // Allows viewing/editing background data on races, classes, etc.
 import "../styling/AdminPage.css";
-import { useState } from "react";
-import TabNavComp from "../components/TabNavComp";
-import TabContentComp from "../components/TabContentComp";
-import Alignments from "./page-tabs/admin/Alignments";
-import Races from "./page-tabs/admin/Races";
-import Backgrounds from "./page-tabs/admin/Backgrounds";
+import AdminEditComp from "../components/AdminEditComp";
+import EditAlignmentModal from "../components/modals/EditAlignmentModal";
+import EditRaceModal from "../components/modals/EditRaceModal";
+import EditBackgroundModal from "../components/modals/EditBackgroundModal";
+import EditAbilityModal from "../components/modals/EditAbilityModal";
+import EditSkillModal from "../components/modals/EditSkillModal";
 
 const AdminPage = () => {
-  const [activeTab, setActiveTab] = useState("alignments");
+  const abilityTemplate = { name: "New Ability", abbreviation: "" };
+
+  const skillTemplate = { name: "New Skill", ability: -1 };
+
+  const alignmentTemplate = { name: "New Alignment" };
+
+  const raceTemplate = {
+    name: "New Race",
+    sources: [
+      {
+        name: "New Source",
+        traits: [],
+        subraces: [],
+      },
+    ],
+  };
+
+  const backgroundTemplate = {
+    name: "New Background",
+    source: "",
+    features: [
+      {
+        name: "",
+        description: "",
+        copyFrom: null,
+        id: 0,
+      },
+    ],
+    characteristics: {
+      copyFrom: null,
+      traits: [""],
+      ideals: [""],
+      bonds: [""],
+      flaws: [""],
+    },
+    skills: [-1, -1],
+    tools: [-1],
+    languages: [-1],
+    equipment: [{ id: -1, count: 0 }],
+  };
 
   return (
-    <>
-      <ul className="nav">
-        <TabNavComp
-          id={"alignments"}
-          tabName={"Alignments"}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
+    <div className="admin">
+      <div className="admin-col">
+        <h1>Abilities</h1>
+        <AdminEditComp
+          singular={"Ability"}
+          plural={"Abilities"}
+          template={abilityTemplate}
+          EditModal={EditAbilityModal}
         />
-        <TabNavComp
-          id={"races"}
-          tabName={"Races"}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-        />
-        <TabNavComp
-          id={"backgrounds"}
-          tabName={"Backgrounds"}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-        />
-      </ul>
-      <div>
-        <TabContentComp id={"alignments"} activeTab={activeTab}>
-          <Alignments />
-        </TabContentComp>
-        <TabContentComp id={"races"} activeTab={activeTab}>
-          <Races />
-        </TabContentComp>
-        <TabContentComp id={"backgrounds"} activeTab={activeTab}>
-          <Backgrounds />
-        </TabContentComp>
       </div>
-    </>
+      <div className="admin-col">
+        <h1>Skills</h1>
+        <AdminEditComp
+          singular={"Skill"}
+          plural={"Skills"}
+          template={skillTemplate}
+          EditModal={EditSkillModal}
+        />
+      </div>
+      <div className="admin-col">
+        <h1>Alignments</h1>
+        <AdminEditComp
+          singular={"Alignment"}
+          plural={"Alignments"}
+          template={alignmentTemplate}
+          EditModal={EditAlignmentModal}
+        />
+      </div>
+      <div className="admin-col">
+        <h1>Races</h1>
+        <AdminEditComp
+          singular={"Race"}
+          plural={"Races"}
+          template={raceTemplate}
+          EditModal={EditRaceModal}
+        />
+      </div>
+      <div className="admin-col">
+        <h1>Backgrounds</h1>
+        <AdminEditComp
+          singular={"Background"}
+          plural={"Backgrounds"}
+          template={backgroundTemplate}
+          EditModal={EditBackgroundModal}
+        />
+      </div>
+    </div>
   );
 };
 

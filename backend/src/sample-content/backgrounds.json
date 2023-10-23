@@ -1,1 +1,19 @@
-[{"name":"Background 1","source":"","features":[{"name":"Background 1 Feature 1","description":"Background 1 Feature 1 Desc","copyFrom":{"copyBackground":2,"copyFeature":-1},"id":0},{"name":"test","description":"test","copyFrom":null,"id":1}],"characteristics":{"copyFrom":null,"traits":["3"],"ideals":["4","5"],"bonds":["7","11"],"flaws":["9","12"]},"id":0},{"name":"Background 2","source":"","features":[{"name":"Background 2 Feature 1","description":"Background 2 Feature 1 Desc","copyFrom":null,"id":0},{"name":"Background 2 Feature 2","description":"Background 2 Feature 2 Desc","copyFrom":null,"id":1}],"characteristics":{"copyFrom":0,"traits":[""],"ideals":[""],"bonds":[""],"flaws":[""]},"id":1},{"name":"New Background","source":"","features":[{"name":"","description":"","copyFrom":{"copyBackground":0,"copyFeature":"Background 1 Feature 1"},"id":0}],"characteristics":{"copyFrom":0,"traits":[""],"ideals":[""],"bonds":[""],"flaws":[""]},"id":2}]
+[
+  {
+    "name": "New Background",
+    "source": "",
+    "features": [{ "name": "", "description": "", "copyFrom": null, "id": 0 }],
+    "characteristics": {
+      "copyFrom": null,
+      "traits": [""],
+      "ideals": [""],
+      "bonds": [""],
+      "flaws": [""]
+    },
+    "skills": [-1, -1],
+    "tools": [-1],
+    "languages": [-1],
+    "equipment": [{ "id": -1, "count": 0 }],
+    "id": 0
+  }
+]

@@ -11,15 +11,49 @@ import DynamicTextArea from "../DynamicTextArea";
 const EditBackgroundModal = ({ item, closeModal, updateItem, removeItem }) => {
   const [newBackground, setNewBackground] = useState(item);
   const [backgroundsList, setBackgroundsList] = useState(null);
+  const [skillsList, setSkillsList] = useState(null);
+  const [toolsList, setToolsList] = useState(null);
+  const [languagesList, setLanguagesList] = useState(null);
 
   useEffect(() => {
     const loadData = async () => {
       const newBackgroundsList = (await axios.get(`/api/data/backgrounds`))
         .data;
+      if (Array.isArray(newBackgroundsList)) {
+        newBackgroundsList.sort(sortAlpha);
+      }
       setBackgroundsList(newBackgroundsList);
+
+      const newSkillsList = (await axios.get(`/api/data/skills`)).data;
+      if (Array.isArray(newSkillsList)) {
+        newSkillsList.sort(sortAlpha);
+      }
+      setSkillsList(newSkillsList);
+
+      const newToolsList = (await axios.get(`/api/data/tools`)).data;
+      if (Array.isArray(newToolsList)) {
+        newToolsList.sort(sortAlpha);
+      }
+      setToolsList(newToolsList);
+
+      const newLanguagesList = (await axios.get(`/api/data/languages`)).data;
+      if (Array.isArray(newLanguagesList)) {
+        newLanguagesList.sort(sortAlpha);
+      }
+      setLanguagesList(newLanguagesList);
     };
     loadData();
   }, []);
+
+  const sortAlpha = (first, second) => {
+    if (first.name < second.name) {
+      return -1;
+    }
+    if (first.name > second.name) {
+      return 1;
+    }
+    return 0;
+  };
 
   const queueChange = (event) => {
     const inputField = event.target;
@@ -30,6 +64,11 @@ const EditBackgroundModal = ({ item, closeModal, updateItem, removeItem }) => {
     const idealIndex = inputField.getAttribute("data-background-ideal-index");
     const bondIndex = inputField.getAttribute("data-background-bond-index");
     const flawIndex = inputField.getAttribute("data-background-flaw-index");
+    const skillIndex = inputField.getAttribute("data-background-skill-index");
+    const toolIndex = inputField.getAttribute("data-background-tool-index");
+    const languageIndex = inputField.getAttribute(
+      "data-background-language-index"
+    );
 
     const backgroundChange = structuredClone(newBackground);
 
@@ -89,6 +128,15 @@ const EditBackgroundModal = ({ item, closeModal, updateItem, removeItem }) => {
         break;
       case "background-flaw":
         backgroundChange.flaws[flawIndex] = inputField.value;
+        break;
+      case "background-skill":
+        backgroundChange.skills[skillIndex] = parseInt(inputField.value);
+        break;
+      case "background-tool":
+        backgroundChange.tools[toolIndex] = parseInt(inputField.value);
+        break;
+      case "background-language":
+        backgroundChange.languages[languageIndex] = parseInt(inputField.value);
         break;
       default:
         window.alert(`Unexpected input field name: ${inputField.name}`);
@@ -181,6 +229,18 @@ const EditBackgroundModal = ({ item, closeModal, updateItem, removeItem }) => {
     }
   };
 
+  if (!backgroundsList || !skillsList || !toolsList || !languagesList) {
+    return (
+      <div className="modal-background">
+        <div className="modal-container">
+          <div className="header"></div>
+          <div className="body">Loading...</div>
+          <div className="footer"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="modal-background">
       <div className="modal-container">
@@ -195,11 +255,10 @@ const EditBackgroundModal = ({ item, closeModal, updateItem, removeItem }) => {
         </div>
         <div className="body col-flex">
           <div className="row-flex col-12">
-            <label htmlFor="background-src" className="col-3">
-              Source
-            </label>
+            <label htmlFor="background-src">Source</label>
             <input
               type="text"
+              className="labeled-text"
               id="background-src"
               name="background-src"
               onChange={queueChange}
@@ -212,6 +271,175 @@ const EditBackgroundModal = ({ item, closeModal, updateItem, removeItem }) => {
             defaultExpandIcon={<ChevronRightIcon />}
             sx={{ width: 1 }}
           >
+            <CustomTreeItem
+              nodeId={`background-skills-list`}
+              label={<div>Skill Proficiencies</div>}
+            >
+              <CustomTreeItem
+                nodeId={`add-background-skill`}
+                label={
+                  <button name="background-skill" onClick={addSection}>
+                    Add Skill Proficiency
+                  </button>
+                }
+              ></CustomTreeItem>
+              {!Array.isArray(skillsList) ? (
+                <CustomTreeItem
+                  key={"background-skills-not-found"}
+                  nodeId={"background-skills-not-found"}
+                  label={<div>{skillsList}</div>}
+                ></CustomTreeItem>
+              ) : (
+                newBackground.skills.map((skill, i) => (
+                  <CustomTreeItem
+                    key={`background-skill-${i}`}
+                    nodeId={`background-skill-${i}`}
+                    label={
+                      <div className="row-flex">
+                        <select
+                          name="background-skill"
+                          data-background-skill-index={i}
+                          defaultValue={skill}
+                          onChange={queueChange}
+                        >
+                          <option hidden>Select a skill</option>
+                          {skillsList.map((skill) => (
+                            <option key={skill.id} value={skill.id}>
+                              {skill.name}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          name="background-skill"
+                          data-background-skill-index={i}
+                          className="delete-button"
+                          onClick={confirmDelete}
+                        >
+                          X
+                        </button>
+                      </div>
+                    }
+                  ></CustomTreeItem>
+                ))
+              )}
+            </CustomTreeItem>
+            <CustomTreeItem
+              nodeId={`background-tools-list`}
+              label={<div>Tool Proficiencies</div>}
+            >
+              <CustomTreeItem
+                nodeId={`add-background-tool`}
+                label={
+                  <button name="background-tool" onClick={addSection}>
+                    Add Tool Proficiency
+                  </button>
+                }
+              ></CustomTreeItem>
+              {!Array.isArray(toolsList) ? (
+                <CustomTreeItem
+                  key={"background-tools-not-found"}
+                  nodeId={"background-tools-not-found"}
+                  label={<div>{toolsList}</div>}
+                ></CustomTreeItem>
+              ) : (
+                newBackground.tools.map((tool, i) => (
+                  <CustomTreeItem
+                    key={`background-tool-${i}`}
+                    nodeId={`background-tool-${i}`}
+                    label={
+                      <div className="row-flex">
+                        <select
+                          name="background-tool"
+                          data-background-tool-index={i}
+                          defaultValue={tool}
+                          onChange={queueChange}
+                        >
+                          <option hidden>Select a tool</option>
+                          {toolsList.map((tool) => (
+                            <option key={tool.id} value={tool.id}>
+                              {tool.name}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          name="background-tool"
+                          data-background-tool-index={i}
+                          className="delete-button"
+                          onClick={confirmDelete}
+                        >
+                          X
+                        </button>
+                      </div>
+                    }
+                  ></CustomTreeItem>
+                ))
+              )}
+            </CustomTreeItem>
+            <CustomTreeItem
+              nodeId={`background-languages-list`}
+              label={<div>Languages</div>}
+            >
+              <CustomTreeItem
+                nodeId={`add-background-language`}
+                label={
+                  <button name="background-language" onClick={addSection}>
+                    Add Language
+                  </button>
+                }
+              ></CustomTreeItem>
+              {!Array.isArray(languagesList) ? (
+                <CustomTreeItem
+                  key={"background-tools-not-found"}
+                  nodeId={"background-tools-not-found"}
+                  label={<div>{languagesList}</div>}
+                ></CustomTreeItem>
+              ) : (
+                newBackground.languages.map((language, i) => (
+                  <CustomTreeItem
+                    key={`background-language-${i}`}
+                    nodeId={`background-language-${i}`}
+                    label={
+                      <div className="row-flex">
+                        <select
+                          name="background-language"
+                          data-background-language-index={i}
+                          defaultValue={language}
+                          onChange={queueChange}
+                        >
+                          <option hidden>Select a language</option>
+                          {languagesList.map((language) => (
+                            <option key={language.id} value={language.id}>
+                              {language.name}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          name="background-language"
+                          data-background-language-index={i}
+                          className="delete-button"
+                          onClick={confirmDelete}
+                        >
+                          X
+                        </button>
+                      </div>
+                    }
+                  ></CustomTreeItem>
+                ))
+              )}
+            </CustomTreeItem>
+            <CustomTreeItem
+              nodeId={`background-equipment-list`}
+              label={<div>Equipment</div>}
+            >
+              <CustomTreeItem
+                nodeId={`add-background-equipment`}
+                label={
+                  <button name="background-equipment" onClick={addSection}>
+                    Add Item
+                  </button>
+                }
+              ></CustomTreeItem>
+            </CustomTreeItem>
             <CustomTreeItem
               nodeId={`background-features-list`}
               label={<div>Features</div>}
@@ -268,22 +496,14 @@ const EditBackgroundModal = ({ item, closeModal, updateItem, removeItem }) => {
                             Copy from another background
                           </label>
                         </div>
-                        {!feature.copyFrom || !backgroundsList ? null : (
+                        {!feature.copyFrom ? null : (
                           <select
                             name="copy-background"
                             data-background-feature-index={i}
-                            defaultValue={
-                              backgroundsList[feature.copyFrom.copyBackground]
-                                ? backgroundsList[
-                                    feature.copyFrom.copyBackground
-                                  ].name
-                                : "Choose background"
-                            }
+                            defaultValue={feature.copyFrom.copyBackground}
                             onChange={queueChange}
                           >
-                            <option disabled hidden>
-                              Choose background
-                            </option>
+                            <option hidden>Choose background</option>
                             {backgroundsList.map((background) => {
                               if (background.id === newBackground.id) {
                                 return null;
@@ -300,41 +520,36 @@ const EditBackgroundModal = ({ item, closeModal, updateItem, removeItem }) => {
                           </select>
                         )}
                         {!feature.copyFrom ||
-                        !backgroundsList ||
-                        !backgroundsList[
-                          feature.copyFrom.copyBackground
-                        ] ? null : (
+                        !backgroundsList.find(
+                          (background) =>
+                            background.id === feature.copyFrom.copyBackground
+                        ) ? null : (
                           <select
                             name="copy-feature"
                             data-background-feature-index={i}
-                            defaultValue={
-                              backgroundsList[feature.copyFrom.copyBackground]
-                                .features[feature.copyFrom.copyFeature]
-                                ? backgroundsList[
-                                    feature.copyFrom.copyBackground
-                                  ].features[feature.copyFrom.copyFeature].name
-                                : "Choose feature"
-                            }
+                            defaultValue={feature.copyFrom.copyFeature}
                             onChange={queueChange}
                           >
-                            <option disabled hidden>
-                              Choose feature
-                            </option>
-                            {backgroundsList[
-                              feature.copyFrom.copyBackground
-                            ].features.map((featureOption) => {
-                              if (featureOption.copyFrom) {
-                                return null;
-                              }
-                              return (
-                                <option
-                                  key={featureOption.id}
-                                  value={featureOption.id}
-                                >
-                                  {featureOption.name}
-                                </option>
-                              );
-                            })}
+                            <option hidden>Choose feature</option>
+                            {backgroundsList
+                              .find(
+                                (background) =>
+                                  background.id ===
+                                  feature.copyFrom.copyBackground
+                              )
+                              .features.map((featureOption) => {
+                                if (featureOption.copyFrom) {
+                                  return null;
+                                }
+                                return (
+                                  <option
+                                    key={featureOption.id}
+                                    value={featureOption.id}
+                                  >
+                                    {featureOption.name}
+                                  </option>
+                                );
+                              })}
                           </select>
                         )}
                       </div>
@@ -375,18 +590,10 @@ const EditBackgroundModal = ({ item, closeModal, updateItem, removeItem }) => {
                     newBackground.characteristics.copyFrom === 0) ? (
                     <select
                       name="copy-characteristics"
-                      defaultValue={
-                        backgroundsList[newBackground.characteristics.copyFrom]
-                          ? backgroundsList[
-                              newBackground.characteristics.copyFrom
-                            ].name
-                          : "Choose background"
-                      }
+                      defaultValue={newBackground.characteristics.copyFrom}
                       onChange={queueChange}
                     >
-                      <option disabled hidden>
-                        Choose background
-                      </option>
+                      <option hidden>Choose background</option>
                       {backgroundsList.map((background) => {
                         if (background.id === newBackground.id) {
                           return null;

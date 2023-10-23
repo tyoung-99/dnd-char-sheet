@@ -1,0 +1,20 @@
+[
+  { "name": "Athletics", "ability": 0, "id": 0 },
+  { "name": "Acrobatics", "ability": 1, "id": 1 },
+  { "name": "Sleight of Hand", "ability": 1, "id": 2 },
+  { "name": "Stealth", "ability": 1, "id": 3 },
+  { "name": "Arcana", "ability": 3, "id": 4 },
+  { "name": "History", "ability": 3, "id": 5 },
+  { "name": "Investigation", "ability": 3, "id": 6 },
+  { "name": "Nature", "ability": 3, "id": 7 },
+  { "name": "Religion", "ability": 3, "id": 8 },
+  { "name": "Animal Handling", "ability": 4, "id": 9 },
+  { "name": "Insight", "ability": 4, "id": 10 },
+  { "name": "Medicine", "ability": 4, "id": 11 },
+  { "name": "Perception", "ability": 4, "id": 12 },
+  { "name": "Survival", "ability": 4, "id": 13 },
+  { "name": "Deception", "ability": 5, "id": 14 },
+  { "name": "Intimidation", "ability": 5, "id": 15 },
+  { "name": "Performance", "ability": 5, "id": 16 },
+  { "name": "Persuasion", "ability": 5, "id": 17 }
+]
