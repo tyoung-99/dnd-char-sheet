@@ -6,11 +6,21 @@ import EditRaceModal from "../components/modals/EditRaceModal";
 import EditBackgroundModal from "../components/modals/EditBackgroundModal";
 import EditAbilityModal from "../components/modals/EditAbilityModal";
 import EditSkillModal from "../components/modals/EditSkillModal";
+import EditLanguageModal from "../components/modals/EditLanguageModal";
 
 const AdminPage = () => {
   const abilityTemplate = { name: "New Ability", abbreviation: "" };
 
   const skillTemplate = { name: "New Skill", ability: -1 };
+
+  const toolTemplate = {};
+
+  const languageTemplate = {
+    name: "New Language",
+    typicalSpeakers: "",
+    script: "",
+    prevalence: "",
+  };
 
   const alignmentTemplate = { name: "New Alignment" };
 
@@ -67,6 +77,24 @@ const AdminPage = () => {
           plural={"Skills"}
           template={skillTemplate}
           EditModal={EditSkillModal}
+        />
+      </div>
+      <div className="admin-col">
+        <h1>Tools</h1>
+        <AdminEditComp
+          singular={"Tool"}
+          plural={"Tools"}
+          template={toolTemplate}
+          // EditModal={EditToolModal}
+        />
+      </div>
+      <div className="admin-col">
+        <h1>Languages</h1>
+        <AdminEditComp
+          singular={"Language"}
+          plural={"Languages"}
+          template={languageTemplate}
+          EditModal={EditLanguageModal}
         />
       </div>
       <div className="admin-col">
