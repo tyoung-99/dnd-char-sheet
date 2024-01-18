@@ -108,14 +108,14 @@ const characters = [
     toolProfs: ["Tool 1", "Tool 2"],
     languages: ["Language 1", "Language 2"],
 
-    backstory: [`Backstory`, `multiple`, `paragraphs`],
+    backstory: ["Backstory", "multiple", "paragraphs"],
     background: {
-      name: "Background",
+      name: "Background Name",
       feature: "Feature",
       personalityTraits: ["Trait 1", "Trait 2"],
-      ideals: ["Ideal"],
-      bonds: ["Bond"],
-      flaws: ["Flaw"],
+      ideals: ["Ideal", "P2"],
+      bonds: ["Bond", "P2"],
+      flaws: ["Flaw", "P2"],
     },
 
     race: {
