@@ -44,6 +44,7 @@ const CharacterPage = () => {
     <div>
       <div className="name-header">
         <h1>{character.name}</h1>
+        <h2>{character.player}</h2>
         <p>{character.alignment}</p>
         <p>
           {character.race.name}{" "}
