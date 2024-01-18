@@ -1,4 +1,5 @@
 // Character's inventory/equipment
+import "../../styling/CharacterInventoryTab.css";
 
 const CharacterInventoryTab = ({ character }) => {
   let itemizedInventory = {};
@@ -34,11 +35,16 @@ const CharacterInventoryTab = ({ character }) => {
 
   return (
     <>
+      <div className="row-flex col-6 coins">
+        <h2 className="col-2">{character.coins.cp} CP</h2>
+        <h2 className="col-2">{character.coins.sp} SP</h2>
+        <h2 className="col-2">{character.coins.ep} EP</h2>
+        <h2 className="col-2">{character.coins.gp} GP</h2>
+        <h2 className="col-2">{character.coins.pp} PP</h2>
+      </div>
       {Object.keys(itemizedInventory).map((type) => (
         <div key={type}>
-          <div className="row-flex">
-            <h2>{type}</h2>
-          </div>
+          <h2>{type}</h2>
           {itemizedInventory[type]}
         </div>
       ))}
