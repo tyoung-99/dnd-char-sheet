@@ -33,10 +33,10 @@ const CharacterPage = () => {
   if (!character) {
     return <div>Loading...</div>;
   }
-  const currentHD = character.hit_dice.remaining.map(
+  const currentHD = character.hitDice.remaining.map(
     (die) => `${die.number}d${die.faces}`
   );
-  const totalHD = character.hit_dice.total.map(
+  const totalHD = character.hitDice.total.map(
     (die) => `${die.number}d${die.faces}`
   );
 
@@ -54,7 +54,7 @@ const CharacterPage = () => {
       <div className="xp-header">XP: {character.xp}</div>
       <div className="combat-header">
         <div>
-          <p>AC: {character.armor_class}</p>
+          <p>AC: {character.armorClass}</p>
           <p>
             Initiative:{" "}
             {(character.initiative >= 0 ? "+" : "") + character.initiative}
@@ -69,7 +69,7 @@ const CharacterPage = () => {
           <p>Current Hit Dice: {currentHD.join(", ")}</p>
           <p>Total Hit Dice: {totalHD.join(", ")}</p>
         </div>
-        <DeathSavesComp deathSaves={character.death_saves} />
+        <DeathSavesComp deathSaves={character.deathSaves} />
       </div>
       <ul className="nav">
         <TabNavComp
