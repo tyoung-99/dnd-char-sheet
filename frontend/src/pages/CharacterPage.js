@@ -52,7 +52,10 @@ const CharacterPage = () => {
         </p>
         <InlineClassListComp classes={character.classes} />
       </div>
-      <div className="xp-header">XP: {character.xp}</div>
+      <div className="xp-inspire-header">
+        <div>XP: {character.xp}</div>
+        <div>Inspiration: {character.inspiration ? "Yes" : "No"}</div>
+      </div>
       <div className="combat-header">
         <div>
           <p>AC: {character.armorClass}</p>

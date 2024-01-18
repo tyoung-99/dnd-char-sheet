@@ -38,8 +38,8 @@
   display: inline-block;
   margin: 0.5rem;
 }
-/* XP total */
-.xp-header {
+/* XP total/inspiration */
+.xp-inspire-header {
   position: absolute;
   top: 2rem;
   right: 2rem;
