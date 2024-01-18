@@ -26,6 +26,18 @@ app.get("/api/characters/:id", async (req, res) => {
   }
 });
 
+app.get("/api/images/:file-name", async (req, res) => {
+  console.log("here");
+  const { fileName } = req.params;
+  console.log(fileName);
+  const image = await readFile(`../imgs/${fileName}`);
+  if (image) {
+    res.sendFile(image);
+  } else {
+    res.sendStatus(404);
+  }
+});
+
 const PORT = process.env.PORT || 8000;
 
 app.listen(PORT, () => {

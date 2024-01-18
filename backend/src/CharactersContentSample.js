@@ -232,6 +232,9 @@ const characters = [
       desc: ["Description", "multiple", "paragraphs"],
     },
 
+    allies: ["Allies", "multiple", "paragraphs"],
+    symbol_src: "1.png",
+
     spellcasting: {
       level: 2,
       slotsMax: [3, 0, 0, 0, 0, 0, 0, 0, 0],
