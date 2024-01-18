@@ -222,6 +222,16 @@ const characters = [
     ],
     coins: { cp: 0, sp: 1, ep: 2, gp: 3, pp: 4 },
 
+    appearance: {
+      age: "25 years",
+      height: "5 ft 4 in",
+      weight: "234 lbs",
+      eyes: "blue",
+      skin: "red",
+      hair: "white",
+      desc: ["Description", "multiple", "paragraphs"],
+    },
+
     spellcasting: {
       level: 2,
       slotsMax: [3, 0, 0, 0, 0, 0, 0, 0, 0],

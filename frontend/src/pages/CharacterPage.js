@@ -84,7 +84,7 @@ const CharacterPage = () => {
         />
         <TabNavComp
           id={"background"}
-          tabName={"Background"}
+          tabName={"Background/Appearance"}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />
