@@ -12,14 +12,34 @@
   display: block;
 }
 
+.float-left {
+  float: left;
+  margin-right: 0.5lh;
+}
+
+.float-right {
+  float: right;
+  margin-left: 0.5lh;
+}
+
+.height-1 {
+  height: 1lh;
+}
+.height-8 {
+  height: 8lh;
+}
+
+.text-block {
+  text-align: justify;
+}
+
 /* Distinct tiles w/in sheet (here so functionality can be used by multiple pages) */
 .grid-container * {
   box-sizing: border-box;
 }
 .grid-tile {
   border: 1px solid black;
-  padding: 0.25rem;
-  padding-left: 1rem;
+  padding: 0.25rem 1rem;
   margin: 0.25rem;
   /* B/c of margin collapse */
   margin-bottom: 0.5rem;

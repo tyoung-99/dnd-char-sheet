@@ -42,15 +42,24 @@ const CharacterPage = () => {
 
   return (
     <div>
-      <div className="name-header">
-        <h1>{character.name}</h1>
-        <h2>{character.player}</h2>
-        <p>{character.alignment}</p>
-        <p>
-          {character.race.name}{" "}
-          {character.race.subrace !== null ? `(${character.race.subrace})` : ""}
-        </p>
-        <InlineClassListComp classes={character.classes} />
+      <div className="avatar-holder">
+        <img
+          src={process.env.PUBLIC_URL + `/img/${character.avatarSrc}`}
+          alt="Avatar"
+          className="avatar"
+        ></img>
+        <div className="name-header avatar-label">
+          <h1>{character.name} </h1>
+          <h2>{character.player}</h2>
+          <p>{character.alignment}</p>
+          <p>
+            {character.race.name}{" "}
+            {character.race.subrace !== null
+              ? `(${character.race.subrace})`
+              : ""}
+          </p>
+          <InlineClassListComp classes={character.classes} />
+        </div>
       </div>
       <div className="xp-inspire-header">
         <div>XP: {character.xp}</div>

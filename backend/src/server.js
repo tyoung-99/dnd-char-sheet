@@ -1,7 +1,10 @@
 import express from "express";
+import { readFile } from "fs/promises";
+import { dirname } from "path";
 import sampleChars from "./CharactersContentSample.js";
 
 const app = express();
+const __dirname = dirname(import.meta.url);
 
 app.get("/api/characters", async (req, res) => {
   const characters = sampleChars;
@@ -21,18 +24,6 @@ app.get("/api/characters/:id", async (req, res) => {
 
   if (character) {
     res.json(character);
-  } else {
-    res.sendStatus(404);
-  }
-});
-
-app.get("/api/images/:file-name", async (req, res) => {
-  console.log("here");
-  const { fileName } = req.params;
-  console.log(fileName);
-  const image = await readFile(`../imgs/${fileName}`);
-  if (image) {
-    res.sendFile(image);
   } else {
     res.sendStatus(404);
   }

@@ -3,6 +3,7 @@ const characters = [
     id: 1,
     name: "Character Name",
     player: "Player Name",
+    avatarSrc: "2.png",
     alignment: "Lawful Good",
     xp: 2500,
     inspiration: false,
@@ -108,7 +109,11 @@ const characters = [
     toolProfs: ["Tool 1", "Tool 2"],
     languages: ["Language 1", "Language 2"],
 
-    backstory: ["Backstory", "multiple", "paragraphs"],
+    backstory: [
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum. Sed vestibulum ac nulla eget dictum. Nulla blandit quam risus, in convallis lectus ultrices sed. Pellentesque non magna eu ipsum pharetra vulputate. Sed placerat sapien malesuada, faucibus lacus tristique, faucibus massa. Praesent vel nisi pulvinar, pellentesque elit quis, eleifend turpis. Pellentesque a erat ultrices, sagittis lorem sit amet, ullamcorper turpis. Aliquam imperdiet nulla et orci molestie, sollicitudin facilisis ante elementum. Duis vehicula sollicitudin rutrum. Nullam nec condimentum arcu, in congue risus. Suspendisse ut lectus nisi.",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum. Sed vestibulum ac nulla eget dictum. Nulla blandit quam risus, in convallis lectus ultrices sed. Pellentesque non magna eu ipsum pharetra vulputate. Sed placerat sapien malesuada, faucibus lacus tristique, faucibus massa. Praesent vel nisi pulvinar, pellentesque elit quis, eleifend turpis. Pellentesque a erat ultrices, sagittis lorem sit amet, ullamcorper turpis. Aliquam imperdiet nulla et orci molestie, sollicitudin facilisis ante elementum. Duis vehicula sollicitudin rutrum. Nullam nec condimentum arcu, in congue risus. Suspendisse ut lectus nisi.ltiple",
+      "In eget magna nibh. Morbi ultrices, nunc sit amet volutpat sollicitudin, sem turpis tincidunt erat, eget molestie mi felis id tortor. Donec nec ligula et nibh feugiat aliquet. Quisque scelerisque orci eget justo bibendum egestas. Nullam ut ante sit amet eros facilisis tempus vel ac nulla. Sed aliquet at purus sit amet commodo. Donec non eleifend nunc. Proin sollicitudin facilisis vulputate. Vestibulum nisl urna, vestibulum a pharetra vel, congue non neque. Integer eu quam sit amet nulla luctus posuere.",
+    ],
     background: {
       name: "Background Name",
       feature: "Feature",
@@ -232,8 +237,12 @@ const characters = [
       desc: ["Description", "multiple", "paragraphs"],
     },
 
-    allies: ["Allies", "multiple", "paragraphs"],
-    symbol_src: "1.png",
+    allies: [
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum. Sed vestibulum ac nulla eget dictum. Nulla blandit quam risus, in convallis lectus ultrices sed. Pellentesque non magna eu ipsum pharetra vulputate. Sed placerat sapien malesuada, faucibus lacus tristique, faucibus massa. Praesent vel nisi pulvinar, pellentesque elit quis, eleifend turpis. Pellentesque a erat ultrices, sagittis lorem sit amet, ullamcorper turpis. Aliquam imperdiet nulla et orci molestie, sollicitudin facilisis ante elementum. Duis vehicula sollicitudin rutrum. Nullam nec condimentum arcu, in congue risus. Suspendisse ut lectus nisi.",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum. Sed vestibulum ac nulla eget dictum. Nulla blandit quam risus, in convallis lectus ultrices sed. Pellentesque non magna eu ipsum pharetra vulputate. Sed placerat sapien malesuada, faucibus lacus tristique, faucibus massa. Praesent vel nisi pulvinar, pellentesque elit quis, eleifend turpis. Pellentesque a erat ultrices, sagittis lorem sit amet, ullamcorper turpis. Aliquam imperdiet nulla et orci molestie, sollicitudin facilisis ante elementum. Duis vehicula sollicitudin rutrum. Nullam nec condimentum arcu, in congue risus. Suspendisse ut lectus nisi.ltiple",
+      "In eget magna nibh. Morbi ultrices, nunc sit amet volutpat sollicitudin, sem turpis tincidunt erat, eget molestie mi felis id tortor. Donec nec ligula et nibh feugiat aliquet. Quisque scelerisque orci eget justo bibendum egestas. Nullam ut ante sit amet eros facilisis tempus vel ac nulla. Sed aliquet at purus sit amet commodo. Donec non eleifend nunc. Proin sollicitudin facilisis vulputate. Vestibulum nisl urna, vestibulum a pharetra vel, congue non neque. Integer eu quam sit amet nulla luctus posuere.",
+    ],
+    symbolSrc: "1.png",
 
     spellcasting: {
       level: 2,

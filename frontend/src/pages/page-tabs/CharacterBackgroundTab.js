@@ -1,17 +1,6 @@
 // Character's background details/backstory
 
-import { useEffect } from "react";
-import axios from "axios";
-
 const CharacterBackgroundTab = ({ character }) => {
-  useEffect(() => {
-    const getImage = async () => {
-      return await axios.get(`/api/images/1.png`);
-    };
-
-    getImage();
-  }, []);
-
   const background = (
     <>
       <h1 className="header-override">{character.background.name}</h1>
@@ -75,10 +64,16 @@ const CharacterBackgroundTab = ({ character }) => {
   const allies = (
     <>
       <h1 className="header-override">Allies & Organizations</h1>
+      <img
+        src={process.env.PUBLIC_URL + `/img/${character.symbolSrc}`}
+        alt="Symbol"
+        className="height-8 float-right"
+      ></img>
       {character.allies.map((paragraph, i) => (
-        <p key={i}>{paragraph}</p>
+        <p key={i} className="text-block col-12">
+          {paragraph}
+        </p>
       ))}
-      {/* <img src={getImage(character.symbol_src)} alt="Symbol"></img> */}
     </>
   );
 
@@ -86,7 +81,9 @@ const CharacterBackgroundTab = ({ character }) => {
     <>
       <h1 className="header-override">Backstory</h1>
       {character.backstory.map((paragraph, i) => (
-        <p key={i}>{paragraph}</p>
+        <p key={i} className="text-block">
+          {paragraph}
+        </p>
       ))}
     </>
   );
