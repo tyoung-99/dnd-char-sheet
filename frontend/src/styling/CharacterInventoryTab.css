@@ -1,7 +1,9 @@
 /* Coins section */
 .coins {
   text-align: center;
+  padding-left: 10rem;
+  padding-right: 10rem;
 }
-.coins h2 {
+.coins h1 {
   margin: auto;
 }

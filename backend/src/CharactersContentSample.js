@@ -224,6 +224,36 @@ const characters = [
         equipped: true,
         bonus: 2,
       },
+      {
+        name: "Carved bone statuette",
+        count: 4,
+        type: "Treasure",
+        value: 10,
+      },
+      {
+        name: "Pair of engraved bone dice",
+        count: 1,
+        type: "Treasure",
+        value: 100,
+      },
+      {
+        name: "Black velvet mask stitched with silver thread",
+        count: 3,
+        type: "Treasure",
+        value: 1,
+      },
+      {
+        name: "Copper chalice with silver filigree",
+        count: 3,
+        type: "Treasure",
+        value: 50,
+      },
+      {
+        name: "Silver ewer",
+        count: 5,
+        type: "Treasure",
+        value: 1000,
+      },
     ],
     coins: { cp: 0, sp: 1, ep: 2, gp: 3, pp: 4 },
 

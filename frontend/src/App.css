@@ -12,14 +12,13 @@
   display: block;
 }
 
-.float-left {
-  float: left;
-  margin-right: 0.5lh;
-}
-
 .float-right {
   float: right;
   margin-left: 0.5lh;
+}
+
+.text-center {
+  text-align: center;
 }
 
 .height-1 {
