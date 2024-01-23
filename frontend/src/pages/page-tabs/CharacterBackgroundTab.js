@@ -3,7 +3,9 @@
 const CharacterBackgroundTab = ({ character }) => {
   const background = (
     <>
-      <h1 className="header-override">{character.background.name}</h1>
+      <h1 className="header-override">
+        Background: {character.background.name}
+      </h1>
       <h1>Personality Traits</h1>
       {character.background.personalityTraits.map((paragraph, i) => (
         <p key={i}>{paragraph}</p>
