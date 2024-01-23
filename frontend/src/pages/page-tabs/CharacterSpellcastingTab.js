@@ -25,7 +25,7 @@ const CharacterSpellcastingTab = ({ character }) => {
   );
   const spellHeaders = slotsTotal.map((count, i) => (
     <div key={i + 1} className="col-1 col-flex">
-      <div className="grid-tile">
+      <div className="grid-tile spell-col">
         <h1>{i + 1}</h1>
         <h2>{count}</h2>
         <h2>{slotsExpended[i]}</h2>
@@ -34,12 +34,12 @@ const CharacterSpellcastingTab = ({ character }) => {
   ));
   spellHeaders.unshift(
     <div key={0} className="col-1 col-flex">
-      <div className="grid-tile">
+      <div className="grid-tile spell-col">
         <h1>Spell Level</h1>
         <h2>Slots Total</h2>
         <h2>Slots Expended</h2>
       </div>
-      <div className="grid-tile">
+      <div className="grid-tile spell-col">
         <h1>Cantrips</h1>
       </div>
     </div>
@@ -86,7 +86,7 @@ const CharacterSpellcastingTab = ({ character }) => {
       <div className="row-flex">
         {spellsKnown.map((level, i) => (
           <div key={i} className="col-1 col-flex">
-            <div className="grid-tile">{level}</div>
+            <div className="grid-tile spell-col">{level}</div>
           </div>
         ))}
       </div>

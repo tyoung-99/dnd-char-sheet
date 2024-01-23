@@ -1,5 +1,4 @@
-/* Column headers */
-.col-flex > div {
+.spell-col {
   height: 100%;
   text-align: center;
 }
