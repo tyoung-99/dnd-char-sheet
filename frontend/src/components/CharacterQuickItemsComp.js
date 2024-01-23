@@ -19,17 +19,16 @@ const CharacterQuickItemsComp = ({ character }) => {
   weapons = weapons.sort((first, second) =>
     first.name > second.name ? 1 : first.name === second.name ? 0 : -1
   );
+  const strMod =
+    Math.floor(
+      character.stats.filter((stat) => stat.name === "STR")[0].score - 10
+    ) / 2;
+  const dexMod =
+    Math.floor(
+      character.stats.filter((stat) => stat.name === "DEX")[0].score - 10
+    ) / 2;
   weapons = weapons.map((item, i) => {
     const damageDice = `${item.damage.dice}d${item.damage.sides}`;
-
-    const strMod =
-      Math.floor(
-        character.stats.filter((stat) => stat.name === "STR")[0].score - 10
-      ) / 2;
-    const dexMod =
-      Math.floor(
-        character.stats.filter((stat) => stat.name === "DEX")[0].score - 10
-      ) / 2;
 
     const abilityMod =
       item.subtypes.includes("Ranged") ||
@@ -37,21 +36,16 @@ const CharacterQuickItemsComp = ({ character }) => {
         ? dexMod
         : strMod;
 
-    const profMod = item.prof_required.some((prof) =>
-      character.weapon_profs.includes(prof)
+    const profMod = item.profRequired.some((prof) =>
+      character.weaponProfs.includes(prof)
     )
-      ? character.prof_bonus
+      ? character.profBonus
       : 0;
 
     const itemBonus = item.bonus || 0;
 
-    const attackMod =
-      abilityMod +
-      profMod +
-      itemBonus +
-      (character.class_modifiers.attack || 0);
-    const damageMod =
-      abilityMod + itemBonus + (character.class_modifiers.damage || 0);
+    const attackMod = abilityMod + profMod + itemBonus;
+    const damageMod = abilityMod + itemBonus;
 
     let activatedDamage;
     if (item.activation && item.activated) {
@@ -142,7 +136,7 @@ const CharacterQuickItemsComp = ({ character }) => {
               {weapons}
             </div>
           </div>
-          <div className="grid-tile">
+          <div className="grid-tile col-end">
             <h1>Consumables</h1>
             <div className="col-flex">
               <div className="row-flex">

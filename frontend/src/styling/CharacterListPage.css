@@ -1,5 +1,4 @@
-/* Link buttons to characters */
-
+/* Buttons to access characters */
 .character-list-item {
   text-decoration: none;
   color: black;
@@ -12,4 +11,19 @@
 
 .character-list-item:hover {
   background-color: lightgray;
+}
+
+img.avatar {
+  height: 3rlh;
+  width: 3rlh;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0.5rlh;
+}
+.avatar-label {
+  display: inline-block;
+  vertical-align: middle;
+}
+.avatar-holder {
+  text-align: center;
 }

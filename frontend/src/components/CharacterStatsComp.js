@@ -10,10 +10,10 @@ const CharacterStatsComp = ({ character }) => {
 
     // Handle saves/skills at same time as abilities for conciseness
     const saveModifier =
-      abilityModifier + (ability.save_prof ? character.prof_bonus : 0);
+      abilityModifier + (ability.saveProf ? character.profBonus : 0);
     saves.push(
       <p key={ability.name}>
-        {ability.save_prof ? (
+        {ability.saveProf ? (
           <span className="proficient"></span>
         ) : (
           <span className="not-proficient"></span>
@@ -23,11 +23,11 @@ const CharacterStatsComp = ({ character }) => {
     );
 
     skills = skills.concat(
-      ability.skill_profs.map((skill) => ({
+      ability.skillProfs.map((skill) => ({
         name: skill.name,
-        prof_type: skill.proficiency,
+        profType: skill.proficiency,
         skillModifier:
-          abilityModifier + skill.proficiency * character.prof_bonus,
+          abilityModifier + skill.proficiency * character.profBonus,
         abilityName: ability.name,
       }))
     );
@@ -46,9 +46,9 @@ const CharacterStatsComp = ({ character }) => {
 
   skills = skills.map((skill) => (
     <p key={skill.name}>
-      {skill.prof_type === 1 ? (
+      {skill.profType === 1 ? (
         <span className="proficient"></span>
-      ) : skill.prof_type === 2 ? (
+      ) : skill.profType === 2 ? (
         <span className="expert"></span>
       ) : (
         <span className="not-proficient"></span>
@@ -70,24 +70,24 @@ const CharacterStatsComp = ({ character }) => {
             <h1>Saving Throws</h1>
             <div>{saves}</div>
           </div>
-          <div className="grid-tile">
+          <div className="grid-tile col-end">
             <h1>Other Proficiencies</h1>
             <h2>Weapons</h2>
-            <p>{character.weapon_profs.join(", ")}</p>
+            <p>{character.weaponProfs.join(", ")}</p>
             <h2>Armor</h2>
-            <p>{character.armor_profs.join(", ")}</p>
+            <p>{character.armorProfs.join(", ")}</p>
             <h2>Tools</h2>
-            <p>{character.tool_profs.join(", ")}</p>
+            <p>{character.toolProfs.join(", ")}</p>
             <h1>Languages</h1>
             <p>{character.languages.join(", ")}</p>
           </div>
         </div>
         <div className="col-6 col-flex">
           <div className="grid-tile">
-            <h1>Proficiency Bonus: {character.prof_bonus}</h1>
+            <h1>Proficiency Bonus: {character.profBonus}</h1>
           </div>
           <div className="grid-tile">
-            <h1>Passive Perception: {character.passive_perception}</h1>
+            <h1>Passive Perception: {character.passivePerception}</h1>
           </div>
           <div className="grid-tile">
             <h1>Speed</h1>

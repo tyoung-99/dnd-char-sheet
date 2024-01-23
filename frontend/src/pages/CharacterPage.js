@@ -33,28 +33,41 @@ const CharacterPage = () => {
   if (!character) {
     return <div>Loading...</div>;
   }
-  const currentHD = character.hit_dice.remaining.map(
+  const currentHD = character.hitDice.remaining.map(
     (die) => `${die.number}d${die.faces}`
   );
-  const totalHD = character.hit_dice.total.map(
+  const totalHD = character.hitDice.total.map(
     (die) => `${die.number}d${die.faces}`
   );
 
   return (
     <div>
-      <div className="name-header">
-        <h1>{character.name}</h1>
-        <p>{character.alignment}</p>
-        <p>
-          {character.race.name}{" "}
-          {character.race.subrace !== null ? `(${character.race.subrace})` : ""}
-        </p>
-        <InlineClassListComp classes={character.classes} />
+      <div className="avatar-holder">
+        <img
+          src={process.env.PUBLIC_URL + `/img/${character.avatarSrc}`}
+          alt="Avatar"
+          className="avatar"
+        ></img>
+        <div className="name-header avatar-label">
+          <h1>{character.name} </h1>
+          <h2>{character.player}</h2>
+          <p>{character.alignment}</p>
+          <p>
+            {character.race.name}{" "}
+            {character.race.subrace !== null
+              ? `(${character.race.subrace})`
+              : ""}
+          </p>
+          <InlineClassListComp classes={character.classes} />
+        </div>
       </div>
-      <div className="xp-header">XP: {character.xp}</div>
+      <div className="xp-inspire-header">
+        <div>XP: {character.xp}</div>
+        <div>Inspiration: {character.inspiration ? "Yes" : "No"}</div>
+      </div>
       <div className="combat-header">
         <div>
-          <p>AC: {character.armor_class}</p>
+          <p>AC: {character.armorClass}</p>
           <p>
             Initiative:{" "}
             {(character.initiative >= 0 ? "+" : "") + character.initiative}
@@ -69,7 +82,7 @@ const CharacterPage = () => {
           <p>Current Hit Dice: {currentHD.join(", ")}</p>
           <p>Total Hit Dice: {totalHD.join(", ")}</p>
         </div>
-        <DeathSavesComp deathSaves={character.death_saves} />
+        <DeathSavesComp deathSaves={character.deathSaves} />
       </div>
       <ul className="nav">
         <TabNavComp
@@ -80,7 +93,7 @@ const CharacterPage = () => {
         />
         <TabNavComp
           id={"background"}
-          tabName={"Background"}
+          tabName={"Background/Appearance"}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />

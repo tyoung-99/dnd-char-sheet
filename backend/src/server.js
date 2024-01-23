@@ -1,7 +1,10 @@
 import express from "express";
+import { readFile } from "fs/promises";
+import { dirname } from "path";
 import sampleChars from "./CharactersContentSample.js";
 
 const app = express();
+const __dirname = dirname(import.meta.url);
 
 app.get("/api/characters", async (req, res) => {
   const characters = sampleChars;
