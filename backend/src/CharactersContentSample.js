@@ -1,8 +1,8 @@
 const characters = [
   {
     id: 1,
-    name: "Character Name",
-    player: "Player Name",
+    name: "Test Char",
+    player: "Jane Doe",
     avatarSrc: "2.png",
     alignment: "Lawful Good",
     xp: 2500,
@@ -115,12 +115,18 @@ const characters = [
       "In eget magna nibh. Morbi ultrices, nunc sit amet volutpat sollicitudin, sem turpis tincidunt erat, eget molestie mi felis id tortor. Donec nec ligula et nibh feugiat aliquet. Quisque scelerisque orci eget justo bibendum egestas. Nullam ut ante sit amet eros facilisis tempus vel ac nulla. Sed aliquet at purus sit amet commodo. Donec non eleifend nunc. Proin sollicitudin facilisis vulputate. Vestibulum nisl urna, vestibulum a pharetra vel, congue non neque. Integer eu quam sit amet nulla luctus posuere.",
     ],
     background: {
-      name: "Background Name",
-      feature: "Feature",
-      personalityTraits: ["Trait 1", "Trait 2"],
-      ideals: ["Ideal", "P2"],
-      bonds: ["Bond", "P2"],
-      flaws: ["Flaw", "P2"],
+      name: "Baldur's Gate Acolyte",
+      personalityTraits: [
+        "I idolize a particular hero of my faith, and constantly refer to that person's deeds and example.",
+        "I can find common ground between the fiercest enemies, empathizing with them and always working towards peace.",
+      ],
+      ideals: [
+        "Tradition. The ancient traditions of worship and sacrifice must be preserved and upheld.",
+      ],
+      bonds: [
+        "I would die to recover an ancient relic of my faith that was lost long ago.",
+      ],
+      flaws: ["I judge others harshly, and myself even more severely."],
     },
 
     race: {
@@ -264,7 +270,11 @@ const characters = [
       eyes: "blue",
       skin: "red",
       hair: "white",
-      desc: ["Description", "multiple", "paragraphs"],
+      desc: [
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum. Sed vestibulum ac nulla eget dictum. Nulla blandit quam risus, in convallis lectus ultrices sed. Pellentesque non magna eu ipsum pharetra vulputate. Sed placerat sapien malesuada, faucibus lacus tristique, faucibus massa. Praesent vel nisi pulvinar, pellentesque elit quis, eleifend turpis. Pellentesque a erat ultrices, sagittis lorem sit amet, ullamcorper turpis. Aliquam imperdiet nulla et orci molestie, sollicitudin facilisis ante elementum. Duis vehicula sollicitudin rutrum. Nullam nec condimentum arcu, in congue risus. Suspendisse ut lectus nisi.",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum. Sed vestibulum ac nulla eget dictum. Nulla blandit quam risus, in convallis lectus ultrices sed. Pellentesque non magna eu ipsum pharetra vulputate. Sed placerat sapien malesuada, faucibus lacus tristique, faucibus massa. Praesent vel nisi pulvinar, pellentesque elit quis, eleifend turpis. Pellentesque a erat ultrices, sagittis lorem sit amet, ullamcorper turpis. Aliquam imperdiet nulla et orci molestie, sollicitudin facilisis ante elementum. Duis vehicula sollicitudin rutrum. Nullam nec condimentum arcu, in congue risus. Suspendisse ut lectus nisi.ltiple",
+        "In eget magna nibh. Morbi ultrices, nunc sit amet volutpat sollicitudin, sem turpis tincidunt erat, eget molestie mi felis id tortor. Donec nec ligula et nibh feugiat aliquet. Quisque scelerisque orci eget justo bibendum egestas. Nullam ut ante sit amet eros facilisis tempus vel ac nulla. Sed aliquet at purus sit amet commodo. Donec non eleifend nunc. Proin sollicitudin facilisis vulputate. Vestibulum nisl urna, vestibulum a pharetra vel, congue non neque. Integer eu quam sit amet nulla luctus posuere.",
+      ],
     },
 
     allies: [
@@ -273,6 +283,58 @@ const characters = [
       "In eget magna nibh. Morbi ultrices, nunc sit amet volutpat sollicitudin, sem turpis tincidunt erat, eget molestie mi felis id tortor. Donec nec ligula et nibh feugiat aliquet. Quisque scelerisque orci eget justo bibendum egestas. Nullam ut ante sit amet eros facilisis tempus vel ac nulla. Sed aliquet at purus sit amet commodo. Donec non eleifend nunc. Proin sollicitudin facilisis vulputate. Vestibulum nisl urna, vestibulum a pharetra vel, congue non neque. Integer eu quam sit amet nulla luctus posuere.",
     ],
     symbolSrc: "1.png",
+
+    abilities: [
+      {
+        name: "Shelter of the Faithful",
+        background: "Baldur's Gate Acolyte",
+        desc: [
+          "As an acolyte, you command the respect of those who share your faith, and you can perform the religious ceremonies of your deity. You and your adventuring companions can expect to receive free healing and care at a temple, shrine, or other established presence of your faith, though you must provide any material components needed for spells. Those who share your religion will support you (but only you) at a modest lifestyle.",
+          "You might also have ties to a specific temple dedicated to your chosen deity or pantheon, and you have a residence there. This could be the temple where you used to serve, if you remain on good terms with it, or a temple where you have found a new home. While near your temple, you can call upon the priests for assistance, provided the assistance you ask for is not hazardous and you remain in good standing with your temple.",
+        ],
+      },
+      {
+        name: "Religious Community",
+        background: "Baldur's Gate Acolyte",
+        desc: [
+          "The effects of a Baldur's Gate feature can be used only while the character is in Baldur's Gate — though, at the DM's discretion, they might have applicable effects in situations similar to those in Baldur's Gate.",
+          "You're tightly connected with the religious community of Baldur's Gate. You know if a deity has a following in the city and any places that faith openly congregates and the neighborhoods those faithful typically inhabit. While this isn't remarkable for most of the city's larger faiths, keeping track of the hundreds of religions newcomers bring with them is no mean feat.",
+        ],
+      },
+      {
+        name: "Size",
+        race: "Human",
+        desc: [
+          "Humans vary widely in height and build, from barely 5 feet to well over 6 feet tall. Regardless of your position in that range, your size is Medium.",
+        ],
+      },
+      {
+        name: "Second Wind",
+        class: "Fighter",
+        desc: [
+          "You have a limited well of stamina that you can draw on to protect yourself from harm. On your turn, you can use a bonus action to regain hit points equal to 1d10 + your fighter level.",
+          "Once you use this feature, you must finish a short or long rest before you can use it again.",
+        ],
+      },
+      {
+        name: "Improved Critical",
+        class: "Fighter",
+        subclass: "Champion",
+        desc: [
+          "Beginning when you choose this archetype at 3rd level, your weapon attacks score a critical hit on a roll of 19 or 20.",
+        ],
+      },
+      {
+        name: "Actor",
+        feat: "Actor",
+        desc: [
+          "Skilled at mimicry and dramatics, you gain the following benefits:",
+          "Increase your Charisma score by 1, to a maximum of 20.",
+          "You have an advantage on Deception and Performance checks when trying to pass yourself off as a different person.",
+          "You can mimic the speech of another person or the sounds made by other creatures. You must have heard the person speaking, or heard the creature make the sound, for at least 1 minute. A successful Insight check contested by your Deception check allows a listener to determine that the effect is faked.",
+        ],
+      },
+    ],
 
     spellcasting: {
       level: 2,
