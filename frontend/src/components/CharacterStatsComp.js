@@ -70,7 +70,7 @@ const CharacterStatsComp = ({ character }) => {
             <h1>Saving Throws</h1>
             <div>{saves}</div>
           </div>
-          <div className="grid-tile">
+          <div className="grid-tile col-end">
             <h1>Other Proficiencies</h1>
             <h2>Weapons</h2>
             <p>{character.weaponProfs.join(", ")}</p>

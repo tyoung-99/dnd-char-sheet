@@ -101,6 +101,11 @@
   width: calc(100% / 12 * 12);
 }
 
+/* Make end of columns go to bottom */
+.col-end {
+  height: 100%;
+}
+
 /* Specify headers to allow default size ones inside grid tiles */
 h1 {
   font-style: normal;

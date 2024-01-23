@@ -136,7 +136,7 @@ const CharacterQuickItemsComp = ({ character }) => {
               {weapons}
             </div>
           </div>
-          <div className="grid-tile">
+          <div className="grid-tile col-end">
             <h1>Consumables</h1>
             <div className="col-flex">
               <div className="row-flex">
