@@ -337,14 +337,144 @@ const characters = [
     ],
 
     spellcasting: {
-      level: 2,
-      slotsMax: [3, 0, 0, 0, 0, 0, 0, 0, 0],
-      slotsCurrent: [1, 0, 0, 0, 0, 0, 0, 0, 0],
-    },
-    pactMagic: {
-      level: 0,
-      slotsMax: [0, 0, 0, 0, 0],
-      slotsCurrent: [0, 0, 0, 0, 0],
+      classes: [
+        { name: "Wizard", ability: "INT", saveDC: 13, attackBonus: 5 },
+        { name: "Fighter", ability: "INT", saveDC: 13, attackBonus: 5 },
+      ],
+      spellSlots: {
+        level: 2,
+        slotsTotal: [3, 0, 0, 0, 0, 0, 0, 0, 0],
+        slotsExpended: [1, 0, 0, 0, 0, 0, 0, 0, 0],
+      },
+      pactSlots: {
+        level: 0,
+        slotsTotal: [0, 0, 0, 0, 0],
+        slotsExpended: [0, 0, 0, 0, 0],
+      },
+      spellsKnown: [
+        {
+          name: "Chromatic Orb",
+          level: 1,
+          school: "Evocation",
+          ritual: false,
+          castTime: "1 action",
+          range: "90 feet",
+          components: {
+            v: true,
+            s: true,
+            m: [
+              {
+                name: "a diamond",
+                value: { count: 50, coin: "gp" },
+                consumed: false,
+              },
+            ],
+          },
+          duration: "Instantaneous",
+          description: [
+            "You hurl a 4-inch-diameter sphere of energy at a creature that you can see within range. You choose acid, cold, fire, lightning, poison, or thunder for the type of orb you create, and then make a ranged spell attack against the target. If the attack hits, the creature takes 3d8 damage of the type you chose.",
+          ],
+          upcast: [
+            "When you cast this spell using a spell slot of 2nd level or higher, the damage increases by 1d8 for each slot level above 1st.",
+          ],
+          class: "Wizard",
+          prepared: 1,
+        },
+        {
+          name: "Beast Bond",
+          level: 1,
+          school: "Divination",
+          ritual: false,
+          castTime: "1 action",
+          range: "Self",
+          components: {
+            v: true,
+            s: false,
+            m: false,
+          },
+          duration: "Concentration, up to 10 minutes",
+          description: [
+            "Briefly surrounded by silvery mist, you teleport up to 30 feet to an unoccupied space that you can see.",
+          ],
+          upcast: false,
+          feat: "Fey Touched",
+          prepared: 2,
+        },
+        {
+          name: "Misty Step",
+          level: 2,
+          school: "Conjuration",
+          ritual: false,
+          castTime: "1 bonus action",
+          range: "Touch",
+          components: {
+            v: true,
+            s: true,
+            m: [
+              {
+                name: "a bit of fur wrapped in a cloth",
+                value: false,
+                consumed: false,
+              },
+            ],
+          },
+          duration: "Instantaneous",
+          description: [
+            "You establish a telepathic link with one beast you touch that is friendly to you or charmed by you. The spell fails if the beast's Intelligence score is 4 or higher. Until the spell ends, the link is active while you and the beast are within line of sight of each other. Through the link, the beast can understand your telepathic messages to it, and it can telepathically communicate simple emotions and concepts back to you. While the link is active, the beast gains advantage on attack rolls against any creature within 5 feet of you that you can see.",
+          ],
+          upcast: false,
+          feat: "Fey Touched",
+          prepared: 2,
+        },
+        {
+          name: "Fire Bolt",
+          level: 0,
+          school: "Evocation",
+          ritual: false,
+          castTime: "1 action",
+          range: "120 feet",
+          components: {
+            v: true,
+            s: true,
+            m: false,
+          },
+          duration: "Instantaneous",
+          description: [
+            "You hurl a mote of fire at a creature or object within range. Make a ranged spell attack against the target. On a hit, the target takes 1d10 fire damage. A flammable object hit by this spell ignites if it isn't being worn or carried.",
+            "This spell's damage increases by 1d10 when you reach 5th level (2d10), 11th level (3d10), and 17th level (4d10).",
+          ],
+          upcast: false,
+          class: "Wizard",
+          prepared: 2,
+        },
+        {
+          name: "Gentle Repose",
+          level: 2,
+          school: "Necromancy",
+          ritual: true,
+          castTime: "1 action",
+          range: "Touch",
+          components: {
+            v: true,
+            s: true,
+            m: [
+              {
+                name: "a pinch of salt and one copper piece placed on each of the corpse's eyes, which must remain there for the duration",
+                value: false,
+                consumed: false,
+              },
+            ],
+          },
+          duration: "10 days",
+          description: [
+            "You touch a corpse or other remains. For the duration, the target is protected from decay and can't become undead.",
+            "The spell also effectively extends the time limit on raising the target from the dead, since days spent under the influence of this spell don't count against the time limit of spells such as Raise Dead.",
+          ],
+          upcast: false,
+          class: "Wizard",
+          prepared: 0,
+        },
+      ],
     },
   },
 ];
