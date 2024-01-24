@@ -1,3 +1,13 @@
+/* Button menu */
+.menu-bar input {
+  border: 1px solid black;
+  background: white;
+  cursor: pointer;
+}
+.menu-bar input:hover {
+  background: lightgray;
+}
+
 /* Navigation tabs */
 .nav {
   margin-bottom: 2rem;
@@ -41,14 +51,20 @@
 /* XP total/inspiration */
 .xp-inspire-header {
   position: absolute;
-  top: 2rem;
-  right: 2rem;
+  top: 1rem;
+  right: 1rem;
 }
 /* Combat-related info for easy reference */
 .combat-header {
   display: flex;
   justify-content: space-evenly;
   line-height: 50%;
+}
+/* Menu of buttons */
+.menu-bar {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
 }
 
 /* Death save section */

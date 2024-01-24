@@ -2,7 +2,7 @@
 
 import "../styling/CharacterPage.css";
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import TabNavComp from "../components/TabNavComp";
 import InlineClassListComp from "../components/InlineClassListComp";
@@ -42,6 +42,16 @@ const CharacterPage = () => {
 
   return (
     <div>
+      <div className="menu-bar">
+        <Link to="/">
+          <input
+            type="button"
+            id="charListLink"
+            name="charListLink"
+            value="< Back to List"
+          ></input>
+        </Link>
+      </div>
       <div className="avatar-holder">
         <img
           src={process.env.PUBLIC_URL + `/img/${character.avatarSrc}`}
