@@ -69,20 +69,9 @@ const CharacterInventoryTab = ({ character }) => {
   });
 
   return (
-    <>
-      <div className="grid-container row-flex">
-        <div className="col-1 col-flex">
-          <div className="grid-tile row-flex coins">
-            <h1 className="col-6 header-override">{character.coins.cp} CP</h1>
-            <h1 className="col-6 header-override">{character.coins.sp} SP</h1>
-            <h1 className="col-6 header-override">{character.coins.ep} EP</h1>
-            <h1 className="col-6 header-override">{character.coins.gp} GP</h1>
-            <h1 className="col-6 header-override">{character.coins.pp} PP</h1>
-          </div>
-        </div>
-      </div>
-      <div className="grid-container row-flex">
-        <div className="grid-tile col-2 col-flex">
+    <div className="grid-container row-flex">
+      <div className="col-flex col-2">
+        <div className="grid-tile col-end">
           <div className="row-flex">
             <h1 className="col-2">Item</h1>
             <h1 className="col-2 text-center">Count</h1>
@@ -94,7 +83,18 @@ const CharacterInventoryTab = ({ character }) => {
             </div>
           ))}
         </div>
-        <div className="grid-tile col-2 col-flex">
+      </div>
+      <div className="col-flex col-2">
+        <div className="grid-tile">
+          <div className="row-flex coins">
+            <h1 className="col-6">{character.coins.cp} CP</h1>
+            <h1 className="col-6">{character.coins.sp} SP</h1>
+            <h1 className="col-6">{character.coins.ep} EP</h1>
+            <h1 className="col-6">{character.coins.gp} GP</h1>
+            <h1 className="col-6">{character.coins.pp} PP</h1>
+          </div>
+        </div>
+        <div className="grid-tile col-end">
           <div className="row-flex">
             <h1 className="col-3">Treasure</h1>
             <h1 className="col-3 text-center">Count</h1>
@@ -103,7 +103,7 @@ const CharacterInventoryTab = ({ character }) => {
           {treasure}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
