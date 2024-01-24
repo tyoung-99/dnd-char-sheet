@@ -5,10 +5,10 @@ import "../../styling/CharacterSpellcastingTab.css";
 const CharacterSpellcastingTab = ({ character }) => {
   const castClasses = character.spellcasting.classes.map((castClass) => (
     <div key={castClass.name} className="row-flex">
-      <h1 className="col-3">{castClass.name}</h1>
-      <h1 className="col-3">Spellcasting Ability: {castClass.ability}</h1>
-      <h1 className="col-3">Spell Save DC: {castClass.saveDC}</h1>
-      <h1 className="col-3">
+      <h1 className="col-4">{castClass.name}</h1>
+      <h1 className="col-4">Spellcasting Ability: {castClass.ability}</h1>
+      <h1 className="col-4">Spell Save DC: {castClass.saveDC}</h1>
+      <h1 className="col-4">
         Spell Attack Bonus: {castClass.attackBonus > 0 ? "+" : null}
         {castClass.attackBonus}
       </h1>
@@ -24,7 +24,7 @@ const CharacterSpellcastingTab = ({ character }) => {
       i < 5 ? count + character.spellcasting.pactSlots.slotsExpended[i] : count
   );
   const spellHeaders = slotsTotal.map((count, i) => (
-    <div key={i + 1} className="col-1 col-flex">
+    <div key={i + 1} className="col-10 col-flex">
       <div className="grid-tile spell-col">
         <h1>{i + 1}</h1>
         <h2>{count}</h2>
@@ -33,7 +33,7 @@ const CharacterSpellcastingTab = ({ character }) => {
     </div>
   ));
   spellHeaders.unshift(
-    <div key={0} className="col-1 col-flex">
+    <div key={0} className="col-10 col-flex">
       <div className="grid-tile spell-col">
         <h1>Spell Level</h1>
         <h2>Slots Total</h2>
@@ -80,12 +80,12 @@ const CharacterSpellcastingTab = ({ character }) => {
   return (
     <>
       <div className="row-flex">
-        <div className="col-12 grid-tile">{castClasses}</div>
+        <div className="col-1 grid-tile">{castClasses}</div>
       </div>
       <div className="row-flex">{spellHeaders}</div>
       <div className="row-flex">
         {spellsKnown.map((level, i) => (
-          <div key={i} className="col-1 col-flex">
+          <div key={i} className="col-10 col-flex">
             <div className="grid-tile spell-col">{level}</div>
           </div>
         ))}
