@@ -54,6 +54,47 @@ const CharacterSpellcastingTab = ({ character }) => {
       first.name > second.name ? 1 : first.name === second.name ? 0 : -1
     );
     level.forEach((spell, i) => {
+      const hoverIcons = [];
+      if (spell.ritual) {
+        hoverIcons.push(["ritual.png", "Ritual"]);
+      }
+      if (spell.components.v) {
+        hoverIcons.push(["verbal.png", "Verbal Component"]);
+      }
+      if (spell.components.s) {
+        hoverIcons.push(["somatic.png", "Somatic Component"]);
+      }
+      if (spell.components.m) {
+        hoverIcons.push(["material.png", "Material Component"]);
+        if (spell.components.m.some((comp) => comp.value)) {
+          hoverIcons.push([
+            "gold_cost.png",
+            "Material Component with Gold Cost",
+          ]);
+        }
+        if (spell.components.m.some((comp) => comp.consumed)) {
+          hoverIcons.push(["consumed.png", "Material Component Consumed"]);
+        }
+      }
+      if (spell.concentration) {
+        hoverIcons.push(["concentration.png", "Concentration"]);
+      }
+      if (spell.background) {
+        hoverIcons.push(["background.png", `From ${spell.background}`]);
+      }
+      if (spell.race) {
+        hoverIcons.push(["race.png", `From ${spell.race}`]);
+      }
+      if (spell.feat) {
+        hoverIcons.push(["feat.png", `From ${spell.feat}`]);
+      }
+      if (spell.class) {
+        hoverIcons.push([
+          `${spell.class.toLowerCase()}.png`,
+          `From ${spell.class}`,
+        ]);
+      }
+
       const key =
         spell.name +
         " " +
@@ -72,6 +113,14 @@ const CharacterSpellcastingTab = ({ character }) => {
           <label htmlFor={"prep " + key} className="spell">
             {spell.name}
           </label>
+          {hoverIcons.map((icon) => (
+            <img
+              src={process.env.PUBLIC_URL + `/img/hover_icons/${icon[0]}`}
+              alt={icon[1]}
+              className="hover-icon"
+              title={icon[1]}
+            ></img>
+          ))}
         </div>
       );
     });

@@ -63,7 +63,7 @@
   font-size: 0.75rem;
   opacity: 0.75;
 }
-/* Tile width in 12ths */
+/* Tile width */
 .col-1 {
   width: calc(100% / 1);
 }
@@ -101,7 +101,7 @@
   width: calc(100% / 12);
 }
 
-/* Make end of columns go to bottom */
+/* End of columns should go to bottom */
 .col-end {
   height: 100%;
 }
@@ -116,4 +116,8 @@ h1.header-override {
   font-style: normal;
   font-weight: bold;
   font-size: 2rem;
+}
+
+.hover-icon {
+  height: 1rlh;
 }
