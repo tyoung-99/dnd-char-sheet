@@ -56,17 +56,17 @@ const CharacterQuickItemsComp = ({ character }) => {
 
     return (
       <div key={i} className="row-flex">
-        <div className="col-4">
+        <div className="col-3">
           <p className="weapon">{item.name}</p>
           <p className="weapon-properties">
             {item.properties.join(", ") || ""}
           </p>
         </div>
-        <p className="col-2">
+        <p className="col-6">
           {attackMod >= 0 ? "+" : ""}
           {attackMod}
         </p>
-        <p className="col-4">
+        <p className="col-3">
           {damageDice}{" "}
           {damageMod > 0
             ? ` + ${damageMod}`
@@ -76,7 +76,7 @@ const CharacterQuickItemsComp = ({ character }) => {
           {` ${item.damage.type}`}
           {activatedDamage}
         </p>
-        <p className="col-2">
+        <p className="col-6">
           {item.activation ? (item.activated ? "Yes" : "No") : "-"}
         </p>
       </div>
@@ -113,8 +113,8 @@ const CharacterQuickItemsComp = ({ character }) => {
     itemizedConsumables[subtype] = itemizedConsumables[subtype].map(
       (item, i) => (
         <div key={i} className="row-flex">
-          <div className="col-6">{item.name}</div>
-          <div className="col-6">{item.count}</div>
+          <div className="col-2">{item.name}</div>
+          <div className="col-2">{item.count}</div>
         </div>
       )
     );
@@ -122,16 +122,16 @@ const CharacterQuickItemsComp = ({ character }) => {
 
   return (
     <>
-      <div className="col-12 row-flex">
-        <div className="col-12 col-flex">
+      <div className="col-1 row-flex">
+        <div className="col-1 col-flex">
           <div className="grid-tile">
             <h1>Weapons</h1>
             <div className="col-flex">
               <div className="row-flex">
-                <h2 className="col-4">Name</h2>
-                <h2 className="col-2">Attack</h2>
-                <h2 className="col-4">Damage</h2>
-                <h2 className="col-2">Activated</h2>
+                <h2 className="col-3">Name</h2>
+                <h2 className="col-6">Attack</h2>
+                <h2 className="col-3">Damage</h2>
+                <h2 className="col-6">Activated</h2>
               </div>
               {weapons}
             </div>
@@ -140,8 +140,8 @@ const CharacterQuickItemsComp = ({ character }) => {
             <h1>Consumables</h1>
             <div className="col-flex">
               <div className="row-flex">
-                <h2 className="col-6">Name</h2>
-                <h2 className="col-6">Amount</h2>
+                <h2 className="col-2">Name</h2>
+                <h2 className="col-2">Amount</h2>
               </div>
               {Object.keys(itemizedConsumables).map((subtype) => (
                 <div key={subtype}>

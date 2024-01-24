@@ -35,8 +35,8 @@ const CharacterInventoryTab = ({ character }) => {
   for (let type in itemizedInventory) {
     itemizedInventory[type] = itemizedInventory[type].map((item, i) => (
       <div key={i} className="row-flex">
-        <div className="col-6">{item.name}</div>
-        <div className="col-6 text-center">{item.count}</div>
+        <div className="col-2">{item.name}</div>
+        <div className="col-2 text-center">{item.count}</div>
       </div>
     ));
   }
@@ -59,9 +59,9 @@ const CharacterInventoryTab = ({ character }) => {
 
     return (
       <div key={i} className="row-flex">
-        <div className="col-4">{item.name}</div>
-        <div className="col-4 text-center">{item.count}</div>
-        <div className="col-4 text-center">
+        <div className="col-3">{item.name}</div>
+        <div className="col-3 text-center">{item.count}</div>
+        <div className="col-3 text-center">
           {value} {coin}
         </div>
       </div>
@@ -71,21 +71,21 @@ const CharacterInventoryTab = ({ character }) => {
   return (
     <>
       <div className="grid-container row-flex">
-        <div className="col-12 col-flex">
+        <div className="col-1 col-flex">
           <div className="grid-tile row-flex coins">
-            <h1 className="col-2 header-override">{character.coins.cp} CP</h1>
-            <h1 className="col-2 header-override">{character.coins.sp} SP</h1>
-            <h1 className="col-2 header-override">{character.coins.ep} EP</h1>
-            <h1 className="col-2 header-override">{character.coins.gp} GP</h1>
-            <h1 className="col-2 header-override">{character.coins.pp} PP</h1>
+            <h1 className="col-6 header-override">{character.coins.cp} CP</h1>
+            <h1 className="col-6 header-override">{character.coins.sp} SP</h1>
+            <h1 className="col-6 header-override">{character.coins.ep} EP</h1>
+            <h1 className="col-6 header-override">{character.coins.gp} GP</h1>
+            <h1 className="col-6 header-override">{character.coins.pp} PP</h1>
           </div>
         </div>
       </div>
       <div className="grid-container row-flex">
-        <div className="grid-tile col-6 col-flex">
+        <div className="grid-tile col-2 col-flex">
           <div className="row-flex">
-            <h1 className="col-6">Item</h1>
-            <h1 className="col-6 text-center">Count</h1>
+            <h1 className="col-2">Item</h1>
+            <h1 className="col-2 text-center">Count</h1>
           </div>
           {Object.keys(itemizedInventory).map((type) => (
             <div key={type}>
@@ -94,11 +94,11 @@ const CharacterInventoryTab = ({ character }) => {
             </div>
           ))}
         </div>
-        <div className="grid-tile col-6 col-flex">
+        <div className="grid-tile col-2 col-flex">
           <div className="row-flex">
-            <h1 className="col-4">Treasure</h1>
-            <h1 className="col-4 text-center">Count</h1>
-            <h1 className="col-4 text-center">Value</h1>
+            <h1 className="col-3">Treasure</h1>
+            <h1 className="col-3 text-center">Count</h1>
+            <h1 className="col-3 text-center">Value</h1>
           </div>
           {treasure}
         </div>

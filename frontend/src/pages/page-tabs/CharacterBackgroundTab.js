@@ -29,29 +29,29 @@ const CharacterBackgroundTab = ({ character }) => {
     <>
       <h1 className="header-override">Appearance</h1>
       <div className="row-flex">
-        <div className="col-4">
+        <div className="col-3">
           <h1>Age</h1>
           <p>{character.appearance.age}</p>
         </div>
-        <div className="col-4">
+        <div className="col-3">
           <h1>Height</h1>
           <p>{character.appearance.height}</p>
         </div>
-        <div className="col-4">
+        <div className="col-3">
           <h1>Weight</h1>
           <p>{character.appearance.weight}</p>
         </div>
       </div>
       <div className="row-flex">
-        <div className="col-4">
+        <div className="col-3">
           <h1>Eyes</h1>
           <p>{character.appearance.eyes}</p>
         </div>
-        <div className="col-4">
+        <div className="col-3">
           <h1>Skin</h1>
           <p>{character.appearance.skin}</p>
         </div>
-        <div className="col-4">
+        <div className="col-3">
           <h1>Hair</h1>
           <p>{character.appearance.hair}</p>
         </div>
@@ -72,7 +72,7 @@ const CharacterBackgroundTab = ({ character }) => {
         className="height-8 float-right"
       ></img>
       {character.allies.map((paragraph, i) => (
-        <p key={i} className="text-block col-12">
+        <p key={i} className="text-block col-1">
           {paragraph}
         </p>
       ))}
@@ -93,12 +93,12 @@ const CharacterBackgroundTab = ({ character }) => {
   return (
     <>
       <div className="row-flex">
-        <div className="col-4 grid-tile">{background}</div>
-        <div className="col-4 grid-tile">{appearance}</div>
-        <div className="col-4 grid-tile">{allies}</div>
+        <div className="col-3 grid-tile">{background}</div>
+        <div className="col-3 grid-tile">{appearance}</div>
+        <div className="col-3 grid-tile">{allies}</div>
       </div>
       <div className="row-flex">
-        <div className="col-12 grid-tile">{backstory}</div>
+        <div className="col-1 grid-tile">{backstory}</div>
       </div>
     </>
   );
