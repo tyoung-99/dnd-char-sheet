@@ -78,19 +78,19 @@ const CharacterSpellcastingTab = ({ character }) => {
   });
 
   return (
-    <>
-      <div className="row-flex">
-        <div className="col-1 grid-tile">{castClasses}</div>
+    <div className="grid-container row-flex">
+      <div className="col-flex col-1">
+        <div className="grid-tile">{castClasses}</div>
+        <div className="row-flex">{spellHeaders}</div>
+        <div className="row-flex">
+          {spellsKnown.map((level, i) => (
+            <div key={i} className="col-1_10 col-flex">
+              <div className="grid-tile spell-col">{level}</div>
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="row-flex">{spellHeaders}</div>
-      <div className="row-flex">
-        {spellsKnown.map((level, i) => (
-          <div key={i} className="col-1_10 col-flex">
-            <div className="grid-tile spell-col">{level}</div>
-          </div>
-        ))}
-      </div>
-    </>
+    </div>
   );
 };
 
