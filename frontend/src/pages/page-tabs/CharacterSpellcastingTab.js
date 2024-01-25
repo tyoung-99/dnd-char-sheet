@@ -15,6 +15,50 @@ const CharacterSpellcastingTab = ({ character }) => {
     </div>
   ));
 
+  const roundsToTime = (rounds) => {
+    const CONVERSIONS = [
+      [600, "hour"],
+      [10, "minute"],
+      [1 / 6, "second"],
+    ];
+    let time = "";
+
+    CONVERSIONS.forEach((pair) => {
+      const newTime = Math.floor(rounds / pair[0]);
+      if (newTime > 0) {
+        time = time.concat(`${newTime} ${pair[1]}${newTime !== 1 ? "s" : ""} `);
+      }
+      rounds = rounds % pair[0];
+    });
+
+    return time;
+  };
+  const roundsLeft = character.spellcasting.concentration.roundsLeft;
+  const concentration = (
+    <>
+      <div className="row-flex">
+        <h1 className="col-1_2">Current Concentration</h1>
+        <h1 className="col-1_2">Time Remaining</h1>
+      </div>
+      <div className="row-flex">
+        {!character.spellcasting.concentration ? (
+          <p>None</p>
+        ) : (
+          <>
+            <p className="col-1_2">
+              {character.spellcasting.concentration.name}
+            </p>
+            <p className="col-1_2">
+              {roundsToTime(roundsLeft)}
+              <br></br>({roundsLeft} round
+              {roundsLeft !== 1 ? "s" : null})
+            </p>
+          </>
+        )}
+      </div>
+    </>
+  );
+
   const slotsTotal = character.spellcasting.spellSlots.slotsTotal.map(
     (count, i) =>
       i < 5 ? count + character.spellcasting.pactSlots.slotsTotal[i] : count
@@ -55,9 +99,6 @@ const CharacterSpellcastingTab = ({ character }) => {
     );
     level.forEach((spell, i) => {
       const hoverIcons = [];
-      if (spell.ritual) {
-        hoverIcons.push(["ritual.png", "Ritual"]);
-      }
       if (spell.components.v) {
         hoverIcons.push(["verbal.png", "Verbal Component"]);
       }
@@ -79,19 +120,22 @@ const CharacterSpellcastingTab = ({ character }) => {
       if (spell.concentration) {
         hoverIcons.push(["concentration.png", "Concentration"]);
       }
+      if (spell.ritual) {
+        hoverIcons.push(["ritual.png", "Ritual"]);
+      }
       if (spell.background) {
-        hoverIcons.push(["background.png", `From ${spell.background}`]);
+        hoverIcons.push(["background.png", `Background: ${spell.background}`]);
       }
       if (spell.race) {
-        hoverIcons.push(["race.png", `From ${spell.race}`]);
+        hoverIcons.push(["race.png", `Race: ${spell.race}`]);
       }
       if (spell.feat) {
-        hoverIcons.push(["feat.png", `From ${spell.feat}`]);
+        hoverIcons.push(["feat.png", `Feat: ${spell.feat}`]);
       }
       if (spell.class) {
         hoverIcons.push([
           `${spell.class.toLowerCase()}.png`,
-          `From ${spell.class}`,
+          `Class: ${spell.class}`,
         ]);
       }
 
@@ -101,20 +145,23 @@ const CharacterSpellcastingTab = ({ character }) => {
         (spell.class || spell.race || spell.background || spell.feat);
       level[i] = (
         <div key={key}>
-          {spell.level > 0 ? (
-            <input
-              type="checkbox"
-              id={"prep " + key}
-              name={"prep " + key}
-              value={"prep " + key}
-              defaultChecked={spell.prepared}
-            ></input>
-          ) : null}
-          <label htmlFor={"prep " + key} className="spell">
-            {spell.name}
-          </label>
+          <div>
+            {spell.level > 0 && spell.prepared !== 2 ? (
+              <input
+                type="checkbox"
+                id={"prep " + key}
+                name={"prep " + key}
+                value={"prep " + key}
+                defaultChecked={spell.prepared}
+              ></input>
+            ) : null}
+            <label htmlFor={"prep " + key} className="spell">
+              {spell.name}
+            </label>
+          </div>
           {hoverIcons.map((icon) => (
             <img
+              key={icon[1]}
               src={process.env.PUBLIC_URL + `/img/hover_icons/${icon[0]}`}
               alt={icon[1]}
               className="hover-icon"
@@ -129,7 +176,10 @@ const CharacterSpellcastingTab = ({ character }) => {
   return (
     <div className="grid-container row-flex">
       <div className="col-flex col-1">
-        <div className="grid-tile">{castClasses}</div>
+        <div className="row-flex">
+          <div className="grid-tile col-7_10">{castClasses}</div>
+          <div className="grid-tile col-3_10">{concentration}</div>
+        </div>
         <div className="row-flex">{spellHeaders}</div>
         <div className="row-flex">
           {spellsKnown.map((level, i) => (
