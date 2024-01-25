@@ -111,12 +111,22 @@ const CharacterQuickItemsComp = ({ character }) => {
   // Convert to HTML
   for (let subtype in itemizedConsumables) {
     itemizedConsumables[subtype] = itemizedConsumables[subtype].map(
-      (item, i) => (
-        <div key={i} className="row-flex">
-          <div className="col-1_2">{item.name}</div>
-          <div className="col-1_2">{item.count}</div>
-        </div>
-      )
+      (item, i) => {
+        let position = "";
+        if (i < itemizedConsumables[subtype].length - 1) {
+          position = position.concat(" flush-below");
+        }
+        if (i > 0) {
+          position = position.concat(" flush-above");
+        }
+
+        return (
+          <div key={i} className="row-flex">
+            <p className={`col-1_2 ${position}`}>{item.name}</p>
+            <p className={`col-1_2 ${position}`}>{item.count}</p>
+          </div>
+        );
+      }
     );
   }
 
@@ -146,7 +156,7 @@ const CharacterQuickItemsComp = ({ character }) => {
               {Object.keys(itemizedConsumables).map((subtype) => (
                 <div key={subtype}>
                   <div className="row-flex">
-                    <h3>{subtype}</h3>
+                    <h3 className="flush-below">{subtype}</h3>
                   </div>
                   {itemizedConsumables[subtype]}
                 </div>
