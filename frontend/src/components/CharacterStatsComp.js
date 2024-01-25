@@ -61,7 +61,7 @@ const CharacterStatsComp = ({ character }) => {
   return (
     <>
       <div className="col-1 row-flex">
-        <div className="col-2 col-flex">
+        <div className="col-1_2 col-flex">
           <div className="grid-tile">
             <h1>Ability Scores</h1>
             <div>{abilityScores}</div>
@@ -82,7 +82,7 @@ const CharacterStatsComp = ({ character }) => {
             <p>{character.languages.join(", ")}</p>
           </div>
         </div>
-        <div className="col-2 col-flex">
+        <div className="col-1_2 col-flex">
           <div className="grid-tile">
             <h1>Proficiency Bonus: +{character.profBonus}</h1>
           </div>
@@ -92,9 +92,9 @@ const CharacterStatsComp = ({ character }) => {
           <div className="grid-tile">
             <h1>Speed</h1>
             <div className="row-flex">
-              <p className="col-3">Walk {character.speed.walk} ft</p>
-              <p className="col-3">Swim {character.speed.swim} ft</p>
-              <p className="col-3">Fly {character.speed.fly} ft</p>
+              <p className="col-1_3">Walk {character.speed.walk} ft</p>
+              <p className="col-1_3">Swim {character.speed.swim} ft</p>
+              <p className="col-1_3">Fly {character.speed.fly} ft</p>
             </div>
           </div>
           <div className="grid-tile">
