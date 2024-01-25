@@ -79,8 +79,14 @@
 .col-1_10 {
   width: calc(100% / 10);
 }
+.col-3_10 {
+  width: calc(100% * 3 / 10);
+}
+.col-7_10 {
+  width: calc(100% * 7 / 10);
+}
 
-/* Make end of columns go to bottom */
+/* End of columns should go to bottom */
 .col-end {
   height: 100%;
 }
@@ -95,4 +101,9 @@ h1.header-override {
   font-style: normal;
   font-weight: bold;
   font-size: 2rem;
+}
+
+.hover-icon {
+  height: 1rlh;
+  margin: 1px;
 }
