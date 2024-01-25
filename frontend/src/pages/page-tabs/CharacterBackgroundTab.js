@@ -27,29 +27,29 @@ const CharacterBackgroundTab = ({ character }) => {
     <>
       <h1>Appearance</h1>
       <div className="row-flex">
-        <div className="col-3">
+        <div className="col-1_3">
           <h2>Age</h2>
           <p>{character.appearance.age}</p>
         </div>
-        <div className="col-3">
+        <div className="col-1_3">
           <h2>Height</h2>
           <p>{character.appearance.height}</p>
         </div>
-        <div className="col-3">
+        <div className="col-1_3">
           <h2>Weight</h2>
           <p>{character.appearance.weight}</p>
         </div>
       </div>
       <div className="row-flex">
-        <div className="col-3">
+        <div className="col-1_3">
           <h2>Eyes</h2>
           <p>{character.appearance.eyes}</p>
         </div>
-        <div className="col-3">
+        <div className="col-1_3">
           <h2>Skin</h2>
           <p>{character.appearance.skin}</p>
         </div>
-        <div className="col-3">
+        <div className="col-1_3">
           <h2>Hair</h2>
           <p>{character.appearance.hair}</p>
         </div>
@@ -92,9 +92,9 @@ const CharacterBackgroundTab = ({ character }) => {
     <div className="grid-container row-flex">
       <div className="col-flex">
         <div className="row-flex">
-          <div className="col-3 grid-tile">{background}</div>
-          <div className="col-3 grid-tile">{appearance}</div>
-          <div className="col-3 grid-tile">{allies}</div>
+          <div className="col-1_3 grid-tile">{background}</div>
+          <div className="col-1_3 grid-tile">{appearance}</div>
+          <div className="col-1_3 grid-tile">{allies}</div>
         </div>
         <div className="row-flex">
           <div className="col-1 grid-tile">{backstory}</div>

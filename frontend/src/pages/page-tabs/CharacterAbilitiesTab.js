@@ -35,8 +35,8 @@ const CharacterAbilitiesTab = ({ character }) => {
 
   return (
     <div className="grid-container row-flex">
-      <div className="col-2 grid-tile">{fromClass}</div>
-      <div className="col-2 grid-tile">{fromOther}</div>
+      <div className="col-1_2 grid-tile">{fromClass}</div>
+      <div className="col-1_2 grid-tile">{fromOther}</div>
     </div>
   );
 };

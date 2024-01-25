@@ -35,8 +35,8 @@ const CharacterInventoryTab = ({ character }) => {
   for (let type in itemizedInventory) {
     itemizedInventory[type] = itemizedInventory[type].map((item, i) => (
       <div key={i} className="row-flex">
-        <div className="col-2">{item.name}</div>
-        <div className="col-2 text-center">{item.count}</div>
+        <div className="col-1_2">{item.name}</div>
+        <div className="col-1_2 text-center">{item.count}</div>
       </div>
     ));
   }
@@ -59,9 +59,9 @@ const CharacterInventoryTab = ({ character }) => {
 
     return (
       <div key={i} className="row-flex">
-        <div className="col-3">{item.name}</div>
-        <div className="col-3 text-center">{item.count}</div>
-        <div className="col-3 text-center">
+        <div className="col-1_3">{item.name}</div>
+        <div className="col-1_3 text-center">{item.count}</div>
+        <div className="col-1_3 text-center">
           {value} {coin}
         </div>
       </div>
@@ -70,11 +70,11 @@ const CharacterInventoryTab = ({ character }) => {
 
   return (
     <div className="grid-container row-flex">
-      <div className="col-flex col-2">
+      <div className="col-flex col-1_2">
         <div className="grid-tile col-end">
           <div className="row-flex">
-            <h1 className="col-2">Item</h1>
-            <h1 className="col-2 text-center">Count</h1>
+            <h1 className="col-1_2">Item</h1>
+            <h1 className="col-1_2 text-center">Count</h1>
           </div>
           {Object.keys(itemizedInventory).map((type) => (
             <div key={type}>
@@ -84,21 +84,21 @@ const CharacterInventoryTab = ({ character }) => {
           ))}
         </div>
       </div>
-      <div className="col-flex col-2">
+      <div className="col-flex col-1_2">
         <div className="grid-tile">
           <div className="row-flex coins">
-            <h1 className="col-6">{character.coins.cp} CP</h1>
-            <h1 className="col-6">{character.coins.sp} SP</h1>
-            <h1 className="col-6">{character.coins.ep} EP</h1>
-            <h1 className="col-6">{character.coins.gp} GP</h1>
-            <h1 className="col-6">{character.coins.pp} PP</h1>
+            <h1 className="col-1_6">{character.coins.cp} CP</h1>
+            <h1 className="col-1_6">{character.coins.sp} SP</h1>
+            <h1 className="col-1_6">{character.coins.ep} EP</h1>
+            <h1 className="col-1_6">{character.coins.gp} GP</h1>
+            <h1 className="col-1_6">{character.coins.pp} PP</h1>
           </div>
         </div>
         <div className="grid-tile col-end">
           <div className="row-flex">
-            <h1 className="col-3">Treasure</h1>
-            <h1 className="col-3 text-center">Count</h1>
-            <h1 className="col-3 text-center">Value</h1>
+            <h1 className="col-1_3">Treasure</h1>
+            <h1 className="col-1_3 text-center">Count</h1>
+            <h1 className="col-1_3 text-center">Value</h1>
           </div>
           {treasure}
         </div>
