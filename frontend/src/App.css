@@ -43,6 +43,10 @@
   margin-bottom: 0px;
 }
 
+.clear-floaters {
+  clear: both;
+}
+
 /* Distinct tiles w/in sheet (here so functionality can be used by multiple pages) */
 .grid-container * {
   box-sizing: border-box;

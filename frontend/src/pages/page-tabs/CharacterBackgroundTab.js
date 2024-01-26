@@ -55,8 +55,20 @@ const CharacterBackgroundTab = ({ character }) => {
         </div>
       </div>
       <h2>Description</h2>
+      <div className="float-right col-flex">
+        {character.appearance.pictures.map((pic, i) => (
+          <img
+            key={i}
+            src={process.env.PUBLIC_URL + `/img/${pic}`}
+            alt={`${character.name}`}
+            className="height-8"
+          ></img>
+        ))}
+      </div>
       {character.appearance.desc.map((paragraph, i) => (
-        <p key={i}>{paragraph}</p>
+        <p key={i} className="text-block">
+          {paragraph}
+        </p>
       ))}
     </>
   );
@@ -64,15 +76,27 @@ const CharacterBackgroundTab = ({ character }) => {
   const allies = (
     <>
       <h1>Allies & Organizations</h1>
-      <img
-        src={process.env.PUBLIC_URL + `/img/${character.symbolSrc}`}
-        alt="Symbol"
-        className="height-8 float-right"
-      ></img>
-      {character.allies.map((paragraph, i) => (
-        <p key={i} className="text-block col-1">
-          {paragraph}
-        </p>
+      {character.allies.map((ally, i) => (
+        <div key={i} className="clear-floaters">
+          <h2>{ally.name}</h2>
+          {ally.symbols ? (
+            <div className="float-right col-flex">
+              {ally.symbols.map((sym, j) => (
+                <img
+                  key={j}
+                  src={process.env.PUBLIC_URL + `/img/${sym}`}
+                  alt={`${ally.name}`}
+                  className="height-8 float-right"
+                ></img>
+              ))}
+            </div>
+          ) : null}
+          {ally.desc.map((paragraph, i) => (
+            <p key={i} className="text-block">
+              {paragraph}
+            </p>
+          ))}
+        </div>
       ))}
     </>
   );
