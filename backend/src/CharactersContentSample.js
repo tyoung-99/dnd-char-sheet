@@ -536,6 +536,380 @@ const characters = [
       concentration: { name: "Beast Bond", roundsLeft: 17 },
     },
   },
+  {
+    id: 2,
+    name: "Dimble Warryn Ashhearth Burgell Orryn Ningel",
+    player: "Tristan",
+    avatarSrc: "6.png",
+    alignment: "Chaotic Good",
+    xp: 0,
+    inspiration: false,
+
+    armorClass: 14,
+    initiative: 2,
+    speed: {
+      walk: 25,
+      swim: 0,
+      fly: 0,
+    },
+    hp: {
+      current: 14,
+      max: 14,
+      temp: 0,
+    },
+    hitDice: {
+      total: [
+        {
+          number: 1,
+          faces: 12,
+        },
+      ],
+      remaining: [
+        {
+          number: 1,
+          faces: 12,
+        },
+      ],
+    },
+    deathSaves: {
+      successes: 0,
+      failures: 0,
+    },
+
+    profBonus: 2,
+    stats: [
+      {
+        name: "STR",
+        score: 17,
+        saveProf: true,
+        skillProfs: [{ name: "Athletics", proficiency: 0 }],
+      },
+      {
+        name: "DEX",
+        score: 14,
+        saveProf: false,
+        skillProfs: [
+          { name: "Acrobatics", proficiency: 1 },
+          { name: "Sleight of Hand", proficiency: 0 },
+          { name: "Stealth", proficiency: 0 },
+        ],
+      },
+      { name: "CON", score: 14, saveProf: true, skillProfs: [] },
+      {
+        name: "INT",
+        score: 8,
+        saveProf: false,
+        skillProfs: [
+          { name: "Arcana", proficiency: 0 },
+          { name: "History", proficiency: 0 },
+          { name: "Investigation", proficiency: 0 },
+          { name: "Nature", proficiency: 0 },
+          { name: "Religion", proficiency: 0 },
+        ],
+      },
+      {
+        name: "WIS",
+        score: 9,
+        saveProf: false,
+        skillProfs: [
+          { name: "Animal Handling", proficiency: 1 },
+          { name: "Insight", proficiency: 0 },
+          { name: "Medicine", proficiency: 0 },
+          { name: "Perception", proficiency: 1 },
+          { name: "Survival", proficiency: 0 },
+        ],
+      },
+      {
+        name: "CHA",
+        score: 13,
+        saveProf: false,
+        skillProfs: [
+          { name: "Deception", proficiency: 0 },
+          { name: "Intimidation", proficiency: 0 },
+          { name: "Performance", proficiency: 1 },
+          { name: "Persuasion", proficiency: 0 },
+        ],
+      },
+    ],
+    passivePerception: 11,
+
+    armorProfs: [
+      "Padded",
+      "Leather",
+      "Studded Leather",
+      "Hide",
+      "Chain Shirt",
+      "Scale Mail",
+      "Breastplate",
+      "Half Plate",
+      "Spiked Armor",
+      "Shield",
+    ],
+    weaponProfs: [
+      "Club",
+      "Dagger",
+      "Greatclub",
+      "Handaxe",
+      "Javelin",
+      "Light Hammer",
+      "Mace",
+      "Quarterstaff",
+      "Sickle",
+      "Spear",
+      "Yklwa",
+      "Crossbow, light",
+      "Dart",
+      "Shortbow",
+      "Sling",
+      "Battleaxe",
+      "Double-bladed Scimitar",
+      "Flail",
+      "Glaive",
+      "Greataxe",
+      "Greatsword",
+      "Halberd",
+      "Lance",
+      "Longsword",
+      "Maul",
+      "Morningstar",
+      "Pike",
+      "Rapier",
+      "Scimitar",
+      "Shortsword",
+      "Trident",
+      "War Pick",
+      "Warhammer",
+      "Whip",
+      "Blowgun",
+      "Crossbow, hand",
+      "Crossbow, heavy",
+      "Longbow",
+      "Net",
+    ],
+    toolProfs: ["Disguise Kit", "Horn"],
+    languages: ["Common", "Gnomish"],
+
+    backstory: [
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum. Sed vestibulum ac nulla eget dictum. Nulla blandit quam risus, in convallis lectus ultrices sed. Pellentesque non magna eu ipsum pharetra vulputate. Sed placerat sapien malesuada, faucibus lacus tristique, faucibus massa. Praesent vel nisi pulvinar, pellentesque elit quis, eleifend turpis. Pellentesque a erat ultrices, sagittis lorem sit amet, ullamcorper turpis. Aliquam imperdiet nulla et orci molestie, sollicitudin facilisis ante elementum. Duis vehicula sollicitudin rutrum. Nullam nec condimentum arcu, in congue risus. Suspendisse ut lectus nisi.",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum. Sed vestibulum ac nulla eget dictum. Nulla blandit quam risus, in convallis lectus ultrices sed. Pellentesque non magna eu ipsum pharetra vulputate. Sed placerat sapien malesuada, faucibus lacus tristique, faucibus massa. Praesent vel nisi pulvinar, pellentesque elit quis, eleifend turpis. Pellentesque a erat ultrices, sagittis lorem sit amet, ullamcorper turpis. Aliquam imperdiet nulla et orci molestie, sollicitudin facilisis ante elementum. Duis vehicula sollicitudin rutrum. Nullam nec condimentum arcu, in congue risus. Suspendisse ut lectus nisi.ltiple",
+      "In eget magna nibh. Morbi ultrices, nunc sit amet volutpat sollicitudin, sem turpis tincidunt erat, eget molestie mi felis id tortor. Donec nec ligula et nibh feugiat aliquet. Quisque scelerisque orci eget justo bibendum egestas. Nullam ut ante sit amet eros facilisis tempus vel ac nulla. Sed aliquet at purus sit amet commodo. Donec non eleifend nunc. Proin sollicitudin facilisis vulputate. Vestibulum nisl urna, vestibulum a pharetra vel, congue non neque. Integer eu quam sit amet nulla luctus posuere.",
+    ],
+    background: {
+      name: "Entertainer",
+      personalityTraits: [
+        "I get bitter if I'm not the center of attention.",
+        "Nobody stays angry at me or around me for long, since I can defuse any amount of tension.",
+      ],
+      ideals: [
+        "People. I like seeing the smiles on people's faces when I perform. That's all that matters.",
+      ],
+      bonds: [
+        "I idolize a hero of the old tales and measure my deeds against that person's.",
+      ],
+      flaws: ["I'm a sucker for a pretty face."],
+    },
+
+    race: {
+      name: "Gnome",
+      subrace: "Forest",
+    },
+
+    // Class(es)
+    classes: [
+      {
+        className: "Barbarian",
+        classLevel: 1,
+      },
+    ],
+
+    equipment: [
+      {
+        name: "Longsword",
+        profRequired: ["Longsword"],
+        count: 1,
+        type: "Weapon",
+        subtypes: ["Melee", "Martial"],
+        properties: ["Versatile (1d10)"],
+        damage: { dice: 1, sides: 8, type: "slashing" },
+        equipped: true,
+      },
+      {
+        name: "Handaxe",
+        profRequired: ["Handaxe"],
+        count: 2,
+        type: "Weapon",
+        subtypes: ["Melee", "Simple"],
+        properties: ["Light", "Thrown (range 20/60)"],
+        damage: { dice: 1, sides: 6, type: "slashing" },
+        equipped: true,
+      },
+      { name: "Backpack", count: 1, type: "Storage" },
+      { name: "Bedroll", count: 1, type: "Tool" },
+      { name: "Mess Kit", count: 1, type: "Tool" },
+      { name: "Tinderbox", count: 1, type: "Tool" },
+      { name: "Torch", count: 10, type: "Tool" },
+      {
+        name: "Rations (1 day)",
+        count: 10,
+        type: "Consumable",
+        subtype: "Food",
+      },
+      { name: "Waterskin", count: 1, type: "Tool" },
+      { name: "Rope (50 ft)", count: 1, type: "Tool" },
+      {
+        name: "Javelin",
+        profRequired: ["Javelin"],
+        count: 4,
+        type: "Weapon",
+        subtypes: ["Melee", "Simple"],
+        properties: ["Thrown (range 30/120)"],
+        damage: { dice: 1, sides: 6, type: "piercing" },
+        equipped: true,
+      },
+      { name: "Horn", count: 1, type: "Musical Instrument" },
+      { name: "Love Letter", count: 1, type: "Misc" },
+      { name: "Pouch", count: 1, type: "Storage" },
+    ],
+    coins: { cp: 0, sp: 1, ep: 2, gp: 3, pp: 4 },
+    attunements: [null, null, null],
+
+    appearance: {
+      age: "X years",
+      height: "X ft X in",
+      weight: "X lbs",
+      eyes: "Brown/purple",
+      skin: "White",
+      hair: "White with purple highlights",
+      desc: [
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum.",
+        "In eget magna nibh. Morbi ultrices, nunc sit amet volutpat sollicitudin, sem turpis tincidunt erat, eget molestie mi felis id tortor.",
+      ],
+      pictures: ["7.png", "8.png"],
+    },
+
+    allies: [
+      {
+        name: "Xalyth",
+        desc: [
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum.",
+          "In eget magna nibh. Morbi ultrices, nunc sit amet volutpat sollicitudin, sem turpis tincidunt erat, eget molestie mi felis id tortor.",
+        ],
+        symbols: ["10.png"],
+      },
+      {
+        name: "Bron",
+        desc: [
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum.",
+          "In eget magna nibh. Morbi ultrices, nunc sit amet volutpat sollicitudin, sem turpis tincidunt erat, eget molestie mi felis id tortor.",
+        ],
+        symbols: ["9.png"],
+      },
+    ],
+
+    abilities: [
+      {
+        name: "By Popular Demand",
+        background: "Entertainer",
+        desc: [
+          "You can always find a place to perform, usually in an inn or tavern but possibly with a circus, at a theater, or even in a noble's court. At such a place, you receive free lodging and food of a modest or comfortable standard (depending on the quality of the establishment), as long as you perform each night. In addition, your performance makes you something of a local figure. When strangers recognize you in a town where you have performed, they typically take a liking to you.",
+        ],
+      },
+      {
+        name: "Size",
+        race: "Gnome",
+        desc: [
+          "Gnomes are between 3 and 4 feet tall and average about 40 pounds. Your size is Small.",
+        ],
+      },
+      {
+        name: "Darkvision",
+        race: "Gnome",
+        desc: [
+          "Accustomed to life underground, you have superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray.",
+        ],
+      },
+      {
+        name: "Gnome Cunning",
+        race: "Gnome",
+        desc: [
+          "You have advantage on all Intelligence, Wisdom, and Charisma saving throws against magic.",
+        ],
+      },
+      {
+        name: "Speak with Small Beasts",
+        race: "Gnome",
+        desc: [
+          "Through sounds and gestures, you can communicate simple ideas with Small or smaller beasts. Forest gnomes love animals and often keep squirrels, badgers, rabbits, moles, woodpeckers, and other creatures as beloved pets.",
+        ],
+      },
+      {
+        name: "Rage",
+        class: "Barbarian",
+        desc: [
+          "In battle, you fight with primal ferocity. On your turn, you can enter a rage as a bonus action.",
+          "While raging, you gain the following benefits if you aren't wearing heavy armor:",
+          "You have advantage on all Strength checks and Strength saving throws.",
+          "When you make a melee weapon attack using Strength, you gain a bonus to the damage roll that increases as you gain levels as a barbarian, as shown in the Rage Damage column of the Barbarian table.",
+          "You have resistance to bludgeoning, piercing, and slashing damage.",
+          "If you are able to cast spells, you can't cast them or concentrate on them while raging.",
+          "Your rage lasts for 1 minute. It ends early if you are knocked unconscious or if your turn ends and you haven't attacked a hostile creature since your last turn or taken damage since then. You can also end your rage on your turn as a bonus action.",
+          "Once you have raged 2 times, you must finish a long rest before you can rage again.",
+        ],
+      },
+      {
+        name: "Unarmored Defence",
+        class: "Barbarian",
+        desc: [
+          "While you are not wearing any armor, your Armor Class equals 10 + your Dexterity modifier + your Constitution modifier. You can use a shield and still gain this benefit.",
+        ],
+      },
+    ],
+
+    spellcasting: {
+      classes: [{ name: "Gnome", ability: "INT", saveDC: 9, attackBonus: 1 }],
+      spellSlots: {
+        slotsTotal: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        slotsExpended: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      },
+      pactSlots: {
+        slotsTotal: [0, 0, 0, 0, 0],
+        slotsExpended: [0, 0, 0, 0, 0],
+      },
+      spellsKnown: [
+        {
+          name: "Minor Illusion",
+          level: 0,
+          school: "Illusion",
+          ritual: false,
+          castTime: "1 action",
+          range: "30 ft",
+          components: {
+            v: false,
+            s: true,
+            m: [
+              {
+                name: "a bit of fleece",
+                value: false,
+                consumed: false,
+              },
+            ],
+          },
+          duration: "1 minute",
+          concentration: false,
+          description: [
+            "You create a sound or an image of an object within range that lasts for the duration. The illusion also ends if you dismiss it as an action or cast this spell again.",
+            "If you create a sound, its volume can range from a whisper to a scream. It can be your voice, someone else's voice, a lion's roar, a beating of drums, or any other sound you choose. The sound continues unabated throughout the duration, or you can make discrete sounds at different times before the spell ends.",
+            "If you create an image of an object — such as a chair, muddy footprints, or a small chest — it must be no larger than a 5-foot cube. The image can't create sound, light, smell, or any other sensory effect. Physical interaction with the image reveals it to be an illusion, because things can pass through it.",
+            "If a creature uses its action to examine the sound or image, the creature can determine that it is an illusion with a successful Intelligence (Investigation) check against your spell save DC. If a creature discerns the illusion for what it is, the illusion becomes faint to the creature.",
+          ],
+          upcast: false,
+          race: "Gnome",
+          prepared: 2,
+        },
+      ],
+      concentration: { name: "Beast Bond", roundsLeft: 17 },
+    },
+  },
 ];
 
 export default characters;
