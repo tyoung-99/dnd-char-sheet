@@ -262,6 +262,7 @@ const characters = [
       },
     ],
     coins: { cp: 0, sp: 1, ep: 2, gp: 3, pp: 4 },
+    attunements: ["Sun Blade", "Flame Tongue Shortsword", null],
 
     appearance: {
       age: "25 years",
