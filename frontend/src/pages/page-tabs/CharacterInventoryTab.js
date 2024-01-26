@@ -71,6 +71,12 @@ const CharacterInventoryTab = ({ character }) => {
   return (
     <div className="grid-container row-flex">
       <div className="col-flex col-1_2">
+        <div className="grid-tile">
+          <h1>Attunements</h1>
+          {character.attunements.map((item, i) => (
+            <p key={i}>{item ? item : "-Empty-"}</p>
+          ))}
+        </div>
         <div className="grid-tile col-end">
           <div className="row-flex">
             <h1 className="col-1_2">Item</h1>
