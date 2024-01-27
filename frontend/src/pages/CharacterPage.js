@@ -52,13 +52,13 @@ const CharacterPage = () => {
           ></input>
         </Link>
       </div>
-      <div className="avatar-holder">
+      <div className="name-header">
         <img
           src={process.env.PUBLIC_URL + `/img/${character.avatarSrc}`}
           alt="Avatar"
           className="avatar"
         ></img>
-        <div className="name-header avatar-label">
+        <div className="avatar-label">
           <h1>{character.name} </h1>
           <h2>{character.player}</h2>
           <p>{character.alignment}</p>
