@@ -19,14 +19,12 @@ const CharacterQuickItemsComp = ({ character }) => {
   weapons = weapons.sort((first, second) =>
     first.name > second.name ? 1 : first.name === second.name ? 0 : -1
   );
-  const strMod =
-    Math.floor(
-      character.stats.filter((stat) => stat.name === "STR")[0].score - 10
-    ) / 2;
-  const dexMod =
-    Math.floor(
-      character.stats.filter((stat) => stat.name === "DEX")[0].score - 10
-    ) / 2;
+  const strMod = Math.floor(
+    (character.stats.filter((stat) => stat.name === "STR")[0].score - 10) / 2
+  );
+  const dexMod = Math.floor(
+    (character.stats.filter((stat) => stat.name === "DEX")[0].score - 10) / 2
+  );
   weapons = weapons.map((item, i) => {
     const damageDice = `${item.damage.dice}d${item.damage.sides}`;
 
