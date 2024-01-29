@@ -214,7 +214,7 @@ const CharacterStatsComp = ({ character }) => {
               <p className="col-1_3">Fly {character.speed.fly} ft</p>
             </div>
           </div>
-          <div className="grid-tile">
+          <div className="grid-tile col-end">
             <h1>Skills</h1>
             <div>{skills}</div>
           </div>

@@ -137,7 +137,7 @@ const CharacterQuickItemsComp = ({ character }) => {
 
   return (
     <>
-      <div className="col-1 row-flex">
+      <div className="col-1 row-flex col-end">
         <div className="col-1 col-flex">
           <div className="grid-tile">
             <h1>Weapons</h1>
