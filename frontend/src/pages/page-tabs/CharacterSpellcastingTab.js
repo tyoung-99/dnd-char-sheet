@@ -33,7 +33,9 @@ const CharacterSpellcastingTab = ({ character }) => {
 
     return time;
   };
-  const roundsLeft = character.spellcasting.concentration.roundsLeft;
+  const roundsLeft = character.spellcasting.concentration
+    ? character.spellcasting.concentration.roundsLeft
+    : null;
   const concentration = (
     <>
       <div className="row-flex">
@@ -42,7 +44,7 @@ const CharacterSpellcastingTab = ({ character }) => {
       </div>
       <div className="row-flex">
         {!character.spellcasting.concentration ? (
-          <p>None</p>
+          <p>-None-</p>
         ) : (
           <>
             <p className="col-1_2">

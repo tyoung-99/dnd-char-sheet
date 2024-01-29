@@ -907,7 +907,7 @@ const characters = [
           prepared: 2,
         },
       ],
-      concentration: { name: "Beast Bond", roundsLeft: 17 },
+      concentration: null,
     },
   },
 ];
