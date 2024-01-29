@@ -117,7 +117,7 @@ const CharacterStatsComp = ({ character }) => {
       },
     ];
 
-    let weaponProfs = character.weaponProfs;
+    let weaponProfs = [...character.weaponProfs];
     WEAPON_PROF_GROUPS.forEach((group) => {
       if (group.profs.every((prof) => weaponProfs.includes(prof))) {
         weaponProfs.unshift(group.name);
@@ -146,7 +146,7 @@ const CharacterStatsComp = ({ character }) => {
       { name: "Light", profs: ["Padded", "Leather", "Studded Leather"] },
     ];
 
-    let armorProfs = character.armorProfs;
+    let armorProfs = [...character.armorProfs];
     ARMOR_PROF_GROUPS.forEach((group) => {
       if (group.profs.every((prof) => armorProfs.includes(prof))) {
         armorProfs.unshift(group.name);
