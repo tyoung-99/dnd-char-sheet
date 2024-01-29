@@ -135,8 +135,6 @@ const CharacterQuickItemsComp = ({ character }) => {
   weapons = handleWeapons(weapons);
   consumables = handleConsumables(consumables);
 
-  console.log(consumables);
-
   return (
     <>
       <div className="col-1 row-flex">
