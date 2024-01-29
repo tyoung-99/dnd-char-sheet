@@ -31,7 +31,6 @@ const CharacterInventoryTab = ({ character }) => {
     first.name > second.name ? 1 : first.name === second.name ? 0 : -1
   );
 
-  // Convert to HTML
   for (let type in itemizedInventory) {
     itemizedInventory[type] = itemizedInventory[type].map((item, i) => (
       <div key={i} className="row-flex">
@@ -82,12 +81,16 @@ const CharacterInventoryTab = ({ character }) => {
             <h1 className="col-1_2">Item</h1>
             <h1 className="col-1_2 text-center">Count</h1>
           </div>
-          {Object.keys(itemizedInventory).map((type) => (
-            <div key={type}>
-              <h1>{type}</h1>
-              {itemizedInventory[type]}
-            </div>
-          ))}
+          {Object.keys(itemizedInventory).length === 0 ? (
+            <p>-None-</p>
+          ) : (
+            Object.keys(itemizedInventory).map((type) => (
+              <div key={type}>
+                <h1>{type}</h1>
+                {itemizedInventory[type]}
+              </div>
+            ))
+          )}
         </div>
       </div>
       <div className="col-flex col-1_2">
@@ -106,7 +109,7 @@ const CharacterInventoryTab = ({ character }) => {
             <h1 className="col-1_3 text-center">Count</h1>
             <h1 className="col-1_3 text-center">Value</h1>
           </div>
-          {treasure}
+          {treasure.length === 0 ? <p>-None-</p> : treasure}
         </div>
       </div>
     </div>
