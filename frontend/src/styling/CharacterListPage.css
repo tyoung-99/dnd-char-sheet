@@ -1,0 +1,30 @@
+/* Buttons to access characters */
+.character-list-item {
+  text-decoration: none;
+  color: black;
+  padding: 10px 10px;
+  margin: 10px 10px;
+  border: 2px solid black;
+  text-align: center;
+  width: 20rem;
+  box-sizing: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.character-list-item:hover {
+  background-color: lightgray;
+}
+
+.character-list-item > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+div:has(> .character-list-item) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+}

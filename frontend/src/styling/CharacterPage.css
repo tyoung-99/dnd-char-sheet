@@ -1,0 +1,82 @@
+/* Button menu */
+.menu-bar input {
+  border: 1px solid black;
+  background: white;
+  cursor: pointer;
+}
+.menu-bar input:hover {
+  background: lightgray;
+}
+
+/* Navigation tabs */
+.nav {
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  border: 1px solid black;
+  padding-left: 0px;
+}
+.nav li {
+  width: 50%;
+  padding: 1rem;
+  list-style: none;
+  text-align: center;
+  cursor: pointer;
+}
+.nav li:hover {
+  background: lightgray;
+}
+.nav li.active {
+  background: black;
+  color: white;
+}
+
+/* Headers common to all pages */
+/* Character name/other basic info */
+.name-header {
+  text-align: center;
+  line-height: 50%;
+  margin-bottom: 1rem;
+}
+.name-header h2 {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 1rem;
+  opacity: 0.75;
+}
+.name-header p {
+  display: inline-block;
+  margin: 0.5rem;
+}
+/* XP total/inspiration */
+.xp-inspire-header {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+/* Combat-related info for easy reference */
+.combat-header {
+  display: flex;
+  justify-content: space-evenly;
+  line-height: 50%;
+}
+/* Menu of buttons */
+.menu-bar {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+}
+
+/* Death save section */
+.death-save-marker {
+  height: 0.75rem;
+  width: 0.75rem;
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid black;
+  display: inline-block;
+  margin-left: 1px;
+}
+.filled {
+  background-color: black;
+}
