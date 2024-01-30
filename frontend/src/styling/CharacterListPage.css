@@ -6,24 +6,25 @@
   margin: 10px 10px;
   border: 2px solid black;
   text-align: center;
-  display: inline-block;
+  width: 20rem;
+  box-sizing: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .character-list-item:hover {
   background-color: lightgray;
 }
 
-img.avatar {
-  height: 3rlh;
-  width: 3rlh;
-  display: inline-block;
-  vertical-align: middle;
-  margin: 0.5rlh;
+.character-list-item > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.avatar-label {
-  display: inline-block;
-  vertical-align: middle;
-}
-.avatar-holder {
-  text-align: center;
+
+div:has(> .character-list-item) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
 }

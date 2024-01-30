@@ -124,3 +124,15 @@ h1.header-override {
   height: 1rlh;
   margin: 1px;
 }
+
+img.avatar {
+  height: 3rlh;
+  width: 3rlh;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0.5rlh;
+}
+.avatar-label {
+  display: inline-block;
+  vertical-align: middle;
+}
