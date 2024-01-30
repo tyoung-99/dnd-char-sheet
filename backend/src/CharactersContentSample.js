@@ -630,7 +630,6 @@ const characters = [
         ],
       },
     ],
-    passivePerception: 11,
 
     armorProfs: [
       "Padded",

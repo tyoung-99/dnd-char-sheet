@@ -9,6 +9,7 @@ const CharacterStatsComp = ({ character }) => {
   const [abilityScores, setAbilityScores] = useState([]);
   const [weaponProfs, setWeaponProfs] = useState([]);
   const [armorProfs, setArmorProfs] = useState([]);
+  const [passivePerception, setPassivePerception] = useState(10);
 
   useEffect(() => {
     const handleSkillsSavesAbilities = (character) => {
@@ -179,14 +180,23 @@ const CharacterStatsComp = ({ character }) => {
     setProfBonus(newProfBonus);
 
     let newSkillsSavesAbilities = handleSkillsSavesAbilities(character);
-    let newWeapons = handleWeapons(character);
-    let newArmor = handleArmor(character);
-
     setSkills(newSkillsSavesAbilities[0]);
     setSaves(newSkillsSavesAbilities[1]);
     setAbilityScores(newSkillsSavesAbilities[2]);
+
+    let newWeapons = handleWeapons(character);
     setWeaponProfs(newWeapons);
+
+    let newArmor = handleArmor(character);
     setArmorProfs(newArmor);
+
+    const wis = character.stats.find((stat) => stat.name === "WIS");
+    const perception = wis.skillProfs.find(
+      (skill) => skill.name === "Perception"
+    );
+    setPassivePerception(
+      10 + Math.floor((wis.score - 10) / 2) + perception.proficiency * profBonus
+    );
   }, [character, profBonus]);
 
   return (
@@ -218,7 +228,7 @@ const CharacterStatsComp = ({ character }) => {
             <h1>Proficiency Bonus: +{profBonus}</h1>
           </div>
           <div className="grid-tile">
-            <h1>Passive Perception: {character.passivePerception}</h1>
+            <h1>Passive Perception: {passivePerception}</h1>
           </div>
           <div className="grid-tile">
             <h1>Speed</h1>
