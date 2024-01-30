@@ -17,6 +17,7 @@ import DeathSavesComp from "../components/DeathSavesComp";
 const CharacterPage = () => {
   const { characterID } = useParams();
   const [character, setCharacter] = useState();
+  const [initiative, setInitiative] = useState();
 
   useEffect(() => {
     const loadCharacter = async () => {
@@ -27,6 +28,18 @@ const CharacterPage = () => {
 
     loadCharacter();
   }, [characterID]);
+
+  useEffect(() => {
+    if (!character) {
+      return;
+    }
+
+    setInitiative(
+      Math.floor(
+        (character.stats.find((stat) => stat.name === "DEX").score - 10) / 2
+      )
+    );
+  }, [character]);
 
   const [activeTab, setActiveTab] = useState("main");
 
@@ -78,10 +91,7 @@ const CharacterPage = () => {
       <div className="combat-header">
         <div>
           <p>AC: {character.armorClass}</p>
-          <p>
-            Initiative:{" "}
-            {(character.initiative >= 0 ? "+" : "") + character.initiative}
-          </p>
+          <p>Initiative: {(initiative >= 0 ? "+" : "") + initiative}</p>
         </div>
         <div>
           <p>Temp HP: {character.hp.temp}</p>

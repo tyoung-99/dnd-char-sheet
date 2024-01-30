@@ -9,7 +9,6 @@ const characters = [
     inspiration: false,
 
     armorClass: 10,
-    initiative: 2,
     speed: {
       walk: 30,
       swim: 5,
@@ -47,7 +46,6 @@ const characters = [
       failures: 1,
     },
 
-    profBonus: 2,
     stats: [
       {
         name: "STR",
@@ -102,7 +100,6 @@ const characters = [
         ],
       },
     ],
-    passivePerception: 12,
 
     weaponProfs: ["Daggers", "Shortswords", "Light Crossbows"],
     armorProfs: ["Armor 1", "Armor 2"],
@@ -546,7 +543,6 @@ const characters = [
     inspiration: false,
 
     armorClass: 14,
-    initiative: 2,
     speed: {
       walk: 25,
       swim: 0,
