@@ -24,7 +24,7 @@ const CharacterQuickItemsComp = ({ character }) => {
       const profMod = item.profRequired.some((prof) =>
         character.weaponProfs.includes(prof)
       )
-        ? character.profBonus
+        ? profBonus
         : 0;
 
       const itemBonus = item.bonus || 0;
@@ -119,6 +119,14 @@ const CharacterQuickItemsComp = ({ character }) => {
 
     return itemizedConsumables;
   };
+
+  const profBonus =
+    Math.ceil(
+      character.classes.reduce(
+        (totalLevel, charClass) => totalLevel + charClass.classLevel,
+        0
+      ) / 4
+    ) + 1;
 
   let weapons = [],
     consumables = [];

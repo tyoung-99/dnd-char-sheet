@@ -576,7 +576,6 @@ const characters = [
       failures: 0,
     },
 
-    profBonus: 2,
     stats: [
       {
         name: "STR",
