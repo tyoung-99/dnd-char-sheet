@@ -19,28 +19,16 @@ const characters = [
       max: 14,
       temp: 2,
     },
-    hitDice: {
-      total: [
-        {
-          number: 3,
-          faces: 10,
-        },
-        {
-          number: 2,
-          faces: 6,
-        },
-      ],
-      remaining: [
-        {
-          number: 1,
-          faces: 10,
-        },
-        {
-          number: 1,
-          faces: 6,
-        },
-      ],
-    },
+    usedHitDice: [
+      {
+        number: 1,
+        faces: 10,
+      },
+      {
+        number: 1,
+        faces: 6,
+      },
+    ],
     deathSaves: {
       successes: 2,
       failures: 1,
@@ -136,10 +124,12 @@ const characters = [
       {
         className: "Fighter",
         classLevel: 3,
+        hitDie: 10,
       },
       {
         className: "Wizard",
         classLevel: 2,
+        hitDie: 6,
       },
     ],
 
@@ -553,20 +543,12 @@ const characters = [
       max: 14,
       temp: 0,
     },
-    hitDice: {
-      total: [
-        {
-          number: 1,
-          faces: 12,
-        },
-      ],
-      remaining: [
-        {
-          number: 1,
-          faces: 12,
-        },
-      ],
-    },
+    usedHitDice: [
+      {
+        number: 1,
+        faces: 12,
+      },
+    ],
     deathSaves: {
       successes: 0,
       failures: 0,
@@ -713,6 +695,7 @@ const characters = [
       {
         className: "Barbarian",
         classLevel: 1,
+        hitDie: 12,
       },
     ],
 

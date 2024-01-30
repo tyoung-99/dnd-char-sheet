@@ -15,9 +15,13 @@ import CharacterSpellcastingTab from "./page-tabs/CharacterSpellcastingTab";
 import DeathSavesComp from "../components/DeathSavesComp";
 
 const CharacterPage = () => {
+  const [activeTab, setActiveTab] = useState("main");
+
   const { characterID } = useParams();
   const [character, setCharacter] = useState();
   const [initiative, setInitiative] = useState();
+  const [currentHitDice, setCurrentHitDice] = useState();
+  const [totalHitDice, setTotalHitDice] = useState();
 
   useEffect(() => {
     const loadCharacter = async () => {
@@ -39,19 +43,37 @@ const CharacterPage = () => {
         (character.stats.find((stat) => stat.name === "DEX").score - 10) / 2
       )
     );
-  }, [character]);
 
-  const [activeTab, setActiveTab] = useState("main");
+    // Leave totals as parseable array at 1st so current can be calculated
+    let newTotal = [];
+    character.classes.forEach((charClass) => {
+      let index = newTotal.findIndex((die) => die.faces === charClass.hitDie);
+      if (index === -1) {
+        newTotal.push({
+          number: charClass.classLevel,
+          faces: charClass.hitDie,
+        });
+      } else {
+        newTotal[index].number += charClass.classLevel;
+      }
+    });
+
+    setCurrentHitDice(
+      character.usedHitDice.map(
+        (usedDie) =>
+          `${
+            newTotal.find((totalDie) => totalDie.faces === usedDie.faces)
+              .number - usedDie.number
+          }d${usedDie.faces}`
+      )
+    );
+    newTotal = newTotal.map((die) => `${die.number}d${die.faces}`);
+    setTotalHitDice(newTotal);
+  }, [character]);
 
   if (!character) {
     return <div>Loading...</div>;
   }
-  const currentHD = character.hitDice.remaining.map(
-    (die) => `${die.number}d${die.faces}`
-  );
-  const totalHD = character.hitDice.total.map(
-    (die) => `${die.number}d${die.faces}`
-  );
 
   return (
     <div>
@@ -94,14 +116,19 @@ const CharacterPage = () => {
           <p>Initiative: {(initiative >= 0 ? "+" : "") + initiative}</p>
         </div>
         <div>
-          <p>Temp HP: {character.hp.temp}</p>
-          <p>Current HP: {character.hp.current}</p>
           <p>Max HP: {character.hp.max}</p>
+          <p>Current HP: {character.hp.current}</p>
+          <p>Temp HP: {character.hp.temp}</p>
         </div>
-        <div>
-          <p>Current Hit Dice: {currentHD.join(", ")}</p>
-          <p>Total Hit Dice: {totalHD.join(", ")}</p>
-        </div>
+        {!(totalHitDice && currentHitDice) ? (
+          <p>Loading...</p>
+        ) : (
+          <div>
+            <p>Total Hit Dice: {totalHitDice.join(", ")}</p>
+            <p>Current Hit Dice: {currentHitDice.join(", ")}</p>
+          </div>
+        )}
+
         <DeathSavesComp deathSaves={character.deathSaves} />
       </div>
       <ul className="nav">
