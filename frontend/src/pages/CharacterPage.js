@@ -22,6 +22,113 @@ const CharacterPage = () => {
   const [initiative, setInitiative] = useState();
   const [currentHitDice, setCurrentHitDice] = useState();
   const [totalHitDice, setTotalHitDice] = useState();
+  const [armorClass, setArmorClass] = useState();
+
+  const calcAC = (character) => {
+    let replacements = [],
+      bonuses = [];
+
+    character.armorClass.forEach((option) => {
+      if (option.class) {
+        option = character.abilities
+          .find(
+            (ability) =>
+              ability.class === option.class && ability.name === option.name
+          )
+          .effects.find((effect) => effect.category === "armorClass").changes;
+      } else if (option.item) {
+        option = character.equipment
+          .find((item) => item.name === option.item && item.equipped)
+          .effects.find((effect) => effect.category === "armorClass").changes;
+      }
+
+      if (option.replace) {
+        replacements.push(option);
+      } else if (option.bonus) {
+        bonuses.push(option);
+      }
+    });
+
+    const equippedItems = character.equipment.filter((item) => item.equipped);
+
+    replacements = replacements.map((option) => {
+      if (
+        option.noArmor &&
+        equippedItems.some(
+          (item) => item.type === "Armor" && !item.subtypes.includes["Shield"]
+        )
+      ) {
+        return -1;
+      }
+
+      if (
+        option.noShield &&
+        equippedItems.some(
+          (item) => item.type === "Armor" && item.subtypes.includes["Shield"]
+        )
+      ) {
+        return -1;
+      }
+
+      const mods = option.replace.mods.map((mod, i) => {
+        let val = Math.floor(
+          (character.stats.find((stat) => stat.name === mod).score - 10) / 2
+        );
+        if (option.replace.modCaps && val > option.replace.modCaps[i]) {
+          val = option.replace.modCaps[i];
+        }
+        return val;
+      });
+
+      return option.replace.base + mods.reduce((total, mod) => total + mod);
+    });
+
+    replacements.push(
+      10 +
+        Math.floor(
+          (character.stats.find((stat) => stat.name === "DEX").score - 10) / 2
+        )
+    );
+
+    bonuses = bonuses.map((option) => {
+      if (
+        option.noArmor &&
+        equippedItems.some(
+          (item) => item.type === "Armor" && !item.subtypes.includes["Shield"]
+        )
+      ) {
+        return 0;
+      }
+
+      if (
+        option.noShield &&
+        equippedItems.some(
+          (item) => item.type === "Armor" && item.subtypes.includes["Shield"]
+        )
+      ) {
+        return 0;
+      }
+
+      let mods = option.bonus.mods.map((mod, i) => {
+        let val = Math.floor(
+          (character.stats.find((stat) => stat.name === mod).score - 10) / 2
+        );
+        if (val > option.replace.modCaps[i]) {
+          val = option.replace.modCaps[i];
+        }
+        return val;
+      });
+      mods.push(option.bonus.flat);
+      mods = mods.reduce((total, mod) => total + mod);
+
+      return mods;
+    });
+
+    return (
+      Math.max(...replacements) +
+      bonuses.reduce((total, bonus) => total + bonus, 0)
+    );
+  };
 
   useEffect(() => {
     const loadCharacter = async () => {
@@ -69,6 +176,8 @@ const CharacterPage = () => {
     );
     newTotal = newTotal.map((die) => `${die.number}d${die.faces}`);
     setTotalHitDice(newTotal);
+
+    setArmorClass(calcAC(character));
   }, [character]);
 
   if (!character) {
@@ -112,7 +221,7 @@ const CharacterPage = () => {
       </div>
       <div className="combat-header">
         <div>
-          <p>AC: {character.armorClass}</p>
+          <p>AC: {armorClass}</p>
           <p>Initiative: {(initiative >= 0 ? "+" : "") + initiative}</p>
         </div>
         <div>

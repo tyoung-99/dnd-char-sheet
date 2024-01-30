@@ -532,7 +532,16 @@ const characters = [
     xp: 0,
     inspiration: false,
 
-    armorClass: 14,
+    armorClass: [
+      {
+        name: "Unarmored Defense",
+        class: "Barbarian",
+      },
+      {
+        name: "Scale Mail",
+        item: "Scale Mail",
+      },
+    ],
     speed: {
       walk: 25,
       swim: 0,
@@ -701,6 +710,25 @@ const characters = [
 
     equipment: [
       {
+        name: "Scale Mail",
+        profRequired: "Scale Mail",
+        count: 1,
+        type: "Armor",
+        subtypes: ["Medium"],
+        properties: ["Stealth Disadvantage"],
+        equipped: true,
+        effects: [
+          {
+            category: "armorClass",
+            changes: {
+              replace: { base: 14, mods: ["DEX"], modCaps: [2] },
+              noArmor: false,
+              noShield: false,
+            },
+          },
+        ],
+      },
+      {
         name: "Longsword",
         profRequired: ["Longswords"],
         count: 1,
@@ -834,10 +862,20 @@ const characters = [
         ],
       },
       {
-        name: "Unarmored Defence",
+        name: "Unarmored Defense",
         class: "Barbarian",
         desc: [
           "While you are not wearing any armor, your Armor Class equals 10 + your Dexterity modifier + your Constitution modifier. You can use a shield and still gain this benefit.",
+        ],
+        effects: [
+          {
+            category: "armorClass",
+            changes: {
+              replace: { base: 10, mods: ["DEX", "CON"] },
+              noArmor: true,
+              noShield: false,
+            },
+          },
         ],
       },
     ],
