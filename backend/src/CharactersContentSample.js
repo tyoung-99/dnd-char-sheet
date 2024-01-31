@@ -9,7 +9,6 @@ const characters = [
     inspiration: false,
 
     armorClass: 10,
-    initiative: 2,
     speed: {
       walk: 30,
       swim: 5,
@@ -20,34 +19,21 @@ const characters = [
       max: 14,
       temp: 2,
     },
-    hitDice: {
-      total: [
-        {
-          number: 3,
-          faces: 10,
-        },
-        {
-          number: 2,
-          faces: 6,
-        },
-      ],
-      remaining: [
-        {
-          number: 1,
-          faces: 10,
-        },
-        {
-          number: 1,
-          faces: 6,
-        },
-      ],
-    },
+    usedHitDice: [
+      {
+        number: 1,
+        faces: 10,
+      },
+      {
+        number: 1,
+        faces: 6,
+      },
+    ],
     deathSaves: {
       successes: 2,
       failures: 1,
     },
 
-    profBonus: 2,
     stats: [
       {
         name: "STR",
@@ -102,7 +88,6 @@ const characters = [
         ],
       },
     ],
-    passivePerception: 12,
 
     weaponProfs: ["Daggers", "Shortswords", "Light Crossbows"],
     armorProfs: ["Armor 1", "Armor 2"],
@@ -139,10 +124,12 @@ const characters = [
       {
         className: "Fighter",
         classLevel: 3,
+        hitDie: 10,
       },
       {
         className: "Wizard",
         classLevel: 2,
+        hitDie: 6,
       },
     ],
 
@@ -545,8 +532,16 @@ const characters = [
     xp: 0,
     inspiration: false,
 
-    armorClass: 14,
-    initiative: 2,
+    armorClass: [
+      {
+        name: "Unarmored Defense",
+        class: "Barbarian",
+      },
+      {
+        name: "Scale Mail",
+        item: "Scale Mail",
+      },
+    ],
     speed: {
       walk: 25,
       swim: 0,
@@ -557,26 +552,17 @@ const characters = [
       max: 14,
       temp: 0,
     },
-    hitDice: {
-      total: [
-        {
-          number: 1,
-          faces: 12,
-        },
-      ],
-      remaining: [
-        {
-          number: 1,
-          faces: 12,
-        },
-      ],
-    },
+    usedHitDice: [
+      {
+        number: 1,
+        faces: 12,
+      },
+    ],
     deathSaves: {
       successes: 0,
       failures: 0,
     },
 
-    profBonus: 2,
     stats: [
       {
         name: "STR",
@@ -631,7 +617,6 @@ const characters = [
         ],
       },
     ],
-    passivePerception: 11,
 
     armorProfs: [
       "Padded",
@@ -719,10 +704,30 @@ const characters = [
       {
         className: "Barbarian",
         classLevel: 1,
+        hitDie: 12,
       },
     ],
 
     equipment: [
+      {
+        name: "Scale Mail",
+        profRequired: "Scale Mail",
+        count: 1,
+        type: "Armor",
+        subtypes: ["Medium"],
+        properties: ["Stealth Disadvantage"],
+        equipped: true,
+        effects: [
+          {
+            category: "armorClass",
+            changes: {
+              replace: { base: 14, mods: ["DEX"], modCaps: [2] },
+              noArmor: false,
+              noShield: false,
+            },
+          },
+        ],
+      },
       {
         name: "Longsword",
         profRequired: ["Longswords"],
@@ -857,10 +862,20 @@ const characters = [
         ],
       },
       {
-        name: "Unarmored Defence",
+        name: "Unarmored Defense",
         class: "Barbarian",
         desc: [
           "While you are not wearing any armor, your Armor Class equals 10 + your Dexterity modifier + your Constitution modifier. You can use a shield and still gain this benefit.",
+        ],
+        effects: [
+          {
+            category: "armorClass",
+            changes: {
+              replace: { base: 10, mods: ["DEX", "CON"] },
+              noArmor: true,
+              noShield: false,
+            },
+          },
         ],
       },
     ],
