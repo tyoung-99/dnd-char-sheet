@@ -117,13 +117,13 @@ const CharacterPage = () => {
         />
         <TabNavComp
           id={"abilities"}
-          tabName={"Abilities"}
+          tabName={"Features/Traits"}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />
         <TabNavComp
           id={"inventory"}
-          tabName={"Inventory"}
+          tabName={"Equipment/Treasure"}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />
