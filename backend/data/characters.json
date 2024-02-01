@@ -15,7 +15,7 @@
       { "number": 1, "sides": 6 }
     ],
     "deathSaves": { "successes": 2, "failures": 1 },
-    "stats": [
+    "abilities": [
       {
         "name": "STR",
         "score": 18,
@@ -149,6 +149,13 @@
         "equipped": true
       },
       {
+        "name": "Sling Bullet",
+        "count": 5,
+        "type": "Consumable",
+        "subtype": "Ammunition",
+        "equipped": true
+      },
+      {
         "name": "Flame Tongue Shortsword",
         "profRequired": ["Shortswords"],
         "count": 1,
@@ -256,7 +263,7 @@
         "symbols": null
       }
     ],
-    "abilities": [
+    "features": [
       {
         "name": "Shelter of the Faithful",
         "background": "Baldur's Gate Acolyte",
@@ -490,7 +497,7 @@
     "hp": { "current": 14, "max": 14, "temp": 0 },
     "usedHitDice": [{ "number": 1, "sides": 12 }],
     "deathSaves": { "successes": 0, "failures": 0 },
-    "stats": [
+    "abilities": [
       {
         "name": "STR",
         "score": 17,
@@ -720,7 +727,7 @@
         "symbols": ["9.png"]
       }
     ],
-    "abilities": [
+    "features": [
       {
         "name": "By Popular Demand",
         "background": "Entertainer",

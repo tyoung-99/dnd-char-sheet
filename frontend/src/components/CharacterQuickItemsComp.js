@@ -7,7 +7,7 @@ const CharacterQuickItemsComp = ({ character }) => {
       first.name > second.name ? 1 : first.name === second.name ? 0 : -1
     );
     weapons = weapons.map((item, i) => {
-      const attack = character.getAttack(item);
+      const [attackMod, damage] = character.getAttack(item);
       return (
         <div key={i} className="row-flex">
           <div className="col-1_3">
@@ -17,11 +17,11 @@ const CharacterQuickItemsComp = ({ character }) => {
             </p>
           </div>
           <p className="col-1_6">
-            {attack[0] >= 0 ? "+" : ""}
-            {attack[0]}
+            {attackMod >= 0 ? "+" : ""}
+            {attackMod}
           </p>
           <p className="col-1_3">
-            {attack[1].map((dice) => {
+            {damage.map((dice) => {
               let damageMod;
               if (dice.mod > 0) {
                 damageMod = ` + ${dice.mod}`;
@@ -66,9 +66,7 @@ const CharacterQuickItemsComp = ({ character }) => {
         (first, second) =>
           first.name > second.name ? 1 : first.name === second.name ? 0 : -1
       );
-    }
 
-    for (let subtype in itemizedConsumables) {
       itemizedConsumables[subtype] = itemizedConsumables[subtype].map(
         (item, i) => {
           let position = "";
@@ -81,8 +79,8 @@ const CharacterQuickItemsComp = ({ character }) => {
 
           return (
             <div key={i} className="row-flex">
-              <p className={`col-1_2 ${position}`}>{item.name}</p>
-              <p className={`col-1_2 ${position}`}>{item.count}</p>
+              <p className={`col-1_2${position}`}>{item.name}</p>
+              <p className={`col-1_2${position}`}>{item.count}</p>
             </div>
           );
         }

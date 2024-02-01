@@ -10,8 +10,8 @@ import InlineClassListComp from "../components/InlineClassListComp";
 import TabContentComp from "../components/TabContentComp";
 import CharacterMainTab from "./page-tabs/CharacterMainTab";
 import CharacterBackgroundTab from "./page-tabs/CharacterBackgroundTab";
-import CharacterAbilitiesTab from "./page-tabs/CharacterAbilitiesTab";
-import CharacterInventoryTab from "./page-tabs/CharacterInventoryTab";
+import CharacterFeaturesTab from "./page-tabs/CharacterFeaturesTab";
+import CharacterEquipmentTab from "./page-tabs/CharacterEquipmentTab";
 import CharacterSpellcastingTab from "./page-tabs/CharacterSpellcastingTab";
 import DeathSavesComp from "../components/DeathSavesComp";
 
@@ -116,13 +116,13 @@ const CharacterPage = () => {
           setActiveTab={setActiveTab}
         />
         <TabNavComp
-          id={"abilities"}
+          id={"features"}
           tabName={"Features/Traits"}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />
         <TabNavComp
-          id={"inventory"}
+          id={"equipment"}
           tabName={"Equipment/Treasure"}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
@@ -141,11 +141,11 @@ const CharacterPage = () => {
         <TabContentComp id={"background"} activeTab={activeTab}>
           <CharacterBackgroundTab character={character} />
         </TabContentComp>
-        <TabContentComp id={"abilities"} activeTab={activeTab}>
-          <CharacterAbilitiesTab character={character} />
+        <TabContentComp id={"features"} activeTab={activeTab}>
+          <CharacterFeaturesTab character={character} />
         </TabContentComp>
-        <TabContentComp id={"inventory"} activeTab={activeTab}>
-          <CharacterInventoryTab character={character} />
+        <TabContentComp id={"equipment"} activeTab={activeTab}>
+          <CharacterEquipmentTab character={character} />
         </TabContentComp>
         <TabContentComp id={"spellcasting"} activeTab={activeTab}>
           <CharacterSpellcastingTab character={character} />

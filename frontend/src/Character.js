@@ -1,6 +1,77 @@
 // Represents 1 character and all its data
 
 class Character {
+  // Order of groups reversed b/c when inserting into list of profs, order gets reversed again
+  WEAPON_PROF_GROUPS = [
+    {
+      name: "Martial",
+      profs: [
+        "Battleaxes",
+        "Double-bladed Scimitars",
+        "Flails",
+        "Glaives",
+        "Greataxes",
+        "Greatswords",
+        "Halberds",
+        "Lances",
+        "Longswords",
+        "Mauls",
+        "Morningstars",
+        "Pikes",
+        "Rapiers",
+        "Scimitars",
+        "Shortswords",
+        "Tridents",
+        "War Picks",
+        "Warhammers",
+        "Whips",
+        "Blowguns",
+        "Hand Crossbows",
+        "Heavy Crossbows",
+        "Longbows",
+        "Nets",
+      ],
+    },
+    {
+      name: "Simple",
+      profs: [
+        "Clubs",
+        "Daggers",
+        "Greatclubs",
+        "Handaxes",
+        "Javelins",
+        "Light Hammers",
+        "Maces",
+        "Quarterstaffs",
+        "Sickles",
+        "Spears",
+        "Yklwas",
+        "Light Crossbows",
+        "Darts",
+        "Shortbows",
+        "Slings",
+      ],
+    },
+  ];
+  ARMOR_PROF_GROUPS = [
+    {
+      name: "Heavy",
+      profs: ["Ring Mail", "Chain Mail", "Splint", "Plate"],
+    },
+    {
+      name: "Medium",
+      profs: [
+        "Hide",
+        "Chain Shirt",
+        "Scale Mail",
+        "Breastplate",
+        "Half Plate",
+        "Spiked Armor",
+      ],
+    },
+    { name: "Light", profs: ["Padded", "Leather", "Studded Leather"] },
+  ];
+
   isProficientWithItem(item) {
     return item.profRequired.some(
       (prof) =>
@@ -8,6 +79,83 @@ class Character {
         this.armorProfs.includes(prof) ||
         this.toolProfs.includes(prof)
     );
+  }
+
+  getPassivePerception() {
+    return 10 + this.getSkillByName("Perception");
+  }
+
+  getSkillByName(skill) {
+    const ability = this.abilities.find((ability) =>
+      ability.skillProfs.some((checkSkill) => checkSkill.name === skill)
+    );
+    return (
+      this.getAbilityMod(ability.name) +
+      ability.skillProfs.find((checkSkill) => checkSkill.name === skill)
+        .proficiency *
+        this.getProfBonus()
+    );
+  }
+
+  getWeaponProfs() {
+    let cleanProfs = [...this.weaponProfs];
+    this.WEAPON_PROF_GROUPS.forEach((group) => {
+      if (group.profs.every((prof) => cleanProfs.includes(prof))) {
+        cleanProfs.unshift(group.name);
+        cleanProfs = cleanProfs.filter((prof) => !group.profs.includes(prof));
+      }
+    });
+    return cleanProfs;
+  }
+
+  getArmorProfs() {
+    let cleanProfs = [...this.armorProfs];
+    this.ARMOR_PROF_GROUPS.forEach((group) => {
+      if (group.profs.every((prof) => cleanProfs.includes(prof))) {
+        cleanProfs.unshift(group.name);
+        cleanProfs = cleanProfs.filter((prof) => !group.profs.includes(prof));
+      }
+    });
+    return cleanProfs;
+  }
+
+  getAbilities() {
+    return this.abilities.map((ability) => ({
+      name: ability.name,
+      score: ability.score,
+      mod: this.getAbilityMod(ability.name),
+    }));
+  }
+
+  getSkills() {
+    let skills = [];
+    this.abilities.forEach((ability) => {
+      ability.skillProfs.forEach((skill) => {
+        skills.push({
+          name: skill.name,
+          prof: skill.proficiency,
+          mod:
+            this.getAbilityMod(ability.name) +
+            skill.proficiency * this.getProfBonus(),
+          ability: ability.name,
+        });
+      });
+    });
+
+    skills.sort((first, second) =>
+      first.name > second.name ? 1 : first.name === second.name ? 0 : -1
+    );
+    return skills;
+  }
+
+  getSaves() {
+    return this.abilities.map((ability) => ({
+      name: ability.name,
+      prof: ability.saveProf,
+      mod:
+        this.getAbilityMod(ability.name) +
+        ability.saveProf * this.getProfBonus(),
+    }));
   }
 
   getAttack(item) {
@@ -44,12 +192,12 @@ class Character {
   }
 
   getAbilityScore(ability) {
-    return this.stats.find((stat) => stat.name === ability).score;
+    return this.abilities.find((stat) => stat.name === ability).score;
   }
 
   getAbilityMod(ability) {
     return Math.floor(
-      (this.stats.find((stat) => stat.name === ability).score - 10) / 2
+      (this.abilities.find((stat) => stat.name === ability).score - 10) / 2
     );
   }
 
@@ -58,7 +206,7 @@ class Character {
   }
 
   getFeature(featureName) {
-    return this.abilities.find((ability) => ability.name === featureName);
+    return this.features.find((feature) => feature.name === featureName);
   }
 
   getItem(itemName) {
@@ -225,9 +373,9 @@ class Character {
 
   getClassFeatures() {
     const list = [];
-    this.abilities.forEach((ability) => {
-      if (ability.class) {
-        list.push(ability);
+    this.features.forEach((feature) => {
+      if (feature.class) {
+        list.push(feature);
       }
     });
     return list;
@@ -235,9 +383,9 @@ class Character {
 
   getOtherFeatures() {
     const list = [];
-    this.abilities.forEach((ability) => {
-      if (!ability.class) {
-        list.push(ability);
+    this.features.forEach((feature) => {
+      if (!feature.class) {
+        list.push(feature);
       }
     });
     return list;
