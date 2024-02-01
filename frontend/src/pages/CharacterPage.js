@@ -89,14 +89,14 @@ const CharacterPage = () => {
             Total Hit Dice:{" "}
             {character
               .getTotalHitDice()
-              .map((die) => `${die.number}d${die.faces}`)
+              .map((die) => `${die.number}d${die.sides}`)
               .join(", ")}
           </p>
           <p>
             Current Hit Dice:{" "}
             {character
               .getCurrentHitDice()
-              .map((die) => `${die.number}d${die.faces}`)
+              .map((die) => `${die.number}d${die.sides}`)
               .join(", ")}
           </p>
         </div>
