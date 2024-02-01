@@ -2,11 +2,6 @@
 import "../styling/CharacterStatsComp.css";
 
 const CharacterStatsComp = ({ character }) => {
-  const profBonus = character.getProfBonus();
-  const passivePerception = character.getPassivePerception();
-  const weaponProfs = character.getWeaponProfs();
-  const armorProfs = character.getArmorProfs();
-
   const abilities = character.getAbilities().map((ability) => (
     <p key={ability.name}>
       {ability.name}: {ability.score} (
@@ -53,9 +48,9 @@ const CharacterStatsComp = ({ character }) => {
           <div className="grid-tile col-end">
             <h1>Other Proficiencies</h1>
             <h2>Weapons</h2>
-            <p>{weaponProfs.join(", ")}</p>
+            <p>{character.getWeaponProfs().join(", ")}</p>
             <h2>Armor</h2>
-            <p>{armorProfs.join(", ")}</p>
+            <p>{character.getArmorProfs().join(", ")}</p>
             <h2>Tools</h2>
             <p>{character.toolProfs.join(", ")}</p>
             <h1>Languages</h1>
@@ -64,10 +59,10 @@ const CharacterStatsComp = ({ character }) => {
         </div>
         <div className="col-1_2 col-flex">
           <div className="grid-tile">
-            <h1>Proficiency Bonus: +{profBonus}</h1>
+            <h1>Proficiency Bonus: +{character.getProfBonus()}</h1>
           </div>
           <div className="grid-tile">
-            <h1>Passive Perception: {passivePerception}</h1>
+            <h1>Passive Perception: {character.getPassivePerception()}</h1>
           </div>
           <div className="grid-tile">
             <h1>Speed</h1>
