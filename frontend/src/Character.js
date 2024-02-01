@@ -72,17 +72,54 @@ class Character {
     { name: "Light", profs: ["Padded", "Leather", "Studded Leather"] },
   ];
 
-  isProficientWithItem(item) {
-    return item.profRequired.some(
-      (prof) =>
-        this.weaponProfs.includes(prof) ||
-        this.armorProfs.includes(prof) ||
-        this.toolProfs.includes(prof)
+  getAbilities() {
+    return this.abilities.map((ability) => ({
+      name: ability.name,
+      score: ability.score,
+      mod: this.getAbilityMod(ability.name),
+    }));
+  }
+
+  getAbilityScore(ability) {
+    return this.abilities.find((stat) => stat.name === ability).score;
+  }
+
+  getAbilityMod(ability) {
+    return Math.floor(
+      (this.abilities.find((stat) => stat.name === ability).score - 10) / 2
     );
   }
 
-  getPassivePerception() {
-    return 10 + this.getSkillByName("Perception");
+  getProfBonus() {
+    return (
+      Math.ceil(
+        this.classes.reduce(
+          (totalLevel, charClass) => totalLevel + charClass.classLevel,
+          0
+        ) / 4
+      ) + 1
+    );
+  }
+
+  getSkills() {
+    let skills = [];
+    this.abilities.forEach((ability) => {
+      ability.skillProfs.forEach((skill) => {
+        skills.push({
+          name: skill.name,
+          prof: skill.proficiency,
+          mod:
+            this.getAbilityMod(ability.name) +
+            skill.proficiency * this.getProfBonus(),
+          ability: ability.name,
+        });
+      });
+    });
+
+    skills.sort((first, second) =>
+      first.name > second.name ? 1 : first.name === second.name ? 0 : -1
+    );
+    return skills;
   }
 
   getSkillByName(skill) {
@@ -95,6 +132,20 @@ class Character {
         .proficiency *
         this.getProfBonus()
     );
+  }
+
+  getPassivePerception() {
+    return 10 + this.getSkillByName("Perception");
+  }
+
+  getSaves() {
+    return this.abilities.map((ability) => ({
+      name: ability.name,
+      prof: ability.saveProf,
+      mod:
+        this.getAbilityMod(ability.name) +
+        ability.saveProf * this.getProfBonus(),
+    }));
   }
 
   getWeaponProfs() {
@@ -119,123 +170,17 @@ class Character {
     return cleanProfs;
   }
 
-  getAbilities() {
-    return this.abilities.map((ability) => ({
-      name: ability.name,
-      score: ability.score,
-      mod: this.getAbilityMod(ability.name),
-    }));
-  }
-
-  getSkills() {
-    let skills = [];
-    this.abilities.forEach((ability) => {
-      ability.skillProfs.forEach((skill) => {
-        skills.push({
-          name: skill.name,
-          prof: skill.proficiency,
-          mod:
-            this.getAbilityMod(ability.name) +
-            skill.proficiency * this.getProfBonus(),
-          ability: ability.name,
-        });
-      });
-    });
-
-    skills.sort((first, second) =>
-      first.name > second.name ? 1 : first.name === second.name ? 0 : -1
-    );
-    return skills;
-  }
-
-  getSaves() {
-    return this.abilities.map((ability) => ({
-      name: ability.name,
-      prof: ability.saveProf,
-      mod:
-        this.getAbilityMod(ability.name) +
-        ability.saveProf * this.getProfBonus(),
-    }));
-  }
-
-  getAttack(item) {
-    const strMod = this.getAbilityMod("STR");
-    const dexMod = this.getAbilityMod("DEX");
-
-    const abilityMod =
-      item.subtypes.includes("Ranged") ||
-      (item.properties.includes("Finesse") && dexMod > strMod)
-        ? dexMod
-        : strMod;
-    const profMod = this.isProficientWithItem(item) ? this.getProfBonus() : 0;
-
-    const attackMod = abilityMod + profMod + (item.attackBonus || 0);
-
-    const damage = JSON.parse(JSON.stringify(item.damage.base));
-    damage[0].mod = abilityMod + (damage[0].mod || 0);
-    if (item.activated) {
-      damage.concat(item.damage.activated);
-    }
-
-    return [attackMod, damage];
-  }
-
-  getProfBonus() {
-    return (
-      Math.ceil(
-        this.classes.reduce(
-          (totalLevel, charClass) => totalLevel + charClass.classLevel,
-          0
-        ) / 4
-      ) + 1
-    );
-  }
-
-  getAbilityScore(ability) {
-    return this.abilities.find((stat) => stat.name === ability).score;
-  }
-
-  getAbilityMod(ability) {
-    return Math.floor(
-      (this.abilities.find((stat) => stat.name === ability).score - 10) / 2
+  isProficientWithItem(item) {
+    return item.profRequired.some(
+      (prof) =>
+        this.weaponProfs.includes(prof) ||
+        this.armorProfs.includes(prof) ||
+        this.toolProfs.includes(prof)
     );
   }
 
   getInitiative() {
     return this.getAbilityMod("DEX");
-  }
-
-  getFeature(featureName) {
-    return this.features.find((feature) => feature.name === featureName);
-  }
-
-  getItem(itemName) {
-    return this.equipment.find((item) => item.name === itemName);
-  }
-
-  getItemsByType(type) {
-    return this.equipment.filter((item) => item.type === type);
-  }
-
-  getItems() {
-    const items = {};
-    this.equipment.forEach((item) => {
-      if (item.type !== "Treasure") {
-        if (!(item.type in items)) {
-          items[item.type] = [];
-        }
-        items[item.type].push(item);
-      }
-    });
-    return items;
-  }
-
-  getTreasure() {
-    return this.equipment.filter((item) => item.type === "Treasure");
-  }
-
-  getEquippedItems() {
-    return this.equipment.filter((item) => item.equipped);
   }
 
   getArmorClass() {
@@ -369,6 +314,61 @@ class Character {
       }
     });
     return total;
+  }
+
+  getAttack(item) {
+    const strMod = this.getAbilityMod("STR");
+    const dexMod = this.getAbilityMod("DEX");
+
+    const abilityMod =
+      item.subtypes.includes("Ranged") ||
+      (item.properties.includes("Finesse") && dexMod > strMod)
+        ? dexMod
+        : strMod;
+    const profMod = this.isProficientWithItem(item) ? this.getProfBonus() : 0;
+
+    const attackMod = abilityMod + profMod + (item.attackBonus || 0);
+
+    const damage = JSON.parse(JSON.stringify(item.damage.base));
+    damage[0].mod = abilityMod + (damage[0].mod || 0);
+    if (item.activated) {
+      damage.concat(item.damage.activated);
+    }
+
+    return [attackMod, damage];
+  }
+
+  getItems() {
+    const items = {};
+    this.equipment.forEach((item) => {
+      if (item.type !== "Treasure") {
+        if (!(item.type in items)) {
+          items[item.type] = [];
+        }
+        items[item.type].push(item);
+      }
+    });
+    return items;
+  }
+
+  getEquippedItems() {
+    return this.equipment.filter((item) => item.equipped);
+  }
+
+  getItemsByType(type) {
+    return this.equipment.filter((item) => item.type === type);
+  }
+
+  getItem(itemName) {
+    return this.equipment.find((item) => item.name === itemName);
+  }
+
+  getTreasure() {
+    return this.equipment.filter((item) => item.type === "Treasure");
+  }
+
+  getFeature(featureName) {
+    return this.features.find((feature) => feature.name === featureName);
   }
 
   getClassFeatures() {
