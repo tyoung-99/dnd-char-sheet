@@ -2,18 +2,8 @@
 import "../../styling/CharacterInventoryTab.css";
 
 const CharacterInventoryTab = ({ character }) => {
-  let itemizedInventory = {};
-  let treasure = [];
-  character.equipment.forEach((item) => {
-    if (item.type === "Treasure") {
-      treasure.push(item);
-    } else {
-      if (!(item.type in itemizedInventory)) {
-        itemizedInventory[item.type] = [];
-      }
-      itemizedInventory[item.type].push(item);
-    }
-  });
+  let itemizedInventory = character.getItems();
+  let treasure = character.getTreasure();
 
   // Alphabetize categories & items w/in categories
   itemizedInventory = Object.keys(itemizedInventory)

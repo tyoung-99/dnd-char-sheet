@@ -6,39 +6,8 @@ const CharacterQuickItemsComp = ({ character }) => {
     weapons = weapons.sort((first, second) =>
       first.name > second.name ? 1 : first.name === second.name ? 0 : -1
     );
-    const strMod = Math.floor(
-      (character.stats.filter((stat) => stat.name === "STR")[0].score - 10) / 2
-    );
-    const dexMod = Math.floor(
-      (character.stats.filter((stat) => stat.name === "DEX")[0].score - 10) / 2
-    );
     weapons = weapons.map((item, i) => {
-      const damageDice = `${item.damage.dice}d${item.damage.sides}`;
-
-      const abilityMod =
-        item.subtypes.includes("Ranged") ||
-        (item.properties.includes("Finesse") && dexMod > strMod)
-          ? dexMod
-          : strMod;
-
-      const profMod = item.profRequired.some((prof) =>
-        character.weaponProfs.includes(prof)
-      )
-        ? profBonus
-        : 0;
-
-      const itemBonus = item.bonus || 0;
-
-      const attackMod = abilityMod + profMod + itemBonus;
-      const damageMod = abilityMod + itemBonus;
-
-      let activatedDamage;
-      if (item.activation && item.activated) {
-        activatedDamage = item.activation.damage
-          ? ` + ${item.activation.damage.dice}d${item.activation.damage.sides} ${item.activation.damage.type}`
-          : null;
-      }
-
+      const [attackMod, damage] = character.getAttack(item);
       return (
         <div key={i} className="row-flex">
           <div className="col-1_3">
@@ -52,14 +21,17 @@ const CharacterQuickItemsComp = ({ character }) => {
             {attackMod}
           </p>
           <p className="col-1_3">
-            {damageDice}{" "}
-            {damageMod > 0
-              ? ` + ${damageMod}`
-              : damageMod < 0
-              ? ` - ${Math.abs(damageMod)}`
-              : ""}
-            {` ${item.damage.type}`}
-            {activatedDamage}
+            {damage.map((dice) => {
+              let damageMod;
+              if (dice.mod > 0) {
+                damageMod = ` + ${dice.mod}`;
+              } else if (dice.mod === 0) {
+                damageMod = "";
+              } else {
+                damageMod = ` - ${Math.abs(dice.mod)}`; // Uses absolute value so there's space between minus and number
+              }
+              return `${dice.number}d${dice.sides}${damageMod} ${dice.type}`;
+            })}
           </p>
           <p className="col-1_6">
             {item.activation ? (item.activated ? "Yes" : "No") : "-"}
@@ -94,9 +66,7 @@ const CharacterQuickItemsComp = ({ character }) => {
         (first, second) =>
           first.name > second.name ? 1 : first.name === second.name ? 0 : -1
       );
-    }
 
-    for (let subtype in itemizedConsumables) {
       itemizedConsumables[subtype] = itemizedConsumables[subtype].map(
         (item, i) => {
           let position = "";
@@ -109,8 +79,8 @@ const CharacterQuickItemsComp = ({ character }) => {
 
           return (
             <div key={i} className="row-flex">
-              <p className={`col-1_2 ${position}`}>{item.name}</p>
-              <p className={`col-1_2 ${position}`}>{item.count}</p>
+              <p className={`col-1_2${position}`}>{item.name}</p>
+              <p className={`col-1_2${position}`}>{item.count}</p>
             </div>
           );
         }
@@ -120,26 +90,13 @@ const CharacterQuickItemsComp = ({ character }) => {
     return itemizedConsumables;
   };
 
-  const profBonus =
-    Math.ceil(
-      character.classes.reduce(
-        (totalLevel, charClass) => totalLevel + charClass.classLevel,
-        0
-      ) / 4
-    ) + 1;
+  let weapons = character
+    .getItemsByType("Weapon")
+    .filter((item) => item.equipped);
+  let consumables = character
+    .getItemsByType("Consumable")
+    .filter((item) => item.equipped);
 
-  let weapons = [],
-    consumables = [];
-
-  character.equipment.forEach((item) => {
-    if (item.equipped === true) {
-      if (item.type === "Weapon") {
-        weapons.push(item);
-      } else if (item.type === "Consumable") {
-        consumables.push(item);
-      }
-    }
-  });
   weapons = handleWeapons(weapons);
   consumables = handleConsumables(consumables);
 

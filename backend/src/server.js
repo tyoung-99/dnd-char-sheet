@@ -1,16 +1,13 @@
 import express from "express";
-import { readFile } from "fs/promises";
-import { dirname } from "path";
-import sampleChars from "./CharactersContentSample.js";
+import getCharacters from "./getCharacters.js";
 
 const app = express();
-const __dirname = dirname(import.meta.url);
 
 app.get("/api/characters", async (req, res) => {
-  const characters = sampleChars;
+  const charList = await getCharacters();
 
-  if (characters) {
-    res.json(characters);
+  if (charList) {
+    res.json(charList);
   } else {
     res.sendStatus(404);
   }
@@ -18,12 +15,11 @@ app.get("/api/characters", async (req, res) => {
 
 app.get("/api/characters/:id", async (req, res) => {
   const { id } = req.params;
-  const character = sampleChars.find(
-    (character) => character.id === parseInt(id)
-  );
+  const charList = await getCharacters();
+  const char = charList.find((elem) => elem.id === parseInt(id));
 
-  if (character) {
-    res.json(character);
+  if (char) {
+    res.json(char);
   } else {
     res.sendStatus(404);
   }
