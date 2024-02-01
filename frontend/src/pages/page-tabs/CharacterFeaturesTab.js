@@ -1,16 +1,8 @@
 // Character's racial/class/background features, plus feats
 
 const CharacterAbilitiesTab = ({ character }) => {
-  let fromClass = [];
-  let fromOther = [];
-
-  character.abilities.forEach((ability) => {
-    if (ability.class) {
-      fromClass.push(ability);
-    } else {
-      fromOther.push(ability);
-    }
-  });
+  let fromClass = character.getClassFeatures();
+  let fromOther = character.getOtherFeatures();
 
   fromClass = fromClass.map((ability, i) => (
     <div key={i}>

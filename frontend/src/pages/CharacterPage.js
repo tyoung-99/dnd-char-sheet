@@ -4,41 +4,36 @@ import "../styling/CharacterPage.css";
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
+import Character from "../Character";
 import TabNavComp from "../components/TabNavComp";
 import InlineClassListComp from "../components/InlineClassListComp";
 import TabContentComp from "../components/TabContentComp";
 import CharacterMainTab from "./page-tabs/CharacterMainTab";
 import CharacterBackgroundTab from "./page-tabs/CharacterBackgroundTab";
-import CharacterAbilitiesTab from "./page-tabs/CharacterAbilitiesTab";
-import CharacterInventoryTab from "./page-tabs/CharacterInventoryTab";
+import CharacterFeaturesTab from "./page-tabs/CharacterFeaturesTab";
+import CharacterEquipmentTab from "./page-tabs/CharacterEquipmentTab";
 import CharacterSpellcastingTab from "./page-tabs/CharacterSpellcastingTab";
 import DeathSavesComp from "../components/DeathSavesComp";
 
 const CharacterPage = () => {
+  const [activeTab, setActiveTab] = useState("main");
+
   const { characterID } = useParams();
   const [character, setCharacter] = useState();
 
   useEffect(() => {
     const loadCharacter = async () => {
       const response = await axios.get(`/api/characters/${characterID}`);
-
-      setCharacter(response.data);
+      const newChar = Object.assign(new Character(), response.data);
+      setCharacter(newChar);
     };
 
     loadCharacter();
   }, [characterID]);
 
-  const [activeTab, setActiveTab] = useState("main");
-
   if (!character) {
     return <div>Loading...</div>;
   }
-  const currentHD = character.hitDice.remaining.map(
-    (die) => `${die.number}d${die.faces}`
-  );
-  const totalHD = character.hitDice.total.map(
-    (die) => `${die.number}d${die.faces}`
-  );
 
   return (
     <div>
@@ -77,20 +72,33 @@ const CharacterPage = () => {
       </div>
       <div className="combat-header">
         <div>
-          <p>AC: {character.armorClass}</p>
+          <p>AC: {character.getArmorClass()}</p>
           <p>
             Initiative:{" "}
-            {(character.initiative >= 0 ? "+" : "") + character.initiative}
+            {(character.getInitiative() >= 0 ? "+" : "") +
+              character.getInitiative()}
           </p>
         </div>
         <div>
-          <p>Temp HP: {character.hp.temp}</p>
-          <p>Current HP: {character.hp.current}</p>
           <p>Max HP: {character.hp.max}</p>
+          <p>Current HP: {character.hp.current}</p>
+          <p>Temp HP: {character.hp.temp}</p>
         </div>
         <div>
-          <p>Current Hit Dice: {currentHD.join(", ")}</p>
-          <p>Total Hit Dice: {totalHD.join(", ")}</p>
+          <p>
+            Total Hit Dice:{" "}
+            {character
+              .getTotalHitDice()
+              .map((die) => `${die.number}d${die.faces}`)
+              .join(", ")}
+          </p>
+          <p>
+            Current Hit Dice:{" "}
+            {character
+              .getCurrentHitDice()
+              .map((die) => `${die.number}d${die.faces}`)
+              .join(", ")}
+          </p>
         </div>
         <DeathSavesComp deathSaves={character.deathSaves} />
       </div>
@@ -108,14 +116,14 @@ const CharacterPage = () => {
           setActiveTab={setActiveTab}
         />
         <TabNavComp
-          id={"abilities"}
-          tabName={"Abilities"}
+          id={"features"}
+          tabName={"Features/Traits"}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />
         <TabNavComp
-          id={"inventory"}
-          tabName={"Inventory"}
+          id={"equipment"}
+          tabName={"Equipment/Treasure"}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />
@@ -133,11 +141,11 @@ const CharacterPage = () => {
         <TabContentComp id={"background"} activeTab={activeTab}>
           <CharacterBackgroundTab character={character} />
         </TabContentComp>
-        <TabContentComp id={"abilities"} activeTab={activeTab}>
-          <CharacterAbilitiesTab character={character} />
+        <TabContentComp id={"features"} activeTab={activeTab}>
+          <CharacterFeaturesTab character={character} />
         </TabContentComp>
-        <TabContentComp id={"inventory"} activeTab={activeTab}>
-          <CharacterInventoryTab character={character} />
+        <TabContentComp id={"equipment"} activeTab={activeTab}>
+          <CharacterEquipmentTab character={character} />
         </TabContentComp>
         <TabContentComp id={"spellcasting"} activeTab={activeTab}>
           <CharacterSpellcastingTab character={character} />

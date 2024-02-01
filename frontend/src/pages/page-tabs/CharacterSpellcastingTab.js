@@ -61,14 +61,9 @@ const CharacterSpellcastingTab = ({ character }) => {
     </>
   );
 
-  const slotsTotal = character.spellcasting.spellSlots.slotsTotal.map(
-    (count, i) =>
-      i < 5 ? count + character.spellcasting.pactSlots.slotsTotal[i] : count
-  );
-  const slotsExpended = character.spellcasting.spellSlots.slotsExpended.map(
-    (count, i) =>
-      i < 5 ? count + character.spellcasting.pactSlots.slotsExpended[i] : count
-  );
+  const slotsTotal = character.getTotalSpellSlots();
+  const slotsExpended = character.getExpendedSpellSlots();
+
   const spellHeaders = slotsTotal.map((count, i) => (
     <div key={i + 1} className="col-1_10 col-flex">
       <div className="grid-tile spell-col">
@@ -91,56 +86,9 @@ const CharacterSpellcastingTab = ({ character }) => {
     </div>
   );
 
-  const spellsKnown = [...Array(10)].map(() => []);
-  character.spellcasting.spellsKnown.forEach((spell) => {
-    spellsKnown[spell.level].push(spell);
-  });
+  const spellsKnown = character.getSpellsKnown();
   spellsKnown.forEach((level) => {
-    level.sort((first, second) =>
-      first.name > second.name ? 1 : first.name === second.name ? 0 : -1
-    );
     level.forEach((spell, i) => {
-      const hoverIcons = [];
-      if (spell.components.v) {
-        hoverIcons.push(["verbal.png", "Verbal Component"]);
-      }
-      if (spell.components.s) {
-        hoverIcons.push(["somatic.png", "Somatic Component"]);
-      }
-      if (spell.components.m) {
-        hoverIcons.push(["material.png", "Material Component"]);
-        if (spell.components.m.some((comp) => comp.value)) {
-          hoverIcons.push([
-            "gold_cost.png",
-            "Material Component with Gold Cost",
-          ]);
-        }
-        if (spell.components.m.some((comp) => comp.consumed)) {
-          hoverIcons.push(["consumed.png", "Material Component Consumed"]);
-        }
-      }
-      if (spell.concentration) {
-        hoverIcons.push(["concentration.png", "Concentration"]);
-      }
-      if (spell.ritual) {
-        hoverIcons.push(["ritual.png", "Ritual"]);
-      }
-      if (spell.background) {
-        hoverIcons.push(["background.png", `Background: ${spell.background}`]);
-      }
-      if (spell.race) {
-        hoverIcons.push(["race.png", `Race: ${spell.race}`]);
-      }
-      if (spell.feat) {
-        hoverIcons.push(["feat.png", `Feat: ${spell.feat}`]);
-      }
-      if (spell.class) {
-        hoverIcons.push([
-          `${spell.class.toLowerCase()}.png`,
-          `Class: ${spell.class}`,
-        ]);
-      }
-
       const key =
         spell.name +
         " " +
@@ -161,7 +109,7 @@ const CharacterSpellcastingTab = ({ character }) => {
               {spell.name}
             </label>
           </div>
-          {hoverIcons.map((icon) => (
+          {spell.hoverIcons.map((icon) => (
             <img
               key={icon[1]}
               src={process.env.PUBLIC_URL + `/img/hover_icons/${icon[0]}`}
