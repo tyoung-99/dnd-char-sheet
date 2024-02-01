@@ -80,9 +80,9 @@ const CharacterPage = () => {
           </p>
         </div>
         <div>
-          <p>Max HP: {character.hp.max}</p>
-          <p>Current HP: {character.hp.current}</p>
-          <p>Temp HP: {character.hp.temp}</p>
+          <p>Max HP: {character.getMaxHitPoints()}</p>
+          <p>Current HP: {character.getCurrentHitPoints()}</p>
+          <p>Temp HP: {character.hitPoints.temp}</p>
         </div>
         <div>
           <p>

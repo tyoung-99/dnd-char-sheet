@@ -9,7 +9,18 @@
     "inspiration": false,
     "armorClass": [],
     "speed": { "walk": 30, "swim": 5, "fly": 0 },
-    "hp": { "current": 10, "max": 14, "temp": 2 },
+    "hitPoints": {
+      "current": { "base": 10, "mods": [{ "name": "Aid", "buff": "Aid" }] },
+      "max": {
+        "base": 14,
+        "mods": [
+          { "name": "Aid", "buff": "Aid" },
+          { "name": "Dwarven Toughness", "race": "Dwarf" },
+          { "name": "Vampire Bite", "buff": "Vampire Bite" }
+        ]
+      },
+      "temp": 2
+    },
     "usedHitDice": [
       { "number": 1, "sides": 10 },
       { "number": 1, "sides": 6 }
@@ -265,6 +276,19 @@
     ],
     "features": [
       {
+        "name": "Dwarven Toughness",
+        "race": "Dwarf",
+        "desc": "Placeholder",
+        "effects": [
+          {
+            "category": "maxHitPoints",
+            "changes": {
+              "bonus": 10
+            }
+          }
+        ]
+      },
+      {
         "name": "Shelter of the Faithful",
         "background": "Baldur's Gate Acolyte",
         "desc": [
@@ -479,7 +503,41 @@
         }
       ],
       "concentration": { "name": "Beast Bond", "roundsLeft": 17 }
-    }
+    },
+    "buffs": [
+      {
+        "name": "Aid",
+        "spell": "Aid",
+        "desc": "Aid desc",
+        "effects": [
+          {
+            "category": "maxHitPoints",
+            "changes": {
+              "bonus": 5
+            }
+          },
+          {
+            "category": "currentHitPoints",
+            "changes": {
+              "bonus": 5
+            }
+          }
+        ]
+      },
+      {
+        "name": "Vampire Bite",
+        "monster": "Vampire",
+        "desc": "Bite desc",
+        "effects": [
+          {
+            "category": "maxHitPoints",
+            "changes": {
+              "bonus": -7
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": 2,
@@ -494,7 +552,11 @@
       { "name": "Scale Mail", "item": "Scale Mail" }
     ],
     "speed": { "walk": 25, "swim": 0, "fly": 0 },
-    "hp": { "current": 14, "max": 14, "temp": 0 },
+    "hitPoints": {
+      "current": { "base": 14, "mods": [] },
+      "max": { "base": 14, "mods": [] },
+      "temp": 0
+    },
     "usedHitDice": [{ "number": 1, "sides": 12 }],
     "deathSaves": { "successes": 0, "failures": 0 },
     "abilities": [
@@ -836,6 +898,7 @@
         }
       ],
       "concentration": null
-    }
+    },
+    "buffs": []
   }
 ]

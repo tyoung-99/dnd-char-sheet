@@ -1,4 +1,4 @@
-// Represents 1 character and all its data
+// Represents 1 character and all its data, performs various calculations on data to allow easier external access to elements of character that depend on other elements
 
 class Character {
   // Order of groups reversed b/c when inserting into list of profs, order gets reversed again
@@ -289,6 +289,47 @@ class Character {
     return bonuses;
   }
 
+  getMaxHitPoints() {
+    return this.#getHitPointsHelper("Max");
+  }
+
+  getCurrentHitPoints() {
+    return this.#getHitPointsHelper("Current");
+  }
+
+  #getHitPointsHelper(type) {
+    let category, categoryName;
+    if (type === "Max") {
+      category = this.hitPoints.max;
+      categoryName = "maxHitPoints";
+    } else {
+      category = this.hitPoints.current;
+      categoryName = "currentHitPoints";
+    }
+
+    const bonuses = category.mods.map((bonus) => {
+      if (bonus.race || bonus.class) {
+        bonus = this.getFeature(bonus.name).effects.find(
+          (effect) => effect.category === categoryName
+        );
+      } else if (bonus.item) {
+        bonus = this.getItem(bonus.name).effects.find(
+          (effect) => effect.category === categoryName
+        );
+      } else if (bonus.buff) {
+        bonus = this.getBuff(bonus.name).effects.find(
+          (effect) => effect.category === categoryName
+        );
+      }
+      return bonus;
+    });
+
+    return (
+      category.base +
+      bonuses.reduce((total, bonus) => total + bonus.changes.bonus, 0)
+    );
+  }
+
   getCurrentHitDice() {
     const total = this.getTotalHitDice();
     const current = this.usedHitDice.map((usedDie) => ({
@@ -462,6 +503,10 @@ class Character {
     }
 
     return hoverIcons;
+  }
+
+  getBuff(buffName) {
+    return this.buffs.find((buff) => buff.name === buffName);
   }
 }
 
