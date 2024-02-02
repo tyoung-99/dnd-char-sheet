@@ -8,6 +8,15 @@ const CharacterQuickItemsComp = ({ character }) => {
     );
     weapons = weapons.map((item, i) => {
       const [attackMod, damage] = character.getAttack(item);
+
+      let attackModStr = `${attackMod.flat >= 0 ? "+" : ""}${attackMod.flat}`;
+      if (attackMod.dice.length > 0) {
+        const attackDice = attackMod.dice.map(
+          (die) => ` + ${die.number}d${die.sides}`
+        );
+        attackModStr = attackModStr.concat(attackDice.join(""));
+      }
+
       return (
         <div key={i} className="row-flex">
           <div className="col-1_3">
@@ -16,10 +25,7 @@ const CharacterQuickItemsComp = ({ character }) => {
               {item.properties.join(", ") || ""}
             </p>
           </div>
-          <p className="col-1_6">
-            {attackMod >= 0 ? "+" : ""}
-            {attackMod}
-          </p>
+          <p className="col-1_6">{attackModStr}</p>
           <p className="col-1_3">
             {damage.map((dice) => {
               let damageMod;

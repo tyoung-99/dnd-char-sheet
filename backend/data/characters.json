@@ -278,12 +278,25 @@
       {
         "name": "Dwarven Toughness",
         "race": "Dwarf",
-        "desc": "Placeholder",
+        "desc": ["Placeholder"],
         "effects": [
           {
-            "category": "maxHitPoints",
+            "category": "MaxHitPoints",
             "changes": {
               "bonus": 10
+            }
+          }
+        ]
+      },
+      {
+        "name": "Test flat attack bonus",
+        "race": "Dwarf",
+        "desc": ["Placeholder"],
+        "effects": [
+          {
+            "category": "AttackMod",
+            "changes": {
+              "flat": 10
             }
           }
         ]
@@ -508,16 +521,16 @@
       {
         "name": "Aid",
         "spell": "Aid",
-        "desc": "Aid desc",
+        "desc": ["Aid desc"],
         "effects": [
           {
-            "category": "maxHitPoints",
+            "category": "MaxHitPoints",
             "changes": {
               "bonus": 5
             }
           },
           {
-            "category": "currentHitPoints",
+            "category": "CurrentHitPoints",
             "changes": {
               "bonus": 5
             }
@@ -527,12 +540,38 @@
       {
         "name": "Vampire Bite",
         "monster": "Vampire",
-        "desc": "Bite desc",
+        "desc": ["Bite desc"],
         "effects": [
           {
-            "category": "maxHitPoints",
+            "category": "MaxHitPoints",
             "changes": {
               "bonus": -7
+            }
+          }
+        ]
+      },
+      {
+        "name": "Bless",
+        "spell": "Bless",
+        "desc": ["Bless desc"],
+        "effects": [
+          {
+            "category": "AttackMod",
+            "changes": {
+              "dice": { "number": 1, "sides": 4 }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Test",
+        "spell": "Test",
+        "desc": ["Test desc"],
+        "effects": [
+          {
+            "category": "AttackMod",
+            "changes": {
+              "dice": { "number": 1, "sides": 10 }
             }
           }
         ]
@@ -700,7 +739,7 @@
         "equipped": true,
         "effects": [
           {
-            "category": "armorClass",
+            "category": "ArmorClass",
             "changes": {
               "replace": { "base": 14, "mods": ["DEX"], "modCaps": [2] },
               "noArmor": false,
@@ -847,7 +886,7 @@
         ],
         "effects": [
           {
-            "category": "armorClass",
+            "category": "ArmorClass",
             "changes": {
               "replace": { "base": 10, "mods": ["DEX", "CON"] },
               "noArmor": true,

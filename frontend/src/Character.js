@@ -191,11 +191,11 @@ class Character {
     this.armorClass.forEach((option) => {
       if (option.class) {
         option = this.getFeature(option.name).effects.find(
-          (effect) => effect.category === "armorClass"
+          (effect) => effect.category === "ArmorClass"
         ).changes;
       } else if (option.item) {
         option = this.getItem(option.item).effects.find(
-          (effect) => effect.category === "armorClass"
+          (effect) => effect.category === "ArmorClass"
         ).changes;
       }
 
@@ -301,10 +301,10 @@ class Character {
     let category, categoryName;
     if (type === "Max") {
       category = this.hitPoints.max;
-      categoryName = "maxHitPoints";
+      categoryName = "MaxHitPoints";
     } else {
       category = this.hitPoints.current;
-      categoryName = "currentHitPoints";
+      categoryName = "CurrentHitPoints";
     }
 
     const bonuses = category.mods.map((bonus) => {
@@ -368,7 +368,47 @@ class Character {
         : strMod;
     const profMod = this.isProficientWithItem(item) ? this.getProfBonus() : 0;
 
-    const attackMod = abilityMod + profMod + (item.attackBonus || 0);
+    const attackMod = {
+      flat: abilityMod + profMod + (item.attackBonus || 0),
+      dice: [],
+    };
+
+    let category = "AttackMod";
+
+    const attackBonuses = this.#getFeatureEffects(category)
+      .concat(this.#getBuffEffects(category))
+      .concat(this.#getItemEffects(category));
+
+    let flatAttackBonus = 0;
+    let attackDice = [];
+    attackBonuses.forEach((bonus) => {
+      bonus.effects.forEach((effect) => {
+        if (effect.category === category) {
+          flatAttackBonus += effect.changes.flat || 0;
+
+          const checkDice = effect.changes.dice;
+          if (!checkDice) {
+            return;
+          }
+
+          const index = attackDice.findIndex(
+            (checkBonus) => checkBonus.sides === checkDice.sides
+          );
+          if (index < 0) {
+            attackDice.push({
+              number: checkDice.number,
+              sides: checkDice.sides,
+            });
+          } else {
+            attackDice[index].number += checkDice.number;
+          }
+        }
+      });
+    });
+    attackMod.flat += flatAttackBonus;
+    attackMod.dice = attackDice.sort(
+      (first, second) => second.sides - first.sides
+    );
 
     const damage = JSON.parse(JSON.stringify(item.damage.base));
     damage[0].mod = abilityMod + (damage[0].mod || 0);
@@ -404,6 +444,14 @@ class Character {
     return this.equipment.find((item) => item.name === itemName);
   }
 
+  #getItemEffects(category) {
+    return this.equipment.filter(
+      (item) =>
+        item.effects &&
+        item.effects.some((effect) => effect.category === category)
+    );
+  }
+
   getTreasure() {
     return this.equipment.filter((item) => item.type === "Treasure");
   }
@@ -413,23 +461,19 @@ class Character {
   }
 
   getClassFeatures() {
-    const list = [];
-    this.features.forEach((feature) => {
-      if (feature.class) {
-        list.push(feature);
-      }
-    });
-    return list;
+    return this.features.filter((feature) => feature.class);
   }
 
   getOtherFeatures() {
-    const list = [];
-    this.features.forEach((feature) => {
-      if (!feature.class) {
-        list.push(feature);
-      }
-    });
-    return list;
+    return this.features.filter((feature) => !feature.class);
+  }
+
+  #getFeatureEffects(category) {
+    return this.features.filter(
+      (feature) =>
+        feature.effects &&
+        feature.effects.some((effect) => effect.category === category)
+    );
   }
 
   getTotalSpellSlots() {
@@ -507,6 +551,14 @@ class Character {
 
   getBuff(buffName) {
     return this.buffs.find((buff) => buff.name === buffName);
+  }
+
+  #getBuffEffects(category) {
+    return this.buffs.filter(
+      (buff) =>
+        buff.effects &&
+        buff.effects.some((effect) => effect.category === category)
+    );
   }
 }
 
