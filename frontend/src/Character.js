@@ -358,9 +358,12 @@ class Character {
   }
 
   getAttack(item) {
+    return [this.#getAttackMod(item), this.#getAttackDamage(item)];
+  }
+
+  #getAttackMod(item) {
     const strMod = this.getAbilityMod("STR");
     const dexMod = this.getAbilityMod("DEX");
-
     const abilityMod =
       item.subtypes.includes("Ranged") ||
       (item.properties.includes("Finesse") && dexMod > strMod)
@@ -374,7 +377,6 @@ class Character {
     };
 
     let category = "AttackMod";
-
     const attackBonuses = this.#getFeatureEffects(category)
       .concat(this.#getBuffEffects(category))
       .concat(this.#getItemEffects(category));
@@ -386,21 +388,8 @@ class Character {
         if (effect.category === category) {
           flatAttackBonus += effect.changes.flat || 0;
 
-          const checkDice = effect.changes.dice;
-          if (!checkDice) {
-            return;
-          }
-
-          const index = attackDice.findIndex(
-            (checkBonus) => checkBonus.sides === checkDice.sides
-          );
-          if (index < 0) {
-            attackDice.push({
-              number: checkDice.number,
-              sides: checkDice.sides,
-            });
-          } else {
-            attackDice[index].number += checkDice.number;
+          if (effect.changes.dice) {
+            this.#addDiceToArr(attackDice, [effect.changes.dice]);
           }
         }
       });
@@ -410,13 +399,68 @@ class Character {
       (first, second) => second.sides - first.sides
     );
 
-    const damage = JSON.parse(JSON.stringify(item.damage.base));
-    damage[0].mod = abilityMod + (damage[0].mod || 0);
+    return attackMod;
+  }
+
+  #getAttackDamage(item) {
+    const strMod = this.getAbilityMod("STR");
+    const dexMod = this.getAbilityMod("DEX");
+    const abilityMod =
+      item.subtypes.includes("Ranged") ||
+      (item.properties.includes("Finesse") && dexMod > strMod)
+        ? dexMod
+        : strMod;
+
+    let damage = JSON.parse(JSON.stringify(item.damage.base));
+    damage[0].flat = abilityMod + (damage[0].flat || 0);
     if (item.activated) {
-      damage.concat(item.damage.activated);
+      damage = damage.concat(item.damage.activated);
     }
 
-    return [attackMod, damage];
+    const category = "DamageMod";
+    const damageBonuses = this.#getFeatureEffects(category)
+      .concat(this.#getBuffEffects(category))
+      .concat(this.#getItemEffects(category));
+
+    damageBonuses.forEach((bonus) => {
+      bonus.effects.forEach((effect) => {
+        if (effect.category === category) {
+          let index = damage.findIndex(
+            (checkDamage) => checkDamage.type === effect.changes.type
+          );
+          if (index < 0) {
+            damage.push({
+              dice: [],
+              flat: 0,
+              type: effect.changes.type,
+            });
+            index = damage.length - 1;
+          }
+
+          damage[index].flat =
+            (effect.changes.flat || 0) + (damage[index].flat || 0);
+
+          if (effect.changes.dice) {
+            this.#addDiceToArr(damage[index].dice, effect.changes.dice);
+          }
+        }
+      });
+    });
+
+    return damage;
+  }
+
+  #addDiceToArr(diceArr, newDice) {
+    newDice.forEach((die) => {
+      const index = diceArr.findIndex(
+        (checkDie) => checkDie.sides === die.sides
+      );
+      if (index < 0) {
+        diceArr.push({ number: die.number, sides: die.sides });
+      } else {
+        diceArr[index].number += die.number;
+      }
+    });
   }
 
   getItems() {

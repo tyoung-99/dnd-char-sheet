@@ -27,20 +27,29 @@ const CharacterQuickItemsComp = ({ character }) => {
           </div>
           <p className="col-1_6">{attackModStr}</p>
           <p className="col-1_3">
-            {damage.map((dice) => {
+            {damage.map((group, j) => {
               let damageMod;
-              if (dice.mod > 0) {
-                damageMod = ` + ${dice.mod}`;
-              } else if (dice.mod === 0) {
+              if (group.flat > 0) {
+                damageMod = ` + ${group.flat}`;
+              } else if (!group.flat || group.flat === 0) {
                 damageMod = "";
               } else {
-                damageMod = ` - ${Math.abs(dice.mod)}`; // Uses absolute value so there's space between minus and number
+                damageMod = ` - ${Math.abs(group.flat)}`; // Uses absolute value so there's space between minus and number
               }
-              return `${dice.number}d${dice.sides}${damageMod} ${dice.type}`;
+
+              let groupDice = group.dice.map(
+                (die, k) =>
+                  `${die.number}d${die.sides}${
+                    k === group.dice.length - 1 ? "" : " + "
+                  }`
+              );
+              return `${groupDice}${damageMod} ${group.type}${
+                j === damage.length - 1 ? "" : " + "
+              }`;
             })}
           </p>
           <p className="col-1_6">
-            {item.activation ? (item.activated ? "Yes" : "No") : "-"}
+            {item.damage.activated ? (item.activated ? "Yes" : "No") : "-"}
           </p>
         </div>
       );

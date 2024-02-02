@@ -132,7 +132,11 @@
         "type": "Weapon",
         "subtypes": ["Melee", "Martial"],
         "properties": ["Versatile (1d10)"],
-        "damage": { "base": [{ "number": 1, "sides": 8, "type": "slashing" }] },
+        "damage": {
+          "base": [
+            { "dice": [{ "number": 1, "sides": 8 }], "type": "slashing" }
+          ]
+        },
         "equipped": true
       },
       {
@@ -149,7 +153,11 @@
         "type": "Weapon",
         "subtypes": ["Melee", "Martial"],
         "properties": ["Finesse", "Light"],
-        "damage": { "base": [{ "number": 1, "sides": 6, "type": "piercing" }] },
+        "damage": {
+          "base": [
+            { "dice": [{ "number": 1, "sides": 6 }], "type": "piercing" }
+          ]
+        },
         "equipped": true
       },
       {
@@ -174,8 +182,12 @@
         "subtypes": ["Melee", "Martial"],
         "properties": ["Finesse", "Light"],
         "damage": {
-          "base": [{ "number": 1, "sides": 6, "type": "piercing" }],
-          "activated": [{ "number": 2, "sides": 6, "type": "fire" }]
+          "base": [
+            { "dice": [{ "number": 1, "sides": 6 }], "type": "piercing" }
+          ],
+          "activated": [
+            { "dice": [{ "number": 2, "sides": 6 }], "type": "fire" }
+          ]
         },
         "equipped": true,
         "activated": true
@@ -187,7 +199,11 @@
         "type": "Weapon",
         "subtypes": ["Ranged", "Simple"],
         "properties": ["Ammunition (Range 80/320)", "Loading", "Two-Handed"],
-        "damage": { "base": [{ "number": 1, "sides": 8, "type": "piercing" }] },
+        "damage": {
+          "base": [
+            { "dice": [{ "number": 1, "sides": 8 }], "type": "piercing" }
+          ]
+        },
         "equipped": true
       },
       {
@@ -198,7 +214,13 @@
         "subtypes": ["Melee", "Martial"],
         "properties": ["Versatile (1d10)"],
         "damage": {
-          "base": [{ "number": 1, "sides": 8, "mod": 2, "type": "slashing" }]
+          "base": [
+            {
+              "dice": [{ "number": 1, "sides": 8 }],
+              "flat": 2,
+              "type": "slashing"
+            }
+          ]
         },
         "equipped": true,
         "attackBonus": 2
@@ -297,6 +319,21 @@
             "category": "AttackMod",
             "changes": {
               "flat": 10
+            }
+          }
+        ]
+      },
+      {
+        "name": "Test damage bonus",
+        "race": "Dwarf",
+        "desc": ["Placeholder"],
+        "effects": [
+          {
+            "category": "DamageMod",
+            "changes": {
+              "flat": 10,
+              "dice": [{ "number": 2, "sides": 6 }],
+              "type": "acid"
             }
           }
         ]
@@ -755,7 +792,11 @@
         "type": "Weapon",
         "subtypes": ["Melee", "Martial"],
         "properties": ["Versatile (1d10)"],
-        "damage": { "base": [{ "number": 1, "sides": 8, "type": "slashing" }] },
+        "damage": {
+          "base": [
+            { "dice": [{ "number": 1, "sides": 8 }], "type": "slashing" }
+          ]
+        },
         "equipped": true
       },
       {
@@ -765,7 +806,11 @@
         "type": "Weapon",
         "subtypes": ["Melee", "Simple"],
         "properties": ["Light", "Thrown (range 20/60)"],
-        "damage": { "base": [{ "number": 1, "sides": 6, "type": "slashing" }] },
+        "damage": {
+          "base": [
+            { "dice": [{ "number": 1, "sides": 6 }], "type": "slashing" }
+          ]
+        },
         "equipped": true
       },
       { "name": "Backpack", "count": 1, "type": "Storage" },
@@ -788,7 +833,11 @@
         "type": "Weapon",
         "subtypes": ["Melee", "Simple"],
         "properties": ["Thrown (range 30/120)"],
-        "damage": { "base": [{ "number": 1, "sides": 6, "type": "piercing" }] },
+        "damage": {
+          "base": [
+            { "dice": [{ "number": 1, "sides": 6 }], "type": "piercing" }
+          ]
+        },
         "equipped": true
       },
       { "name": "Horn", "count": 1, "type": "Musical Instrument" },
