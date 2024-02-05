@@ -3,17 +3,23 @@
 import "../../styling/CharacterSpellcastingTab.css";
 
 const CharacterSpellcastingTab = ({ character }) => {
-  const castClasses = character.spellcasting.classes.map((castClass) => (
-    <div key={castClass.name} className="row-flex">
-      <h1 className="col-1_4">{castClass.name}</h1>
-      <h1 className="col-1_4">Spellcasting Ability: {castClass.ability}</h1>
-      <h1 className="col-1_4">Spell Save DC: {castClass.saveDC}</h1>
-      <h1 className="col-1_4">
-        Spell Attack Bonus: {castClass.attackBonus > 0 ? "+" : null}
-        {castClass.attackBonus}
-      </h1>
-    </div>
-  ));
+  const castClasses = character.spellcasting.sources.map((castSrc) => {
+    const srcName = castSrc.class || castSrc.other;
+    const spellAttackBonus = character.getSpellAttackBonus(srcName);
+    return (
+      <div key={srcName} className="row-flex">
+        <h1 className="col-1_4">{srcName}</h1>
+        <h1 className="col-1_4">Spellcasting Ability: {castSrc.ability}</h1>
+        <h1 className="col-1_4">
+          Spell Save DC: {character.getSpellSaveDC(srcName)}
+        </h1>
+        <h1 className="col-1_4">
+          Spell Attack Bonus: {spellAttackBonus > 0 ? "+" : null}
+          {spellAttackBonus}
+        </h1>
+      </div>
+    );
+  });
 
   const roundsToTime = (rounds) => {
     const CONVERSIONS = [

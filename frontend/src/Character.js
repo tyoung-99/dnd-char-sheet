@@ -187,10 +187,8 @@ class Character {
     // Compare every currently legal AC calculation, select highest
     let replacements = [],
       bonuses = [];
-    let category = "ArmorClass";
-    const options = this.#getFeatureEffects(category)
-      .concat(this.#getBuffEffects(category))
-      .concat(this.#getItemEffects(category));
+    const category = "ArmorClass";
+    const options = this.#getEffects(category);
 
     options.forEach((option) => {
       const effect = option.effects.find(
@@ -296,9 +294,7 @@ class Character {
   }
 
   #getHitPointsHelper(category, categoryName) {
-    const bonuses = this.#getFeatureEffects(categoryName)
-      .concat(this.#getBuffEffects(categoryName))
-      .concat(this.#getItemEffects(categoryName));
+    const bonuses = this.#getEffects(categoryName);
 
     return (
       category.base +
@@ -363,10 +359,8 @@ class Character {
       dice: [],
     };
 
-    let category = "AttackMod";
-    const attackBonuses = this.#getFeatureEffects(category)
-      .concat(this.#getBuffEffects(category))
-      .concat(this.#getItemEffects(category));
+    const category = "AttackMod";
+    const attackBonuses = this.#getEffects(category);
 
     let flatAttackBonus = 0;
     let attackDice = [];
@@ -405,9 +399,7 @@ class Character {
     }
 
     const category = "DamageMod";
-    const damageBonuses = this.#getFeatureEffects(category)
-      .concat(this.#getBuffEffects(category))
-      .concat(this.#getItemEffects(category));
+    const damageBonuses = this.#getEffects(category);
 
     damageBonuses.forEach((bonus) => {
       bonus.effects.forEach((effect) => {
@@ -476,13 +468,14 @@ class Character {
   }
 
   #getItemEffects(category) {
-    return this.equipment.filter(
-      (item) =>
+    return this.equipment.filter((item) => {
+      return (
         item.effects &&
         item.effects.some(
           (effect) => effect.category === category && item.equipped
         )
-    );
+      );
+    });
   }
 
   getTreasure() {
@@ -509,10 +502,215 @@ class Character {
     );
   }
 
-  getTotalSpellSlots() {
-    return this.spellcasting.spellSlots.slotsTotal.map((count, i) =>
-      i < 5 ? count + this.spellcasting.pactSlots.slotsTotal[i] : count
+  getSpellcastingAbility(source) {
+    return this.spellcasting.sources.find(
+      (src) => (src.class || src.other) === source
+    ).ability;
+  }
+
+  getSpellSaveDC(source) {
+    return (
+      8 +
+      this.getProfBonus() +
+      this.getAbilityMod(this.getSpellcastingAbility(source)) +
+      this.#spellBonusHelper(source, "SpellSaveDC")
     );
+  }
+
+  getSpellAttackBonus(source) {
+    return (
+      this.getProfBonus() +
+      this.getAbilityMod(this.getSpellcastingAbility(source)) +
+      this.#spellBonusHelper(source, "SpellAttackBonus")
+    );
+  }
+
+  #spellBonusHelper(source, category) {
+    return this.#getEffects(category).reduce(
+      (total, elem) =>
+        total +
+        elem.effects.reduce(
+          (subtotal, effect) =>
+            effect.category === category && effect.classRestriction === source
+              ? subtotal + effect.changes.bonus
+              : subtotal,
+          0
+        ),
+      0
+    );
+  }
+
+  getTotalSpellSlots() {
+    let [spellcastingLevel, pactLevel] = this.#createSpellcastingLevelArr();
+
+    spellcastingLevel = Object.keys(spellcastingLevel).reduce(
+      (total, casterType) => {
+        let newLevels = [...spellcastingLevel[casterType]];
+
+        switch (casterType) {
+          case "full":
+            newLevels = this.#spellcastingLevelArrToLevel(newLevels, 1, true);
+            break;
+          case "halfRoundUp":
+            newLevels = this.#spellcastingLevelArrToLevel(newLevels, 2, true);
+            break;
+          case "halfRoundDown":
+            newLevels = this.#spellcastingLevelArrToLevel(newLevels, 2, false);
+            break;
+          case "thirdRoundUp":
+            newLevels = this.#spellcastingLevelArrToLevel(newLevels, 3, true);
+            break;
+          case "thirdRoundDown":
+            newLevels = this.#spellcastingLevelArrToLevel(newLevels, 3, false);
+            break;
+          default:
+        }
+
+        return total + newLevels;
+      },
+      0
+    );
+
+    let spellSlots = new Array(9).fill(0);
+    let pactSlots = new Array(5).fill(0);
+
+    spellSlots = spellSlots.map((_, i) => {
+      switch (i + 1) {
+        case 1:
+          return spellcastingLevel <= 0
+            ? 0
+            : spellcastingLevel <= 1
+            ? 2
+            : spellcastingLevel <= 2
+            ? 3
+            : 4;
+        case 2:
+          return spellcastingLevel <= 2 ? 0 : spellcastingLevel <= 3 ? 2 : 3;
+        case 3:
+          return spellcastingLevel <= 4 ? 0 : spellcastingLevel <= 4 ? 2 : 3;
+        case 4:
+          return spellcastingLevel <= 6
+            ? 0
+            : spellcastingLevel <= 7
+            ? 1
+            : spellcastingLevel <= 8
+            ? 2
+            : 3;
+        case 5:
+          return spellcastingLevel <= 8
+            ? 0
+            : spellcastingLevel <= 9
+            ? 1
+            : spellcastingLevel <= 17
+            ? 2
+            : 3;
+        case 6:
+          return spellcastingLevel <= 10 ? 0 : spellcastingLevel <= 18 ? 1 : 2;
+        case 7:
+          return spellcastingLevel <= 12 ? 0 : spellcastingLevel <= 19 ? 1 : 2;
+        case 8:
+          return spellcastingLevel <= 14 ? 0 : 1;
+        case 9:
+          return spellcastingLevel <= 16 ? 0 : 1;
+        default:
+          return 0;
+      }
+    });
+
+    pactSlots = pactSlots.map((_, i) => {
+      switch (i + 1) {
+        case 1:
+          return pactLevel === 1 ? 1 : pactLevel === 2 ? 2 : 0;
+        case 2:
+          return pactLevel >= 3 && pactLevel <= 4 ? 2 : 0;
+        case 3:
+          return pactLevel >= 5 && pactLevel <= 6 ? 2 : 0;
+        case 4:
+          return pactLevel >= 7 && pactLevel <= 8 ? 2 : 0;
+        case 5:
+          return pactLevel <= 8
+            ? 0
+            : pactLevel <= 10
+            ? 2
+            : pactLevel <= 16
+            ? 3
+            : 4;
+        default:
+          return 0;
+      }
+    });
+
+    return spellSlots.map((count, i) => (i < 5 ? count + pactSlots[i] : count));
+  }
+
+  #createSpellcastingLevelArr() {
+    let spellcastingLevel = {
+      full: [],
+      halfRoundUp: [],
+      halfRoundDown: [],
+      thirdRoundUp: [],
+      thirdRoundDown: [],
+    };
+    let pactLevel = 0;
+
+    this.spellcasting.sources.forEach((src) => {
+      if (src.class) {
+        const classLevel = this.classes.find(
+          (checkClass) => checkClass.className === src.class
+        ).classLevel;
+
+        switch (src.class) {
+          case "Bard":
+          case "Cleric":
+          case "Druid":
+          case "Sorcerer":
+          case "Wizard":
+            spellcastingLevel.full.push(classLevel);
+            break;
+          case "Artificer":
+            spellcastingLevel.halfRoundUp.push(classLevel);
+            break;
+          case "Paladin":
+          case "Ranger":
+            if (this.spellcasting.sources.length !== 1 || classLevel === 1) {
+              spellcastingLevel.halfRoundDown.push(classLevel);
+            } else {
+              spellcastingLevel.halfRoundUp.push(classLevel);
+            }
+            break;
+          case "Fighter":
+          case "Rogue":
+            if (this.spellcasting.sources.length !== 1) {
+              spellcastingLevel.thirdRoundDown.push(classLevel);
+            } else {
+              spellcastingLevel.thirdRoundUp.push(classLevel);
+            }
+            break;
+          case "Warlock":
+            pactLevel = classLevel;
+            break;
+          default:
+        }
+      }
+    });
+
+    return [spellcastingLevel, pactLevel];
+  }
+
+  #spellcastingLevelArrToLevel(levelsArr, divideBy, roundUp) {
+    if (this.spellcasting.roundBeforeAdding) {
+      levelsArr = levelsArr.map((level) =>
+        roundUp ? Math.ceil(level / divideBy) : Math.floor(level / divideBy)
+      );
+    }
+    let newLevel = levelsArr.reduce((total, val) => total + val, 0);
+    if (!this.spellcasting.roundBeforeAdding) {
+      newLevel = roundUp
+        ? Math.ceil(newLevel / divideBy)
+        : Math.floor(newLevel / divideBy);
+    }
+
+    return newLevel;
   }
 
   getExpendedSpellSlots() {
@@ -592,6 +790,12 @@ class Character {
         buff.effects &&
         buff.effects.some((effect) => effect.category === category)
     );
+  }
+
+  #getEffects(category) {
+    return this.#getFeatureEffects(category)
+      .concat(this.#getBuffEffects(category))
+      .concat(this.#getItemEffects(category));
   }
 }
 

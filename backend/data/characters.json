@@ -97,7 +97,7 @@
     },
     "race": { "name": "Human", "subrace": null },
     "classes": [
-      { "className": "Fighter", "classLevel": 3, "hitDie": 10 },
+      { "className": "Fighter", "classLevel": 4, "hitDie": 10 },
       { "className": "Wizard", "classLevel": 2, "hitDie": 6 }
     ],
     "equipment": [
@@ -215,7 +215,23 @@
           ]
         },
         "equipped": true,
-        "attackBonus": 2
+        "attackBonus": 2,
+        "effects": [
+          {
+            "category": "SpellSaveDC",
+            "changes": {
+              "bonus": 3
+            },
+            "classRestriction": "Wizard"
+          },
+          {
+            "category": "SpellAttackBonus",
+            "changes": {
+              "bonus": 3
+            },
+            "classRestriction": "Fighter"
+          }
+        ]
       },
       {
         "name": "Carved bone statuette",
@@ -381,10 +397,11 @@
       }
     ],
     "spellcasting": {
-      "classes": [
-        { "name": "Wizard", "ability": "INT", "saveDC": 13, "attackBonus": 5 },
-        { "name": "Fighter", "ability": "INT", "saveDC": 13, "attackBonus": 5 }
+      "sources": [
+        { "class": "Wizard", "ability": "INT" },
+        { "class": "Fighter", "ability": "INT" }
       ],
+      "roundBeforeAdding": false,
       "spellSlots": {
         "level": 2,
         "slotsTotal": [3, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -934,9 +951,8 @@
       }
     ],
     "spellcasting": {
-      "classes": [
-        { "name": "Gnome", "ability": "INT", "saveDC": 9, "attackBonus": 1 }
-      ],
+      "sources": [{ "other": "Gnome", "ability": "INT" }],
+      "roundBeforeAdding": false,
       "spellSlots": {
         "slotsTotal": [0, 0, 0, 0, 0, 0, 0, 0, 0],
         "slotsExpended": [0, 0, 0, 0, 0, 0, 0, 0, 0]
