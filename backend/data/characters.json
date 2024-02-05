@@ -7,18 +7,10 @@
     "alignment": "Lawful Good",
     "xp": 2500,
     "inspiration": false,
-    "armorClass": [],
     "speed": { "walk": 30, "swim": 5, "fly": 0 },
     "hitPoints": {
-      "current": { "base": 10, "mods": [{ "name": "Aid", "buff": "Aid" }] },
-      "max": {
-        "base": 14,
-        "mods": [
-          { "name": "Aid", "buff": "Aid" },
-          { "name": "Dwarven Toughness", "race": "Dwarf" },
-          { "name": "Vampire Bite", "buff": "Vampire Bite" }
-        ]
-      },
+      "current": { "base": 10 },
+      "max": { "base": 14 },
       "temp": 2
     },
     "usedHitDice": [
@@ -623,14 +615,10 @@
     "alignment": "Chaotic Good",
     "xp": 0,
     "inspiration": false,
-    "armorClass": [
-      { "name": "Unarmored Defense", "class": "Barbarian" },
-      { "name": "Scale Mail", "item": "Scale Mail" }
-    ],
     "speed": { "walk": 25, "swim": 0, "fly": 0 },
     "hitPoints": {
-      "current": { "base": 14, "mods": [] },
-      "max": { "base": 14, "mods": [] },
+      "current": { "base": 14 },
+      "max": { "base": 14 },
       "temp": 0
     },
     "usedHitDice": [{ "number": 1, "sides": 12 }],

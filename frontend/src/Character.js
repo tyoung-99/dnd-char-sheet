@@ -187,22 +187,20 @@ class Character {
     // Compare every currently legal AC calculation, select highest
     let replacements = [],
       bonuses = [];
+    let category = "ArmorClass";
+    const options = this.#getFeatureEffects(category)
+      .concat(this.#getBuffEffects(category))
+      .concat(this.#getItemEffects(category));
 
-    this.armorClass.forEach((option) => {
-      if (option.class) {
-        option = this.getFeature(option.name).effects.find(
-          (effect) => effect.category === "ArmorClass"
-        ).changes;
-      } else if (option.item) {
-        option = this.getItem(option.item).effects.find(
-          (effect) => effect.category === "ArmorClass"
-        ).changes;
-      }
+    options.forEach((option) => {
+      const effect = option.effects.find(
+        (checkEffect) => checkEffect.category === category
+      );
 
-      if (option.replace) {
-        replacements.push(option);
-      } else if (option.bonus) {
-        bonuses.push(option);
+      if (effect.changes.replace) {
+        replacements.push(effect.changes);
+      } else if (effect.changes.bonus) {
+        bonuses.push(effect.changes);
       }
     });
 
@@ -290,43 +288,32 @@ class Character {
   }
 
   getMaxHitPoints() {
-    return this.#getHitPointsHelper("Max");
+    return this.#getHitPointsHelper(this.hitPoints.max, "MaxHitPoints");
   }
 
   getCurrentHitPoints() {
-    return this.#getHitPointsHelper("Current");
+    return this.#getHitPointsHelper(this.hitPoints.current, "CurrentHitPoints");
   }
 
-  #getHitPointsHelper(type) {
-    let category, categoryName;
-    if (type === "Max") {
-      category = this.hitPoints.max;
-      categoryName = "MaxHitPoints";
-    } else {
-      category = this.hitPoints.current;
-      categoryName = "CurrentHitPoints";
-    }
-
-    const bonuses = category.mods.map((bonus) => {
-      if (bonus.race || bonus.class) {
-        bonus = this.getFeature(bonus.name).effects.find(
-          (effect) => effect.category === categoryName
-        );
-      } else if (bonus.item) {
-        bonus = this.getItem(bonus.name).effects.find(
-          (effect) => effect.category === categoryName
-        );
-      } else if (bonus.buff) {
-        bonus = this.getBuff(bonus.name).effects.find(
-          (effect) => effect.category === categoryName
-        );
-      }
-      return bonus;
-    });
+  #getHitPointsHelper(category, categoryName) {
+    const bonuses = this.#getFeatureEffects(categoryName)
+      .concat(this.#getBuffEffects(categoryName))
+      .concat(this.#getItemEffects(categoryName));
 
     return (
       category.base +
-      bonuses.reduce((total, bonus) => total + bonus.changes.bonus, 0)
+      bonuses.reduce(
+        (total, elem) =>
+          total +
+          elem.effects.reduce(
+            (subtotal, effect) =>
+              effect.category === categoryName
+                ? subtotal + effect.changes.bonus
+                : subtotal,
+            0
+          ),
+        0
+      )
     );
   }
 
@@ -492,7 +479,9 @@ class Character {
     return this.equipment.filter(
       (item) =>
         item.effects &&
-        item.effects.some((effect) => effect.category === category)
+        item.effects.some(
+          (effect) => effect.category === category && item.equipped
+        )
     );
   }
 
