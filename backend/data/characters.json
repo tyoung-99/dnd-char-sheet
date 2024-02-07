@@ -98,7 +98,9 @@
     "race": { "name": "Human", "subrace": null },
     "classes": [
       { "className": "Fighter", "classLevel": 4, "hitDie": 10 },
-      { "className": "Wizard", "classLevel": 2, "hitDie": 6 }
+      { "className": "Wizard", "classLevel": 2, "hitDie": 6 },
+      { "className": "Druid", "classLevel": 2, "hitDie": 8 },
+      { "className": "Cleric", "classLevel": 2, "hitDie": 8 }
     ],
     "equipment": [
       { "name": "Backpack", "count": 1, "type": "Storage" },
@@ -405,7 +407,9 @@
     "spellcasting": {
       "sources": [
         { "class": "Wizard", "ability": "INT" },
-        { "class": "Fighter", "ability": "INT" }
+        { "class": "Fighter", "ability": "INT" },
+        { "class": "Druid", "ability": "WIS" },
+        { "class": "Cleric", "ability": "WIS" }
       ],
       "roundBeforeAdding": false,
       "spellSlotsExpended": [1, 0, 0, 0, 0, 0, 0, 0, 0],

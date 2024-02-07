@@ -3,20 +3,40 @@
 import "../../styling/CharacterSpellcastingTab.css";
 
 const CharacterSpellcastingTab = ({ character }) => {
+  const spellsPreparedCounts = character.getSpellsPreparedCounts();
+  console.log(spellsPreparedCounts);
   const castClasses = character.spellcasting.sources.map((castSrc) => {
     const srcName = castSrc.class || castSrc.other;
     const spellAttackBonus = character.getSpellAttackBonus(srcName);
+    console.log(srcName);
     return (
-      <div key={srcName} className="row-flex">
-        <h1 className="col-1_4">{srcName}</h1>
-        <h1 className="col-1_4">Spellcasting Ability: {castSrc.ability}</h1>
-        <h1 className="col-1_4">
-          Spell Save DC: {character.getSpellSaveDC(srcName)}
-        </h1>
-        <h1 className="col-1_4">
-          Spell Attack Bonus: {spellAttackBonus > 0 ? "+" : null}
-          {spellAttackBonus}
-        </h1>
+      <div key={srcName} className="col-flex col-1_2">
+        <div className="row-flex col-1">
+          <h1 className="col-1_2">{srcName}</h1>
+          <h1 className="col-1_2">Spellcasting Ability: {castSrc.ability}</h1>
+        </div>
+        <div className="row-flex col-1">
+          <h1 className="col-1_2">
+            Spell Save DC: {character.getSpellSaveDC(srcName)}
+          </h1>
+          <h1 className="col-1_2">
+            Spell Attack Bonus: {spellAttackBonus > 0 ? "+" : null}
+            {spellAttackBonus}
+          </h1>
+        </div>
+        <div className="row-flex col-1">
+          {!(srcName in spellsPreparedCounts) ? null : (
+            <>
+              <h1 className="col-1_2">
+                Max Spells Prepared: {spellsPreparedCounts[srcName].maxPrepped}
+              </h1>
+              <h1 className="col-1_2">
+                Current Spells Prepared:{" "}
+                {spellsPreparedCounts[srcName].currentPrepped || 0}
+              </h1>
+            </>
+          )}
+        </div>
       </div>
     );
   });
@@ -133,8 +153,10 @@ const CharacterSpellcastingTab = ({ character }) => {
     <div className="grid-container row-flex">
       <div className="col-flex col-1">
         <div className="row-flex">
-          <div className="grid-tile col-7_10">{castClasses}</div>
-          <div className="grid-tile col-3_10">{concentration}</div>
+          <div className="grid-tile col-6_10">
+            <div className="row-flex cast-classes col-end">{castClasses}</div>
+          </div>
+          <div className="grid-tile col-4_10">{concentration}</div>
         </div>
         <div className="row-flex">{spellHeaders}</div>
         <div className="row-flex">

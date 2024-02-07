@@ -666,43 +666,44 @@ class Character {
     let pactLevel = 0;
 
     this.spellcasting.sources.forEach((src) => {
-      if (src.class) {
-        const classLevel = this.classes.find(
-          (checkClass) => checkClass.className === src.class
-        ).classLevel;
+      if (!src.class) {
+        return;
+      }
+      const classLevel = this.classes.find(
+        (checkClass) => checkClass.className === src.class
+      ).classLevel;
 
-        switch (src.class) {
-          case "Bard":
-          case "Cleric":
-          case "Druid":
-          case "Sorcerer":
-          case "Wizard":
-            spellcastingLevel.full.push(classLevel);
-            break;
-          case "Artificer":
+      switch (src.class) {
+        case "Bard":
+        case "Cleric":
+        case "Druid":
+        case "Sorcerer":
+        case "Wizard":
+          spellcastingLevel.full.push(classLevel);
+          break;
+        case "Artificer":
+          spellcastingLevel.halfRoundUp.push(classLevel);
+          break;
+        case "Paladin":
+        case "Ranger":
+          if (this.spellcasting.sources.length === 1) {
             spellcastingLevel.halfRoundUp.push(classLevel);
-            break;
-          case "Paladin":
-          case "Ranger":
-            if (this.spellcasting.sources.length !== 1 || classLevel === 1) {
-              spellcastingLevel.halfRoundDown.push(classLevel);
-            } else {
-              spellcastingLevel.halfRoundUp.push(classLevel);
-            }
-            break;
-          case "Fighter":
-          case "Rogue":
-            if (this.spellcasting.sources.length !== 1) {
-              spellcastingLevel.thirdRoundDown.push(classLevel);
-            } else {
-              spellcastingLevel.thirdRoundUp.push(classLevel);
-            }
-            break;
-          case "Warlock":
-            pactLevel = classLevel;
-            break;
-          default:
-        }
+          } else {
+            spellcastingLevel.halfRoundDown.push(classLevel);
+          }
+          break;
+        case "Fighter":
+        case "Rogue":
+          if (this.spellcasting.sources.length === 1) {
+            spellcastingLevel.thirdRoundUp.push(classLevel);
+          } else {
+            spellcastingLevel.thirdRoundDown.push(classLevel);
+          }
+          break;
+        case "Warlock":
+          pactLevel = classLevel;
+          break;
+        default:
       }
     });
 
@@ -790,6 +791,58 @@ class Character {
     }
 
     return hoverIcons;
+  }
+
+  getSpellsPreparedCounts() {
+    const preppedSpellsByClass = {};
+    this.spellcasting.spellsKnown.forEach((spell) => {
+      if (!spell.class) {
+        return;
+      }
+      if (spell.prepared === 1) {
+        if (!(spell.class in preppedSpellsByClass)) {
+          preppedSpellsByClass[spell.class] = 0;
+        }
+        preppedSpellsByClass[spell.class]++;
+      }
+    });
+
+    const prepared = {};
+    this.spellcasting.sources.forEach((src) => {
+      if (!src.class) {
+        return;
+      }
+      const castClass = this.classes.find(
+        (checkClass) => checkClass.className === src.class
+      );
+
+      let maxPrepped = 1;
+      switch (castClass.className) {
+        case "Cleric":
+        case "Druid":
+        case "Wizard":
+          maxPrepped = this.getAbilityMod(src.ability) + castClass.classLevel;
+          break;
+        case "Artificer":
+        case "Paladin":
+          maxPrepped =
+            this.getAbilityMod(src.ability) +
+            Math.floor(castClass.classLevel / 2);
+          break;
+        default:
+          return;
+      }
+      if (maxPrepped < 1) {
+        maxPrepped = 1;
+      }
+
+      prepared[castClass.className] = {
+        maxPrepped: maxPrepped,
+        currentPrepped: preppedSpellsByClass[castClass.className],
+      };
+    });
+
+    return prepared;
   }
 
   getBuff(buffName) {
