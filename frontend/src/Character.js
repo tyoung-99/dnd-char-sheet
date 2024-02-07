@@ -572,7 +572,7 @@ class Character {
     );
 
     let spellSlots = new Array(9).fill(0);
-    let pactSlots = new Array(5).fill(0);
+    let pactSlots = new Array(9).fill(0);
 
     spellSlots = spellSlots.map((_, i) => {
       switch (i + 1) {
@@ -640,7 +640,19 @@ class Character {
       }
     });
 
-    return spellSlots.map((count, i) => (i < 5 ? count + pactSlots[i] : count));
+    let totalSlots = spellSlots.map((count, i) => count + pactSlots[i]);
+    const category = "SpellSlotsMax";
+    const bonuses = this.#getEffects(category);
+    bonuses.forEach((bonus) => {
+      const effect = bonus.effects.find(
+        (checkEffect) => checkEffect.category === category
+      );
+      effect.changes.slots.forEach((extras, i) => {
+        totalSlots[i] += extras;
+      });
+    });
+
+    return totalSlots;
   }
 
   #createSpellcastingLevelArr() {
@@ -714,8 +726,8 @@ class Character {
   }
 
   getExpendedSpellSlots() {
-    return this.spellcasting.spellSlots.slotsExpended.map((count, i) =>
-      i < 5 ? count + this.spellcasting.pactSlots.slotsExpended[i] : count
+    return this.spellcasting.spellSlotsExpended.map(
+      (slots, i) => slots + this.spellcasting.pactSlotsExpended[i]
     );
   }
 

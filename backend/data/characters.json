@@ -343,6 +343,12 @@
               "dice": [{ "number": 2, "sides": 6 }],
               "type": "acid"
             }
+          },
+          {
+            "category": "SpellSlotsMax",
+            "changes": {
+              "slots": [1, 0, 1, 0, 0, 0, 0, 0, 0]
+            }
           }
         ]
       },
@@ -402,16 +408,8 @@
         { "class": "Fighter", "ability": "INT" }
       ],
       "roundBeforeAdding": false,
-      "spellSlots": {
-        "level": 2,
-        "slotsTotal": [3, 0, 0, 0, 0, 0, 0, 0, 0],
-        "slotsExpended": [1, 0, 0, 0, 0, 0, 0, 0, 0]
-      },
-      "pactSlots": {
-        "level": 0,
-        "slotsTotal": [0, 0, 0, 0, 0],
-        "slotsExpended": [0, 0, 0, 0, 0]
-      },
+      "spellSlotsExpended": [1, 0, 0, 0, 0, 0, 0, 0, 0],
+      "pactSlotsExpended": [0, 0, 0, 0, 0, 0, 0, 0, 0],
       "spellsKnown": [
         {
           "name": "Chromatic Orb",
@@ -615,9 +613,9 @@
         "desc": ["Test desc"],
         "effects": [
           {
-            "category": "AttackMod",
+            "category": "SpellSlotsMax",
             "changes": {
-              "dice": { "number": 1, "sides": 10 }
+              "slots": [1, 2, 0, 0, 0, 0, 0, 0, 0]
             }
           }
         ]
@@ -953,14 +951,8 @@
     "spellcasting": {
       "sources": [{ "other": "Gnome", "ability": "INT" }],
       "roundBeforeAdding": false,
-      "spellSlots": {
-        "slotsTotal": [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        "slotsExpended": [0, 0, 0, 0, 0, 0, 0, 0, 0]
-      },
-      "pactSlots": {
-        "slotsTotal": [0, 0, 0, 0, 0],
-        "slotsExpended": [0, 0, 0, 0, 0]
-      },
+      "spellSlotsExpended": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "pactSlotsExpended": [0, 0, 0, 0, 0, 0, 0, 0, 0],
       "spellsKnown": [
         {
           "name": "Minor Illusion",
