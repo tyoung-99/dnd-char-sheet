@@ -1,6 +1,6 @@
 // Full character sheet
 
-import "../styling/CharacterPage.css";
+import "../styling/pages/CharacterPage.css";
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";

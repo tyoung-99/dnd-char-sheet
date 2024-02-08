@@ -1,5 +1,5 @@
 // Character's weapons/attacks, ammo/consumables
-import "../styling/CharacterQuickItemsComp.css";
+import "../styling/components/CharacterQuickItemsComp.css";
 
 const CharacterQuickItemsComp = ({ character }) => {
   const handleWeapons = (weapons) => {

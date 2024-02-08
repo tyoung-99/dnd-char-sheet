@@ -1,5 +1,5 @@
 // Character's ability scores, saves, skills, other proficiencies, languages, and speeds
-import "../styling/CharacterStatsComp.css";
+import "../styling/components/CharacterStatsComp.css";
 
 const CharacterStatsComp = ({ character }) => {
   const abilities = character.getAbilities().map((ability) => (

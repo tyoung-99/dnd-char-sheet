@@ -1,5 +1,5 @@
 // Character's inventory/equipment
-import "../../styling/CharacterInventoryTab.css";
+import "../../styling/pages/page-tabs/CharacterInventoryTab.css";
 
 const CharacterInventoryTab = ({ character }) => {
   let itemizedInventory = character.getItems();

@@ -1,14 +1,12 @@
 // Character's spells/spell slots
 
-import "../../styling/CharacterSpellcastingTab.css";
+import "../../styling/pages/page-tabs/CharacterSpellcastingTab.css";
 
 const CharacterSpellcastingTab = ({ character }) => {
   const spellsPreparedCounts = character.getSpellsPreparedCounts();
-  console.log(spellsPreparedCounts);
   const castClasses = character.spellcasting.sources.map((castSrc) => {
     const srcName = castSrc.class || castSrc.other;
     const spellAttackBonus = character.getSpellAttackBonus(srcName);
-    console.log(srcName);
     return (
       <div key={srcName} className="col-flex col-1_2">
         <div className="row-flex col-1">
@@ -131,7 +129,19 @@ const CharacterSpellcastingTab = ({ character }) => {
                 defaultChecked={spell.prepared}
               ></input>
             ) : null}
-            <label htmlFor={"prep " + key} className="spell">
+            <label
+              htmlFor={"prep " + key}
+              className="spell"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                window.open(
+                  "https://example.com",
+                  "PopupWindow",
+                  "width=600,height=400"
+                );
+              }}
+            >
               {spell.name}
             </label>
           </div>
