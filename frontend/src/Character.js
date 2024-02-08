@@ -761,10 +761,10 @@ class Character {
     }
     if (spell.components.m) {
       hoverIcons.push(["material.png", "Material Component"]);
-      if (spell.components.m.some((comp) => comp.value)) {
+      if (spell.components.m.costly) {
         hoverIcons.push(["gold_cost.png", "Material Component with Gold Cost"]);
       }
-      if (spell.components.m.some((comp) => comp.consumed)) {
+      if (spell.components.m.consumed) {
         hoverIcons.push(["consumed.png", "Material Component Consumed"]);
       }
     }
@@ -843,6 +843,15 @@ class Character {
     });
 
     return prepared;
+  }
+
+  getSpellComponents(spell) {
+    const comps = spell.components;
+    const compsArr = [];
+    if (comps.v) compsArr.push("V");
+    if (comps.s) compsArr.push("S");
+    if (comps.m) compsArr.push(`M (${comps.m.text})`);
+    return compsArr.join(", ");
   }
 
   getBuff(buffName) {

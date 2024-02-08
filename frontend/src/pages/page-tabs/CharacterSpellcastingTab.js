@@ -1,6 +1,8 @@
 // Character's spells/spell slots
 
 import "../../styling/pages/page-tabs/CharacterSpellcastingTab.css";
+import SpellModal from "../../components/modals/SpellModal";
+import { useState } from "react";
 
 const CharacterSpellcastingTab = ({ character }) => {
   const spellsPreparedCounts = character.getSpellsPreparedCounts();
@@ -110,6 +112,25 @@ const CharacterSpellcastingTab = ({ character }) => {
     </div>
   );
 
+  const [currentModal, setCurrentModal] = useState("");
+
+  const openModal = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const {
+      target: {
+        dataset: { modal },
+      },
+    } = event;
+    if (modal) {
+      setCurrentModal(modal);
+    }
+  };
+
+  const closeModal = () => {
+    setCurrentModal("");
+  };
+
   const spellsKnown = character.getSpellsKnown();
   spellsKnown.forEach((level) => {
     level.forEach((spell, i) => {
@@ -132,15 +153,8 @@ const CharacterSpellcastingTab = ({ character }) => {
             <label
               htmlFor={"prep " + key}
               className="spell"
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                window.open(
-                  "https://example.com",
-                  "PopupWindow",
-                  "width=600,height=400"
-                );
-              }}
+              data-modal={key}
+              onClick={openModal}
             >
               {spell.name}
             </label>
@@ -152,8 +166,16 @@ const CharacterSpellcastingTab = ({ character }) => {
               alt={icon[1]}
               className="hover-icon"
               title={icon[1]}
+              data-modal={key}
+              onClick={openModal}
             ></img>
           ))}
+          <SpellModal
+            spell={spell}
+            character={character}
+            closeModal={closeModal}
+            isOpen={currentModal === key}
+          />
         </div>
       );
     });
