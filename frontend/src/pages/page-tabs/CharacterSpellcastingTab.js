@@ -117,11 +117,7 @@ const CharacterSpellcastingTab = ({ character }) => {
   const openModal = (event) => {
     event.preventDefault();
     event.stopPropagation();
-    const {
-      target: {
-        dataset: { modal },
-      },
-    } = event;
+    const modal = event.target.dataset.modal;
     if (modal) {
       setCurrentModal(modal);
     }
