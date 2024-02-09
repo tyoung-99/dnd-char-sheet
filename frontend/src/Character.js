@@ -286,7 +286,14 @@ class Character {
   }
 
   getMaxHitPoints() {
-    return this.#getHitPointsHelper(this.hitPoints.max, "MaxHitPoints");
+    return (
+      this.#getHitPointsHelper(this.hitPoints.max, "MaxHitPoints") +
+      this.getAbilityMod("CON") *
+        this.classes.reduce(
+          (total, charClass) => total + charClass.classLevel,
+          0
+        )
+    );
   }
 
   getCurrentHitPoints() {
