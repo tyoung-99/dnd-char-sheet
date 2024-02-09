@@ -590,6 +590,7 @@
         "name": "Aid",
         "spell": "Aid",
         "desc": ["Aid desc"],
+        "isDebuff": false,
         "effects": [
           {
             "category": "MaxHitPoints",
@@ -609,6 +610,7 @@
         "name": "Vampire Bite",
         "monster": "Vampire",
         "desc": ["Bite desc"],
+        "isDebuff": true,
         "effects": [
           {
             "category": "MaxHitPoints",
@@ -622,6 +624,7 @@
         "name": "Bless",
         "spell": "Bless",
         "desc": ["Bless desc"],
+        "isDebuff": false,
         "effects": [
           {
             "category": "AttackMod",
@@ -635,6 +638,7 @@
         "name": "Test",
         "spell": "Test",
         "desc": ["Test desc"],
+        "isDebuff": false,
         "effects": [
           {
             "category": "SpellSlotsMax",
