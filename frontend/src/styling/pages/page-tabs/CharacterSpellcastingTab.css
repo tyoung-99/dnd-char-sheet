@@ -1,0 +1,40 @@
+.spell-col {
+  height: 100%;
+  text-align: center;
+}
+
+div:has(> .spell) {
+  display: flex;
+  align-items: center;
+}
+.spell {
+  font-weight: bold;
+  font-size: 0.75rem;
+  text-align: center;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Spellcasting classes displayed in dynamic grid w/ appropriate spacing */
+.cast-classes {
+  flex-wrap: wrap;
+}
+.cast-classes > div:nth-child(odd) {
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+}
+.cast-classes > div:nth-child(even) {
+  border-bottom: 1px solid black;
+}
+.cast-classes > div:nth-last-child(1) {
+  border-bottom: none;
+}
+.cast-classes > div:nth-last-child(2):nth-child(odd) {
+  border-bottom: none;
+}
+.cast-classes > div:only-child {
+  border-right: none;
+}
+.cast-classes h1 {
+  margin: 0.5em;
+}

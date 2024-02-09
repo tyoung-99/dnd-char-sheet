@@ -1,4 +1,4 @@
-import "../styling/CharacterListPage.css";
+import "../styling/pages/CharacterListPage.css";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Character from "../Character";

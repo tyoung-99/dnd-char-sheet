@@ -93,11 +93,23 @@
 .col-1_6 {
   width: calc(100% / 6);
 }
+.col-1_7 {
+  width: calc(100% / 7);
+}
+.col-6_7 {
+  width: calc(100% * 6 / 7);
+}
 .col-1_10 {
   width: calc(100% / 10);
 }
 .col-3_10 {
   width: calc(100% * 3 / 10);
+}
+.col-4_10 {
+  width: calc(100% * 4 / 10);
+}
+.col-6_10 {
+  width: calc(100% * 6 / 10);
 }
 .col-7_10 {
   width: calc(100% * 7 / 10);

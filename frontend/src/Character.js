@@ -1,4 +1,4 @@
-// Represents 1 character and all its data
+// Represents 1 character and all its data, performs various calculations on data to allow easier external access to elements of character that depend on other elements
 
 class Character {
   // Order of groups reversed b/c when inserting into list of profs, order gets reversed again
@@ -72,17 +72,54 @@ class Character {
     { name: "Light", profs: ["Padded", "Leather", "Studded Leather"] },
   ];
 
-  isProficientWithItem(item) {
-    return item.profRequired.some(
-      (prof) =>
-        this.weaponProfs.includes(prof) ||
-        this.armorProfs.includes(prof) ||
-        this.toolProfs.includes(prof)
+  getAbilities() {
+    return this.abilities.map((ability) => ({
+      name: ability.name,
+      score: ability.score,
+      mod: this.getAbilityMod(ability.name),
+    }));
+  }
+
+  getAbilityScore(ability) {
+    return this.abilities.find((stat) => stat.name === ability).score;
+  }
+
+  getAbilityMod(ability) {
+    return Math.floor(
+      (this.abilities.find((stat) => stat.name === ability).score - 10) / 2
     );
   }
 
-  getPassivePerception() {
-    return 10 + this.getSkillByName("Perception");
+  getProfBonus() {
+    return (
+      Math.ceil(
+        this.classes.reduce(
+          (totalLevel, charClass) => totalLevel + charClass.classLevel,
+          0
+        ) / 4
+      ) + 1
+    );
+  }
+
+  getSkills() {
+    let skills = [];
+    this.abilities.forEach((ability) => {
+      ability.skillProfs.forEach((skill) => {
+        skills.push({
+          name: skill.name,
+          prof: skill.proficiency,
+          mod:
+            this.getAbilityMod(ability.name) +
+            skill.proficiency * this.getProfBonus(),
+          ability: ability.name,
+        });
+      });
+    });
+
+    skills.sort((first, second) =>
+      first.name > second.name ? 1 : first.name === second.name ? 0 : -1
+    );
+    return skills;
   }
 
   getSkillByName(skill) {
@@ -95,6 +132,20 @@ class Character {
         .proficiency *
         this.getProfBonus()
     );
+  }
+
+  getPassivePerception() {
+    return 10 + this.getSkillByName("Perception");
+  }
+
+  getSaves() {
+    return this.abilities.map((ability) => ({
+      name: ability.name,
+      prof: ability.saveProf,
+      mod:
+        this.getAbilityMod(ability.name) +
+        ability.saveProf * this.getProfBonus(),
+    }));
   }
 
   getWeaponProfs() {
@@ -119,85 +170,12 @@ class Character {
     return cleanProfs;
   }
 
-  getAbilities() {
-    return this.abilities.map((ability) => ({
-      name: ability.name,
-      score: ability.score,
-      mod: this.getAbilityMod(ability.name),
-    }));
-  }
-
-  getSkills() {
-    let skills = [];
-    this.abilities.forEach((ability) => {
-      ability.skillProfs.forEach((skill) => {
-        skills.push({
-          name: skill.name,
-          prof: skill.proficiency,
-          mod:
-            this.getAbilityMod(ability.name) +
-            skill.proficiency * this.getProfBonus(),
-          ability: ability.name,
-        });
-      });
-    });
-
-    skills.sort((first, second) =>
-      first.name > second.name ? 1 : first.name === second.name ? 0 : -1
-    );
-    return skills;
-  }
-
-  getSaves() {
-    return this.abilities.map((ability) => ({
-      name: ability.name,
-      prof: ability.saveProf,
-      mod:
-        this.getAbilityMod(ability.name) +
-        ability.saveProf * this.getProfBonus(),
-    }));
-  }
-
-  getAttack(item) {
-    const strMod = this.getAbilityMod("STR");
-    const dexMod = this.getAbilityMod("DEX");
-
-    const abilityMod =
-      item.subtypes.includes("Ranged") ||
-      (item.properties.includes("Finesse") && dexMod > strMod)
-        ? dexMod
-        : strMod;
-    const profMod = this.isProficientWithItem(item) ? this.getProfBonus() : 0;
-
-    const attackMod = abilityMod + profMod + (item.attackBonus || 0);
-
-    const damage = JSON.parse(JSON.stringify(item.damage.base));
-    damage[0].mod = abilityMod + (damage[0].mod || 0);
-    if (item.activated) {
-      damage.concat(item.damage.activated);
-    }
-
-    return [attackMod, damage];
-  }
-
-  getProfBonus() {
-    return (
-      Math.ceil(
-        this.classes.reduce(
-          (totalLevel, charClass) => totalLevel + charClass.classLevel,
-          0
-        ) / 4
-      ) + 1
-    );
-  }
-
-  getAbilityScore(ability) {
-    return this.abilities.find((stat) => stat.name === ability).score;
-  }
-
-  getAbilityMod(ability) {
-    return Math.floor(
-      (this.abilities.find((stat) => stat.name === ability).score - 10) / 2
+  isProficientWithItem(item) {
+    return item.profRequired.some(
+      (prof) =>
+        this.weaponProfs.includes(prof) ||
+        this.armorProfs.includes(prof) ||
+        this.toolProfs.includes(prof)
     );
   }
 
@@ -205,59 +183,22 @@ class Character {
     return this.getAbilityMod("DEX");
   }
 
-  getFeature(featureName) {
-    return this.features.find((feature) => feature.name === featureName);
-  }
-
-  getItem(itemName) {
-    return this.equipment.find((item) => item.name === itemName);
-  }
-
-  getItemsByType(type) {
-    return this.equipment.filter((item) => item.type === type);
-  }
-
-  getItems() {
-    const items = {};
-    this.equipment.forEach((item) => {
-      if (item.type !== "Treasure") {
-        if (!(item.type in items)) {
-          items[item.type] = [];
-        }
-        items[item.type].push(item);
-      }
-    });
-    return items;
-  }
-
-  getTreasure() {
-    return this.equipment.filter((item) => item.type === "Treasure");
-  }
-
-  getEquippedItems() {
-    return this.equipment.filter((item) => item.equipped);
-  }
-
   getArmorClass() {
     // Compare every currently legal AC calculation, select highest
     let replacements = [],
       bonuses = [];
+    const category = "ArmorClass";
+    const options = this.#getEffects(category);
 
-    this.armorClass.forEach((option) => {
-      if (option.class) {
-        option = this.getFeature(option.name).effects.find(
-          (effect) => effect.category === "armorClass"
-        ).changes;
-      } else if (option.item) {
-        option = this.getItem(option.item).effects.find(
-          (effect) => effect.category === "armorClass"
-        ).changes;
-      }
+    options.forEach((option) => {
+      const effect = option.effects.find(
+        (checkEffect) => checkEffect.category === category
+      );
 
-      if (option.replace) {
-        replacements.push(option);
-      } else if (option.bonus) {
-        bonuses.push(option);
+      if (effect.changes.replace) {
+        replacements.push(effect.changes);
+      } else if (effect.changes.bonus) {
+        bonuses.push(effect.changes);
       }
     });
 
@@ -344,6 +285,34 @@ class Character {
     return bonuses;
   }
 
+  getMaxHitPoints() {
+    return this.#getHitPointsHelper(this.hitPoints.max, "MaxHitPoints");
+  }
+
+  getCurrentHitPoints() {
+    return this.#getHitPointsHelper(this.hitPoints.current, "CurrentHitPoints");
+  }
+
+  #getHitPointsHelper(category, categoryName) {
+    const bonuses = this.#getEffects(categoryName);
+
+    return (
+      category.base +
+      bonuses.reduce(
+        (total, elem) =>
+          total +
+          elem.effects.reduce(
+            (subtotal, effect) =>
+              effect.category === categoryName
+                ? subtotal + effect.changes.bonus
+                : subtotal,
+            0
+          ),
+        0
+      )
+    );
+  }
+
   getCurrentHitDice() {
     const total = this.getTotalHitDice();
     const current = this.usedHitDice.map((usedDie) => ({
@@ -371,35 +340,395 @@ class Character {
     return total;
   }
 
-  getClassFeatures() {
-    const list = [];
-    this.features.forEach((feature) => {
-      if (feature.class) {
-        list.push(feature);
+  getAttack(item) {
+    return [this.#getAttackMod(item), this.#getAttackDamage(item)];
+  }
+
+  #getAttackMod(item) {
+    const strMod = this.getAbilityMod("STR");
+    const dexMod = this.getAbilityMod("DEX");
+    const abilityMod =
+      item.subtypes.includes("Ranged") ||
+      (item.properties.includes("Finesse") && dexMod > strMod)
+        ? dexMod
+        : strMod;
+    const profMod = this.isProficientWithItem(item) ? this.getProfBonus() : 0;
+
+    const attackMod = {
+      flat: abilityMod + profMod + (item.attackBonus || 0),
+      dice: [],
+    };
+
+    const category = "AttackMod";
+    const attackBonuses = this.#getEffects(category);
+
+    let flatAttackBonus = 0;
+    let attackDice = [];
+    attackBonuses.forEach((bonus) => {
+      bonus.effects.forEach((effect) => {
+        if (effect.category === category) {
+          flatAttackBonus += effect.changes.flat || 0;
+
+          if (effect.changes.dice) {
+            this.#addDiceToArr(attackDice, [effect.changes.dice]);
+          }
+        }
+      });
+    });
+    attackMod.flat += flatAttackBonus;
+    attackMod.dice = attackDice.sort(
+      (first, second) => second.sides - first.sides
+    );
+
+    return attackMod;
+  }
+
+  #getAttackDamage(item) {
+    const strMod = this.getAbilityMod("STR");
+    const dexMod = this.getAbilityMod("DEX");
+    const abilityMod =
+      item.subtypes.includes("Ranged") ||
+      (item.properties.includes("Finesse") && dexMod > strMod)
+        ? dexMod
+        : strMod;
+
+    let damage = JSON.parse(JSON.stringify(item.damage.base));
+    damage[0].flat = abilityMod + (damage[0].flat || 0);
+    if (item.activated) {
+      damage = damage.concat(item.damage.activated);
+    }
+
+    const category = "DamageMod";
+    const damageBonuses = this.#getEffects(category);
+
+    damageBonuses.forEach((bonus) => {
+      bonus.effects.forEach((effect) => {
+        if (effect.category === category) {
+          let index = damage.findIndex(
+            (checkDamage) => checkDamage.type === effect.changes.type
+          );
+          if (index < 0) {
+            damage.push({
+              dice: [],
+              flat: 0,
+              type: effect.changes.type,
+            });
+            index = damage.length - 1;
+          }
+
+          damage[index].flat =
+            (effect.changes.flat || 0) + (damage[index].flat || 0);
+
+          if (effect.changes.dice) {
+            this.#addDiceToArr(damage[index].dice, effect.changes.dice);
+          }
+        }
+      });
+    });
+
+    return damage;
+  }
+
+  #addDiceToArr(diceArr, newDice) {
+    newDice.forEach((die) => {
+      const index = diceArr.findIndex(
+        (checkDie) => checkDie.sides === die.sides
+      );
+      if (index < 0) {
+        diceArr.push({ number: die.number, sides: die.sides });
+      } else {
+        diceArr[index].number += die.number;
       }
     });
-    return list;
+  }
+
+  getItems() {
+    const items = {};
+    this.equipment.forEach((item) => {
+      if (item.type !== "Treasure") {
+        if (!(item.type in items)) {
+          items[item.type] = [];
+        }
+        items[item.type].push(item);
+      }
+    });
+    return items;
+  }
+
+  getEquippedItems() {
+    return this.equipment.filter((item) => item.equipped);
+  }
+
+  getItemsByType(type) {
+    return this.equipment.filter((item) => item.type === type);
+  }
+
+  getItem(itemName) {
+    return this.equipment.find((item) => item.name === itemName);
+  }
+
+  #getItemEffects(category) {
+    return this.equipment.filter((item) => {
+      return (
+        item.effects &&
+        item.effects.some(
+          (effect) => effect.category === category && item.equipped
+        )
+      );
+    });
+  }
+
+  getTreasure() {
+    return this.equipment.filter((item) => item.type === "Treasure");
+  }
+
+  getFeature(featureName) {
+    return this.features.find((feature) => feature.name === featureName);
+  }
+
+  getClassFeatures() {
+    return this.features.filter((feature) => feature.class);
   }
 
   getOtherFeatures() {
-    const list = [];
-    this.features.forEach((feature) => {
-      if (!feature.class) {
-        list.push(feature);
-      }
-    });
-    return list;
+    return this.features.filter((feature) => !feature.class);
   }
 
-  getTotalSpellSlots() {
-    return this.spellcasting.spellSlots.slotsTotal.map((count, i) =>
-      i < 5 ? count + this.spellcasting.pactSlots.slotsTotal[i] : count
+  #getFeatureEffects(category) {
+    return this.features.filter(
+      (feature) =>
+        feature.effects &&
+        feature.effects.some((effect) => effect.category === category)
     );
   }
 
+  getSpellcastingAbility(source) {
+    return this.spellcasting.sources.find(
+      (src) => (src.class || src.other) === source
+    ).ability;
+  }
+
+  getSpellSaveDC(source) {
+    return (
+      8 +
+      this.getProfBonus() +
+      this.getAbilityMod(this.getSpellcastingAbility(source)) +
+      this.#spellBonusHelper(source, "SpellSaveDC")
+    );
+  }
+
+  getSpellAttackBonus(source) {
+    return (
+      this.getProfBonus() +
+      this.getAbilityMod(this.getSpellcastingAbility(source)) +
+      this.#spellBonusHelper(source, "SpellAttackBonus")
+    );
+  }
+
+  #spellBonusHelper(source, category) {
+    return this.#getEffects(category).reduce(
+      (total, elem) =>
+        total +
+        elem.effects.reduce(
+          (subtotal, effect) =>
+            effect.category === category && effect.classRestriction === source
+              ? subtotal + effect.changes.bonus
+              : subtotal,
+          0
+        ),
+      0
+    );
+  }
+
+  getTotalSpellSlots() {
+    let [spellcastingLevel, pactLevel] = this.#createSpellcastingLevelArr();
+
+    spellcastingLevel = Object.keys(spellcastingLevel).reduce(
+      (total, casterType) => {
+        let newLevels = [...spellcastingLevel[casterType]];
+
+        switch (casterType) {
+          case "full":
+            newLevels = this.#spellcastingLevelArrToLevel(newLevels, 1, true);
+            break;
+          case "halfRoundUp":
+            newLevels = this.#spellcastingLevelArrToLevel(newLevels, 2, true);
+            break;
+          case "halfRoundDown":
+            newLevels = this.#spellcastingLevelArrToLevel(newLevels, 2, false);
+            break;
+          case "thirdRoundUp":
+            newLevels = this.#spellcastingLevelArrToLevel(newLevels, 3, true);
+            break;
+          case "thirdRoundDown":
+            newLevels = this.#spellcastingLevelArrToLevel(newLevels, 3, false);
+            break;
+          default:
+        }
+
+        return total + newLevels;
+      },
+      0
+    );
+
+    let spellSlots = new Array(9).fill(0);
+    let pactSlots = new Array(9).fill(0);
+
+    spellSlots = spellSlots.map((_, i) => {
+      switch (i + 1) {
+        case 1:
+          return spellcastingLevel <= 0
+            ? 0
+            : spellcastingLevel <= 1
+            ? 2
+            : spellcastingLevel <= 2
+            ? 3
+            : 4;
+        case 2:
+          return spellcastingLevel <= 2 ? 0 : spellcastingLevel <= 3 ? 2 : 3;
+        case 3:
+          return spellcastingLevel <= 4 ? 0 : spellcastingLevel <= 4 ? 2 : 3;
+        case 4:
+          return spellcastingLevel <= 6
+            ? 0
+            : spellcastingLevel <= 7
+            ? 1
+            : spellcastingLevel <= 8
+            ? 2
+            : 3;
+        case 5:
+          return spellcastingLevel <= 8
+            ? 0
+            : spellcastingLevel <= 9
+            ? 1
+            : spellcastingLevel <= 17
+            ? 2
+            : 3;
+        case 6:
+          return spellcastingLevel <= 10 ? 0 : spellcastingLevel <= 18 ? 1 : 2;
+        case 7:
+          return spellcastingLevel <= 12 ? 0 : spellcastingLevel <= 19 ? 1 : 2;
+        case 8:
+          return spellcastingLevel <= 14 ? 0 : 1;
+        case 9:
+          return spellcastingLevel <= 16 ? 0 : 1;
+        default:
+          return 0;
+      }
+    });
+
+    pactSlots = pactSlots.map((_, i) => {
+      switch (i + 1) {
+        case 1:
+          return pactLevel === 1 ? 1 : pactLevel === 2 ? 2 : 0;
+        case 2:
+          return pactLevel >= 3 && pactLevel <= 4 ? 2 : 0;
+        case 3:
+          return pactLevel >= 5 && pactLevel <= 6 ? 2 : 0;
+        case 4:
+          return pactLevel >= 7 && pactLevel <= 8 ? 2 : 0;
+        case 5:
+          return pactLevel <= 8
+            ? 0
+            : pactLevel <= 10
+            ? 2
+            : pactLevel <= 16
+            ? 3
+            : 4;
+        default:
+          return 0;
+      }
+    });
+
+    let totalSlots = spellSlots.map((count, i) => count + pactSlots[i]);
+    const category = "SpellSlotsMax";
+    const bonuses = this.#getEffects(category);
+    bonuses.forEach((bonus) => {
+      const effect = bonus.effects.find(
+        (checkEffect) => checkEffect.category === category
+      );
+      effect.changes.slots.forEach((extras, i) => {
+        totalSlots[i] += extras;
+      });
+    });
+
+    return totalSlots;
+  }
+
+  #createSpellcastingLevelArr() {
+    let spellcastingLevel = {
+      full: [],
+      halfRoundUp: [],
+      halfRoundDown: [],
+      thirdRoundUp: [],
+      thirdRoundDown: [],
+    };
+    let pactLevel = 0;
+
+    this.spellcasting.sources.forEach((src) => {
+      if (!src.class) {
+        return;
+      }
+      const classLevel = this.classes.find(
+        (checkClass) => checkClass.className === src.class
+      ).classLevel;
+
+      switch (src.class) {
+        case "Bard":
+        case "Cleric":
+        case "Druid":
+        case "Sorcerer":
+        case "Wizard":
+          spellcastingLevel.full.push(classLevel);
+          break;
+        case "Artificer":
+          spellcastingLevel.halfRoundUp.push(classLevel);
+          break;
+        case "Paladin":
+        case "Ranger":
+          if (this.spellcasting.sources.length === 1) {
+            spellcastingLevel.halfRoundUp.push(classLevel);
+          } else {
+            spellcastingLevel.halfRoundDown.push(classLevel);
+          }
+          break;
+        case "Fighter":
+        case "Rogue":
+          if (this.spellcasting.sources.length === 1) {
+            spellcastingLevel.thirdRoundUp.push(classLevel);
+          } else {
+            spellcastingLevel.thirdRoundDown.push(classLevel);
+          }
+          break;
+        case "Warlock":
+          pactLevel = classLevel;
+          break;
+        default:
+      }
+    });
+
+    return [spellcastingLevel, pactLevel];
+  }
+
+  #spellcastingLevelArrToLevel(levelsArr, divideBy, roundUp) {
+    if (this.spellcasting.roundBeforeAdding) {
+      levelsArr = levelsArr.map((level) =>
+        roundUp ? Math.ceil(level / divideBy) : Math.floor(level / divideBy)
+      );
+    }
+    let newLevel = levelsArr.reduce((total, val) => total + val, 0);
+    if (!this.spellcasting.roundBeforeAdding) {
+      newLevel = roundUp
+        ? Math.ceil(newLevel / divideBy)
+        : Math.floor(newLevel / divideBy);
+    }
+
+    return newLevel;
+  }
+
   getExpendedSpellSlots() {
-    return this.spellcasting.spellSlots.slotsExpended.map((count, i) =>
-      i < 5 ? count + this.spellcasting.pactSlots.slotsExpended[i] : count
+    return this.spellcasting.spellSlotsExpended.map(
+      (slots, i) => slots + this.spellcasting.pactSlotsExpended[i]
     );
   }
 
@@ -432,10 +761,10 @@ class Character {
     }
     if (spell.components.m) {
       hoverIcons.push(["material.png", "Material Component"]);
-      if (spell.components.m.some((comp) => comp.value)) {
+      if (spell.components.m.costly) {
         hoverIcons.push(["gold_cost.png", "Material Component with Gold Cost"]);
       }
-      if (spell.components.m.some((comp) => comp.consumed)) {
+      if (spell.components.m.consumed) {
         hoverIcons.push(["consumed.png", "Material Component Consumed"]);
       }
     }
@@ -462,6 +791,85 @@ class Character {
     }
 
     return hoverIcons;
+  }
+
+  getSpellsPreparedCounts() {
+    const preppedSpellsByClass = {};
+    this.spellcasting.spellsKnown.forEach((spell) => {
+      if (!spell.class) {
+        return;
+      }
+      if (spell.prepared === 1) {
+        if (!(spell.class in preppedSpellsByClass)) {
+          preppedSpellsByClass[spell.class] = 0;
+        }
+        preppedSpellsByClass[spell.class]++;
+      }
+    });
+
+    const prepared = {};
+    this.spellcasting.sources.forEach((src) => {
+      if (!src.class) {
+        return;
+      }
+      const castClass = this.classes.find(
+        (checkClass) => checkClass.className === src.class
+      );
+
+      let maxPrepped = 1;
+      switch (castClass.className) {
+        case "Cleric":
+        case "Druid":
+        case "Wizard":
+          maxPrepped = this.getAbilityMod(src.ability) + castClass.classLevel;
+          break;
+        case "Artificer":
+        case "Paladin":
+          maxPrepped =
+            this.getAbilityMod(src.ability) +
+            Math.floor(castClass.classLevel / 2);
+          break;
+        default:
+          return;
+      }
+      if (maxPrepped < 1) {
+        maxPrepped = 1;
+      }
+
+      prepared[castClass.className] = {
+        maxPrepped: maxPrepped,
+        currentPrepped: preppedSpellsByClass[castClass.className],
+      };
+    });
+
+    return prepared;
+  }
+
+  getSpellComponents(spell) {
+    const comps = spell.components;
+    const compsArr = [];
+    if (comps.v) compsArr.push("V");
+    if (comps.s) compsArr.push("S");
+    if (comps.m) compsArr.push(`M (${comps.m.text})`);
+    return compsArr.join(", ");
+  }
+
+  getBuff(buffName) {
+    return this.buffs.find((buff) => buff.name === buffName);
+  }
+
+  #getBuffEffects(category) {
+    return this.buffs.filter(
+      (buff) =>
+        buff.effects &&
+        buff.effects.some((effect) => effect.category === category)
+    );
+  }
+
+  #getEffects(category) {
+    return this.#getFeatureEffects(category)
+      .concat(this.#getBuffEffects(category))
+      .concat(this.#getItemEffects(category));
   }
 }
 

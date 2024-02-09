@@ -1,0 +1,17 @@
+.modal-container {
+  width: 50%;
+}
+
+.modal-container .header {
+  text-align: left;
+}
+
+.modal-container .body {
+  border-top: 2px solid black;
+  border-bottom: 2px solid black;
+}
+
+.modal-container .footer {
+  display: block;
+  text-align: left;
+}

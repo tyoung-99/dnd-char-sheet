@@ -1,19 +1,45 @@
 // Character's spells/spell slots
 
-import "../../styling/CharacterSpellcastingTab.css";
+import "../../styling/pages/page-tabs/CharacterSpellcastingTab.css";
+import SpellModal from "../../components/modals/SpellModal";
+import { useState } from "react";
 
 const CharacterSpellcastingTab = ({ character }) => {
-  const castClasses = character.spellcasting.classes.map((castClass) => (
-    <div key={castClass.name} className="row-flex">
-      <h1 className="col-1_4">{castClass.name}</h1>
-      <h1 className="col-1_4">Spellcasting Ability: {castClass.ability}</h1>
-      <h1 className="col-1_4">Spell Save DC: {castClass.saveDC}</h1>
-      <h1 className="col-1_4">
-        Spell Attack Bonus: {castClass.attackBonus > 0 ? "+" : null}
-        {castClass.attackBonus}
-      </h1>
-    </div>
-  ));
+  const spellsPreparedCounts = character.getSpellsPreparedCounts();
+  const castClasses = character.spellcasting.sources.map((castSrc) => {
+    const srcName = castSrc.class || castSrc.other;
+    const spellAttackBonus = character.getSpellAttackBonus(srcName);
+    return (
+      <div key={srcName} className="col-flex col-1_2">
+        <div className="row-flex col-1">
+          <h1 className="col-1_2">{srcName}</h1>
+          <h1 className="col-1_2">Spellcasting Ability: {castSrc.ability}</h1>
+        </div>
+        <div className="row-flex col-1">
+          <h1 className="col-1_2">
+            Spell Save DC: {character.getSpellSaveDC(srcName)}
+          </h1>
+          <h1 className="col-1_2">
+            Spell Attack Bonus: {spellAttackBonus > 0 ? "+" : null}
+            {spellAttackBonus}
+          </h1>
+        </div>
+        <div className="row-flex col-1">
+          {!(srcName in spellsPreparedCounts) ? null : (
+            <>
+              <h1 className="col-1_2">
+                Max Spells Prepared: {spellsPreparedCounts[srcName].maxPrepped}
+              </h1>
+              <h1 className="col-1_2">
+                Current Spells Prepared:{" "}
+                {spellsPreparedCounts[srcName].currentPrepped || 0}
+              </h1>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  });
 
   const roundsToTime = (rounds) => {
     const CONVERSIONS = [
@@ -86,6 +112,21 @@ const CharacterSpellcastingTab = ({ character }) => {
     </div>
   );
 
+  const [currentModal, setCurrentModal] = useState("");
+
+  const openModal = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const modal = event.target.dataset.modal;
+    if (modal) {
+      setCurrentModal(modal);
+    }
+  };
+
+  const closeModal = () => {
+    setCurrentModal("");
+  };
+
   const spellsKnown = character.getSpellsKnown();
   spellsKnown.forEach((level) => {
     level.forEach((spell, i) => {
@@ -105,7 +146,12 @@ const CharacterSpellcastingTab = ({ character }) => {
                 defaultChecked={spell.prepared}
               ></input>
             ) : null}
-            <label htmlFor={"prep " + key} className="spell">
+            <label
+              htmlFor={"prep " + key}
+              className="spell"
+              data-modal={key}
+              onClick={openModal}
+            >
               {spell.name}
             </label>
           </div>
@@ -116,8 +162,16 @@ const CharacterSpellcastingTab = ({ character }) => {
               alt={icon[1]}
               className="hover-icon"
               title={icon[1]}
+              data-modal={key}
+              onClick={openModal}
             ></img>
           ))}
+          <SpellModal
+            spell={spell}
+            character={character}
+            closeModal={closeModal}
+            isOpen={currentModal === key}
+          />
         </div>
       );
     });
@@ -127,8 +181,10 @@ const CharacterSpellcastingTab = ({ character }) => {
     <div className="grid-container row-flex">
       <div className="col-flex col-1">
         <div className="row-flex">
-          <div className="grid-tile col-7_10">{castClasses}</div>
-          <div className="grid-tile col-3_10">{concentration}</div>
+          <div className="grid-tile col-6_10">
+            <div className="row-flex cast-classes col-end">{castClasses}</div>
+          </div>
+          <div className="grid-tile col-4_10">{concentration}</div>
         </div>
         <div className="row-flex">{spellHeaders}</div>
         <div className="row-flex">

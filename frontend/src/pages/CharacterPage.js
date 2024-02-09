@@ -1,6 +1,6 @@
 // Full character sheet
 
-import "../styling/CharacterPage.css";
+import "../styling/pages/CharacterPage.css";
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
@@ -80,23 +80,23 @@ const CharacterPage = () => {
           </p>
         </div>
         <div>
-          <p>Max HP: {character.hp.max}</p>
-          <p>Current HP: {character.hp.current}</p>
-          <p>Temp HP: {character.hp.temp}</p>
+          <p>Max HP: {character.getMaxHitPoints()}</p>
+          <p>Current HP: {character.getCurrentHitPoints()}</p>
+          <p>Temp HP: {character.hitPoints.temp}</p>
         </div>
         <div>
           <p>
             Total Hit Dice:{" "}
             {character
               .getTotalHitDice()
-              .map((die) => `${die.number}d${die.faces}`)
+              .map((die) => `${die.number}d${die.sides}`)
               .join(", ")}
           </p>
           <p>
             Current Hit Dice:{" "}
             {character
               .getCurrentHitDice()
-              .map((die) => `${die.number}d${die.faces}`)
+              .map((die) => `${die.number}d${die.sides}`)
               .join(", ")}
           </p>
         </div>
