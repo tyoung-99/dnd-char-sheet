@@ -75,19 +75,34 @@ class Character {
   getAbilities() {
     return this.abilities.map((ability) => ({
       name: ability.name,
-      score: ability.score,
+      score: this.getAbilityScore(ability.name),
       mod: this.getAbilityMod(ability.name),
     }));
   }
 
   getAbilityScore(ability) {
-    return this.abilities.find((stat) => stat.name === ability).score;
+    const category = "AbilityScore";
+    const bonuses = this.#getEffects(category);
+
+    return (
+      this.abilities.find((stat) => stat.name === ability).score +
+      bonuses.reduce(
+        (total, elem) =>
+          total +
+          elem.effects.reduce(
+            (subtotal, effect) =>
+              effect.category === category
+                ? subtotal + effect.changes[ability] || 0
+                : subtotal,
+            0
+          ),
+        0
+      )
+    );
   }
 
   getAbilityMod(ability) {
-    return Math.floor(
-      (this.abilities.find((stat) => stat.name === ability).score - 10) / 2
-    );
+    return Math.floor((this.getAbilityScore(ability) - 10) / 2);
   }
 
   getProfBonus() {

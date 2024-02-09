@@ -3,12 +3,6 @@
 const CharacterBuffsTab = ({ character }) => {
   const parseBuff = (currentBuff, i) => (
     <div key={i}>
-      <h2 className="float-right">
-        {currentBuff.spell ||
-          currentBuff.monster ||
-          currentBuff.condition ||
-          currentBuff.ability}
-      </h2>
       <h1>{currentBuff.name}</h1>
       {currentBuff.desc.map((paragraph, j) => (
         <p key={j}>{paragraph}</p>

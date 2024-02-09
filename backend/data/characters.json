@@ -308,6 +308,19 @@
     ],
     "features": [
       {
+        "name": "Ability Score Increase",
+        "class": "Fighter",
+        "desc": ["Placeholder"],
+        "effects": [
+          {
+            "category": "AbilityScore",
+            "changes": {
+              "STR": 2
+            }
+          }
+        ]
+      },
+      {
         "name": "Dwarven Toughness",
         "race": "Dwarf",
         "desc": ["Placeholder"],
@@ -588,7 +601,6 @@
     "buffs": [
       {
         "name": "Aid",
-        "spell": "Aid",
         "desc": ["Aid desc"],
         "isDebuff": false,
         "effects": [
@@ -608,7 +620,6 @@
       },
       {
         "name": "Vampire Bite",
-        "monster": "Vampire",
         "desc": ["Bite desc"],
         "isDebuff": true,
         "effects": [
@@ -622,7 +633,6 @@
       },
       {
         "name": "Bless",
-        "spell": "Bless",
         "desc": ["Bless desc"],
         "isDebuff": false,
         "effects": [
@@ -636,7 +646,6 @@
       },
       {
         "name": "Test",
-        "spell": "Test",
         "desc": ["Test desc"],
         "isDebuff": false,
         "effects": [
