@@ -241,7 +241,7 @@
           {
             "category": "SavingThrow",
             "changes": {
-              "CON": 10
+              "flat": { "CON": 10 }
             }
           }
         ]
@@ -353,6 +353,19 @@
             "category": "AttackMod",
             "changes": {
               "flat": 10
+            }
+          }
+        ]
+      },
+      {
+        "name": "Resilient",
+        "feat": "Resilient",
+        "desc": ["Resilient placeeholder"],
+        "effects": [
+          {
+            "category": "SavingThrow",
+            "changes": {
+              "prof": ["CHA"]
             }
           }
         ]
@@ -618,8 +631,10 @@
           {
             "category": "SavingThrow",
             "changes": {
-              "WIS": 5,
-              "STR": -2
+              "flat": {
+                "WIS": 5,
+                "STR": -2
+              }
             }
           }
         ]

@@ -205,6 +205,18 @@ class Character {
       saveProfs.push("CHA");
     }
 
+    const category = "SavingThrow";
+    this.#getEffects(category).forEach((bonus) => {
+      const effect = bonus.effects.find(
+        (checkEffect) => checkEffect.category === category
+      );
+      if (effect.changes.prof) {
+        effect.changes.prof.forEach((ability) => {
+          if (!saveProfs.includes(ability)) saveProfs.push(ability);
+        });
+      }
+    });
+
     return saveProfs;
   }
 
@@ -224,9 +236,11 @@ class Character {
       const effect = bonus.effects.find(
         (checkEffect) => checkEffect.category === category
       );
-      Object.keys(effect.changes).forEach((ability) => {
-        bonusesParsed[ability] += effect.changes[ability];
-      });
+      if (effect.changes.flat) {
+        Object.keys(effect.changes.flat).forEach((ability) => {
+          bonusesParsed[ability] += effect.changes.flat[ability];
+        });
+      }
     });
 
     return bonusesParsed;
