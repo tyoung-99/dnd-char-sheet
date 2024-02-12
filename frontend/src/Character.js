@@ -185,7 +185,7 @@ class Character {
     if (["Barbarian", "Fighter", "Monk", "Ranger"].includes(baseClass)) {
       saveProfs.push("STR");
     }
-    if (["Bard", "Monk", "Ranger", "Fighter"].includes(baseClass)) {
+    if (["Bard", "Monk", "Ranger", "Rogue"].includes(baseClass)) {
       saveProfs.push("DEX");
     }
     if (["Artificer", "Barbarian", "Fighter", "Sorcerer"].includes(baseClass)) {

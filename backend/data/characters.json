@@ -704,24 +704,21 @@
       {
         "name": "STR",
         "score": 17,
-        "saveProf": true,
         "skillProfs": [{ "name": "Athletics", "proficiency": 0 }]
       },
       {
         "name": "DEX",
         "score": 14,
-        "saveProf": false,
         "skillProfs": [
           { "name": "Acrobatics", "proficiency": 1 },
           { "name": "Sleight of Hand", "proficiency": 0 },
           { "name": "Stealth", "proficiency": 0 }
         ]
       },
-      { "name": "CON", "score": 14, "saveProf": true, "skillProfs": [] },
+      { "name": "CON", "score": 14, "skillProfs": [] },
       {
         "name": "INT",
         "score": 8,
-        "saveProf": false,
         "skillProfs": [
           { "name": "Arcana", "proficiency": 0 },
           { "name": "History", "proficiency": 0 },
@@ -733,7 +730,6 @@
       {
         "name": "WIS",
         "score": 9,
-        "saveProf": false,
         "skillProfs": [
           { "name": "Animal Handling", "proficiency": 1 },
           { "name": "Insight", "proficiency": 0 },
@@ -745,7 +741,6 @@
       {
         "name": "CHA",
         "score": 13,
-        "saveProf": false,
         "skillProfs": [
           { "name": "Deception", "proficiency": 0 },
           { "name": "Intimidation", "proficiency": 0 },
