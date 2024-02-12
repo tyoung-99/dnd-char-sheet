@@ -97,7 +97,12 @@
     },
     "race": { "name": "Human", "subrace": null },
     "classes": [
-      { "className": "Fighter", "classLevel": 4, "hitDie": 10 },
+      {
+        "className": "Fighter",
+        "classLevel": 4,
+        "hitDie": 10,
+        "startingClass": true
+      },
       { "className": "Wizard", "classLevel": 2, "hitDie": 6 },
       { "className": "Druid", "classLevel": 2, "hitDie": 8 },
       { "className": "Cleric", "classLevel": 2, "hitDie": 8 }
@@ -232,6 +237,12 @@
               "bonus": 3
             },
             "classRestriction": "Fighter"
+          },
+          {
+            "category": "SavingThrow",
+            "changes": {
+              "CON": 10
+            }
           }
         ]
       },
@@ -600,6 +611,20 @@
     },
     "buffs": [
       {
+        "name": "Save buff",
+        "desc": ["Save buff desc"],
+        "isDebuff": false,
+        "effects": [
+          {
+            "category": "SavingThrow",
+            "changes": {
+              "WIS": 5,
+              "STR": -2
+            }
+          }
+        ]
+      },
+      {
         "name": "Aid",
         "desc": ["Aid desc"],
         "isDebuff": false,
@@ -804,7 +829,14 @@
       "flaws": ["I'm a sucker for a pretty face."]
     },
     "race": { "name": "Gnome", "subrace": "Forest" },
-    "classes": [{ "className": "Barbarian", "classLevel": 1, "hitDie": 12 }],
+    "classes": [
+      {
+        "className": "Barbarian",
+        "classLevel": 1,
+        "hitDie": 12,
+        "startingClass": true
+      }
+    ],
     "equipment": [
       {
         "name": "Scale Mail",

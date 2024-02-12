@@ -154,13 +154,82 @@ class Character {
   }
 
   getSaves() {
-    return this.abilities.map((ability) => ({
+    const saves = this.abilities.map((ability) => ({
       name: ability.name,
-      prof: ability.saveProf,
-      mod:
-        this.getAbilityMod(ability.name) +
-        ability.saveProf * this.getProfBonus(),
+      prof: false,
+      mod: this.getAbilityMod(ability.name),
     }));
+
+    const saveProfs = this.#getSaveProfBonuses();
+    saveProfs.forEach((saveName) => {
+      const current = saves.find((checkSave) => checkSave.name === saveName);
+      current.prof = true;
+      current.mod += this.getProfBonus();
+    });
+
+    const bonuses = this.#getSaveOtherBonuses();
+    Object.keys(bonuses).forEach((ability) => {
+      saves.find((checkSave) => checkSave.name === ability).mod +=
+        bonuses[ability];
+    });
+
+    return saves;
+  }
+
+  #getSaveProfBonuses() {
+    const baseClass = this.classes.find(
+      (checkClass) => checkClass.startingClass
+    ).className;
+    const saveProfs = [];
+
+    if (["Barbarian", "Fighter", "Monk", "Ranger"].includes(baseClass)) {
+      saveProfs.push("STR");
+    }
+    if (["Bard", "Monk", "Ranger", "Fighter"].includes(baseClass)) {
+      saveProfs.push("DEX");
+    }
+    if (["Artificer", "Barbarian", "Fighter", "Sorcerer"].includes(baseClass)) {
+      saveProfs.push("CON");
+    }
+    if (["Artificer", "Druid", "Rogue", "Wizard"].includes(baseClass)) {
+      saveProfs.push("INT");
+    }
+    if (
+      ["Cleric", "Druid", "Paladin", "Warlock", "Wizard"].includes(baseClass)
+    ) {
+      saveProfs.push("WIS");
+    }
+    if (
+      ["Bard", "Cleric", "Paladin", "Sorcerer", "Warlock"].includes(baseClass)
+    ) {
+      saveProfs.push("CHA");
+    }
+
+    return saveProfs;
+  }
+
+  #getSaveOtherBonuses() {
+    const category = "SavingThrow";
+    const bonuses = this.#getEffects(category);
+    const bonusesParsed = {
+      STR: 0,
+      DEX: 0,
+      CON: 0,
+      INT: 0,
+      WIS: 0,
+      CHA: 0,
+    };
+
+    bonuses.forEach((bonus) => {
+      const effect = bonus.effects.find(
+        (checkEffect) => checkEffect.category === category
+      );
+      Object.keys(effect.changes).forEach((ability) => {
+        bonusesParsed[ability] += effect.changes[ability];
+      });
+    });
+
+    return bonusesParsed;
   }
 
   getWeaponProfs() {
