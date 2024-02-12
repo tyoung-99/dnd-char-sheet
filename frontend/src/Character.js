@@ -191,7 +191,23 @@ class Character {
   }
 
   getPassivePerception() {
-    return 10 + this.getSkillByName("Perception");
+    const category = "PassivePerception";
+    return (
+      10 +
+      this.getSkillByName("Perception") +
+      this.#getEffects(category).reduce(
+        (total, elem) =>
+          total +
+          elem.effects.reduce(
+            (subtotal, effect) =>
+              effect.category === category
+                ? subtotal + effect.changes.bonus
+                : subtotal,
+            0
+          ),
+        0
+      )
+    );
   }
 
   getSaves() {

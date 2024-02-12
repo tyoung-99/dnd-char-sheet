@@ -669,6 +669,19 @@
     },
     "buffs": [
       {
+        "name": "Passive Perception buff",
+        "desc": ["Passive Perception buff desc"],
+        "isDebuff": false,
+        "effects": [
+          {
+            "category": "PassivePerception",
+            "changes": {
+              "bonus": 5
+            }
+          }
+        ]
+      },
+      {
         "name": "Skill buff",
         "desc": ["Skill buff desc"],
         "isDebuff": false,
