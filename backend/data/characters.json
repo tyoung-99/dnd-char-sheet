@@ -72,10 +72,24 @@
         ]
       }
     ],
-    "weaponProfs": ["Daggers", "Shortswords", "Light Crossbows"],
-    "armorProfs": ["Armor 1", "Armor 2"],
-    "toolProfs": ["Tool 1", "Tool 2"],
-    "languages": ["Language 1", "Language 2"],
+    "weaponProfs": [
+      { "name": "Daggers", "src": "Fighter" },
+      { "name": "Shortswords", "src": "Fighter" },
+      { "name": "Light Crossbows", "src": "Fighter" },
+      { "name": "Daggers", "src": "Wizard" }
+    ],
+    "armorProfs": [
+      { "name": "Armor 1", "src": "Fighter" },
+      { "name": "Armor 2", "src": "Fighter" }
+    ],
+    "toolProfs": [
+      { "name": "Tool 1", "src": "Cleric" },
+      { "name": "Tool 2", "src": "Human" }
+    ],
+    "languages": [
+      { "name": "Language 1", "src": "Baldur's Gate Acolyte" },
+      { "name": "Language 2", "src": "Fighter" }
+    ],
     "backstory": [
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum. Sed vestibulum ac nulla eget dictum. Nulla blandit quam risus, in convallis lectus ultrices sed. Pellentesque non magna eu ipsum pharetra vulputate. Sed placerat sapien malesuada, faucibus lacus tristique, faucibus massa. Praesent vel nisi pulvinar, pellentesque elit quis, eleifend turpis. Pellentesque a erat ultrices, sagittis lorem sit amet, ullamcorper turpis. Aliquam imperdiet nulla et orci molestie, sollicitudin facilisis ante elementum. Duis vehicula sollicitudin rutrum. Nullam nec condimentum arcu, in congue risus. Suspendisse ut lectus nisi.",
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum. Sed vestibulum ac nulla eget dictum. Nulla blandit quam risus, in convallis lectus ultrices sed. Pellentesque non magna eu ipsum pharetra vulputate. Sed placerat sapien malesuada, faucibus lacus tristique, faucibus massa. Praesent vel nisi pulvinar, pellentesque elit quis, eleifend turpis. Pellentesque a erat ultrices, sagittis lorem sit amet, ullamcorper turpis. Aliquam imperdiet nulla et orci molestie, sollicitudin facilisis ante elementum. Duis vehicula sollicitudin rutrum. Nullam nec condimentum arcu, in congue risus. Suspendisse ut lectus nisi.ltiple",

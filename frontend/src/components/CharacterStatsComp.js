@@ -52,9 +52,9 @@ const CharacterStatsComp = ({ character }) => {
             <h2>Armor</h2>
             <p>{character.getArmorProfs().join(", ")}</p>
             <h2>Tools</h2>
-            <p>{character.toolProfs.join(", ")}</p>
+            <p>{character.getToolProfs().join(", ")}</p>
             <h1>Languages</h1>
-            <p>{character.languages.join(", ")}</p>
+            <p>{character.getLanguages().join(", ")}</p>
           </div>
         </div>
         <div className="col-1_2 col-flex">

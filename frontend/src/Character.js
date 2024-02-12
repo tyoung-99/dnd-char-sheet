@@ -247,7 +247,9 @@ class Character {
   }
 
   getWeaponProfs() {
-    let cleanProfs = [...this.weaponProfs];
+    let cleanProfs = [
+      ...new Set([...this.weaponProfs].map((prof) => prof.name)),
+    ];
     this.WEAPON_PROF_GROUPS.forEach((group) => {
       if (group.profs.every((prof) => cleanProfs.includes(prof))) {
         cleanProfs.unshift(group.name);
@@ -258,7 +260,9 @@ class Character {
   }
 
   getArmorProfs() {
-    let cleanProfs = [...this.armorProfs];
+    let cleanProfs = [
+      ...new Set([...this.armorProfs].map((prof) => prof.name)),
+    ];
     this.ARMOR_PROF_GROUPS.forEach((group) => {
       if (group.profs.every((prof) => cleanProfs.includes(prof))) {
         cleanProfs.unshift(group.name);
@@ -266,6 +270,14 @@ class Character {
       }
     });
     return cleanProfs;
+  }
+
+  getToolProfs() {
+    return [...new Set([...this.toolProfs].map((prof) => prof.name))];
+  }
+
+  getLanguages() {
+    return [...new Set([...this.languages].map((prof) => prof.name))];
   }
 
   isProficientWithItem(item) {
