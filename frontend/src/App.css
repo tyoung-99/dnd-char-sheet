@@ -135,6 +135,10 @@ h1.header-override {
 .hover-icon {
   height: 1rlh;
   margin: 1px;
+  vertical-align: middle;
+}
+p:has(> .hover-icon) {
+  display: inline;
 }
 
 img.avatar {

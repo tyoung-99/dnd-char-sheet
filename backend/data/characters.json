@@ -23,14 +23,21 @@
         "name": "STR",
         "score": 18,
         "saveProf": true,
-        "skillProfs": [{ "name": "Athletics", "proficiency": 2 }]
+        "skillProfs": [
+          {
+            "name": "Athletics",
+            "proficiency": 2,
+            "profSrc": "Fighter",
+            "expSrc": "Skill Expert"
+          }
+        ]
       },
       {
         "name": "DEX",
         "score": 10,
         "saveProf": false,
         "skillProfs": [
-          { "name": "Acrobatics", "proficiency": 1 },
+          { "name": "Acrobatics", "proficiency": 1, "profSrc": "Fighter" },
           { "name": "Sleight of Hand", "proficiency": 0 },
           { "name": "Stealth", "proficiency": 0 }
         ]
@@ -65,10 +72,19 @@
         "score": 16,
         "saveProf": false,
         "skillProfs": [
-          { "name": "Deception", "proficiency": 0 },
+          {
+            "name": "Deception",
+            "proficiency": 1,
+            "expSrc": "Skill Expert"
+          },
           { "name": "Intimidation", "proficiency": 0 },
-          { "name": "Performance", "proficiency": 1 },
-          { "name": "Persuasion", "proficiency": 2 }
+          { "name": "Performance", "proficiency": 1, "profSrc": "Fighter" },
+          {
+            "name": "Persuasion",
+            "proficiency": 2,
+            "profSrc": "Baldur's Gate Acolyte",
+            "expSrc": "Fighter"
+          }
         ]
       }
     ],
@@ -653,6 +669,23 @@
     },
     "buffs": [
       {
+        "name": "Skill buff",
+        "desc": ["Skill buff desc"],
+        "isDebuff": false,
+        "effects": [
+          {
+            "category": "Skill",
+            "changes": {
+              "proficiency": ["Religion"],
+              "expertise": ["Performance", "Investigation"],
+              "flat": {
+                "Survival": 5
+              }
+            }
+          }
+        ]
+      },
+      {
         "name": "Save buff",
         "desc": ["Save buff desc"],
         "isDebuff": false,
@@ -769,7 +802,7 @@
         "name": "DEX",
         "score": 14,
         "skillProfs": [
-          { "name": "Acrobatics", "proficiency": 1 },
+          { "name": "Acrobatics", "proficiency": 1, "profSrc": "Entertainer" },
           { "name": "Sleight of Hand", "proficiency": 0 },
           { "name": "Stealth", "proficiency": 0 }
         ]
@@ -790,10 +823,14 @@
         "name": "WIS",
         "score": 9,
         "skillProfs": [
-          { "name": "Animal Handling", "proficiency": 1 },
+          {
+            "name": "Animal Handling",
+            "proficiency": 1,
+            "profSrc": "Barbarian"
+          },
           { "name": "Insight", "proficiency": 0 },
           { "name": "Medicine", "proficiency": 0 },
-          { "name": "Perception", "proficiency": 1 },
+          { "name": "Perception", "proficiency": 1, "profSrc": "Barbarian" },
           { "name": "Survival", "proficiency": 0 }
         ]
       },
@@ -803,7 +840,7 @@
         "skillProfs": [
           { "name": "Deception", "proficiency": 0 },
           { "name": "Intimidation", "proficiency": 0 },
-          { "name": "Performance", "proficiency": 1 },
+          { "name": "Performance", "proficiency": 1, "profSrc": "Entertainer" },
           { "name": "Persuasion", "proficiency": 0 }
         ]
       }

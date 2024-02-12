@@ -30,6 +30,14 @@ const CharacterStatsComp = ({ character }) => {
         <span className="not-proficient"></span>
       )}{" "}
       {(skill.mod >= 0 ? "+" : "") + skill.mod} {skill.name} ({skill.ability})
+      {skill.error ? (
+        <img
+          src={process.env.PUBLIC_URL + "/img/hover_icons/danger.png"}
+          alt={skill.error}
+          className="hover-icon"
+          title={skill.error}
+        ></img>
+      ) : null}
     </p>
   ));
 

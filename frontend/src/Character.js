@@ -120,20 +120,61 @@ class Character {
     let skills = [];
     this.abilities.forEach((ability) => {
       ability.skillProfs.forEach((skill) => {
-        skills.push({
+        const newSkill = {
           name: skill.name,
-          prof: skill.proficiency,
-          mod:
-            this.getAbilityMod(ability.name) +
-            skill.proficiency * this.getProfBonus(),
+          prof: 0,
+          mod: this.getAbilityMod(ability.name),
           ability: ability.name,
-        });
+        };
+
+        if (skill.expSrc && !skill.profSrc) {
+          newSkill.error = `Ineligible for expertise in ${skill.name}`;
+        } else {
+          newSkill.prof = skill.proficiency;
+          newSkill.mod += skill.proficiency * this.getProfBonus();
+        }
+
+        skills.push(newSkill);
+      });
+    });
+
+    const category = "Skill";
+    this.#getEffects(category).forEach((bonus) => {
+      const effect = bonus.effects.find(
+        (checkEffect) => checkEffect.category === category
+      );
+
+      Object.keys(effect.changes.flat).forEach((skillName) => {
+        skills.find((checkSkill) => checkSkill.name === skillName).mod +=
+          effect.changes.flat[skillName];
+      });
+
+      effect.changes.proficiency.forEach((skillName) => {
+        const skill = skills.find(
+          (checkSkill) => checkSkill.name === skillName
+        );
+        skill.prof += 1;
+        skill.mod += this.getProfBonus();
+      });
+
+      effect.changes.expertise.forEach((skillName) => {
+        const skill = skills.find(
+          (checkSkill) => checkSkill.name === skillName
+        );
+        if (skill.prof !== 1) {
+          skill.error = `Ineligible for expertise in ${skill.name}`;
+          return;
+        }
+        skill.prof += 1;
+        skill.mod += this.getProfBonus();
       });
     });
 
     skills.sort((first, second) =>
       first.name > second.name ? 1 : first.name === second.name ? 0 : -1
     );
+
+    console.log(skills);
     return skills;
   }
 
