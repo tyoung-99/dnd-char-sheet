@@ -33,6 +33,8 @@ const CharacterStatsComp = ({ character }) => {
     </p>
   ));
 
+  const speeds = character.getSpeeds();
+
   return (
     <>
       <div className="col-1 row-flex">
@@ -67,9 +69,9 @@ const CharacterStatsComp = ({ character }) => {
           <div className="grid-tile">
             <h1>Speed</h1>
             <div className="row-flex">
-              <p className="col-1_3">Walk {character.speed.walk} ft</p>
-              <p className="col-1_3">Swim {character.speed.swim} ft</p>
-              <p className="col-1_3">Fly {character.speed.fly} ft</p>
+              <p className="col-1_3">Walk {speeds.walk} ft</p>
+              <p className="col-1_3">Swim {speeds.swim} ft</p>
+              <p className="col-1_3">Fly {speeds.fly} ft</p>
             </div>
           </div>
           <div className="grid-tile col-end">

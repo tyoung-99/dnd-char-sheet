@@ -359,6 +359,21 @@
         ]
       },
       {
+        "name": "Squat Nimbleness",
+        "feat": "Squat Nimbleness",
+        "desc": ["Placeholder"],
+        "effects": [
+          {
+            "category": "Speed",
+            "changes": {
+              "walk": { "modifier": 5 },
+              "swim": { "modifier": 0 },
+              "fly": { "modifier": 0 }
+            }
+          }
+        ]
+      },
+      {
         "name": "Test flat attack bonus",
         "race": "Dwarf",
         "desc": ["Placeholder"],
@@ -699,7 +714,7 @@
         ]
       },
       {
-        "name": "Test",
+        "name": "Test slots max",
         "desc": ["Test desc"],
         "isDebuff": false,
         "effects": [
@@ -707,6 +722,21 @@
             "category": "SpellSlotsMax",
             "changes": {
               "slots": [1, 2, 0, 0, 0, 0, 0, 0, 0]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Test speed",
+        "desc": ["Test desc"],
+        "isDebuff": true,
+        "effects": [
+          {
+            "category": "Speed",
+            "changes": {
+              "walk": { "multiplier": 0.5 },
+              "swim": { "multiplier": 0.5 },
+              "fly": { "multiplier": 0.5 }
             }
           }
         ]

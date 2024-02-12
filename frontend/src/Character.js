@@ -395,6 +395,35 @@ class Character {
     return bonuses;
   }
 
+  getSpeeds() {
+    const speeds = Object.assign({}, this.speed);
+    const category = "Speed";
+    const bonuses = this.#getEffects(category);
+    const modifiers = { walk: 0, swim: 0, fly: 0 },
+      multipliers = { walk: 1, swim: 1, fly: 1 };
+
+    bonuses.forEach((bonus) => {
+      const effect = bonus.effects.find(
+        (checkEffect) => checkEffect.category === category
+      );
+      Object.keys(effect.changes).forEach((speedType) => {
+        modifiers[speedType] += effect.changes[speedType].modifier || 0;
+        multipliers[speedType] *= effect.changes[speedType].multiplier || 1;
+      });
+    });
+
+    /* RAW doesn't address order of operations, using modifiers before multipliers 
+    b/c it's consistent w/ how damage resistance is handled, and it makes modifiers 
+    consistent in effect, rather than being devestating or negligible, as they would 
+    when applied after a halving/doubling of speed, respectively */
+    Object.keys(modifiers).forEach((speedType) => {
+      speeds[speedType] += modifiers[speedType];
+      speeds[speedType] *= multipliers[speedType];
+    });
+
+    return speeds;
+  }
+
   getMaxHitPoints() {
     return (
       this.#getHitPointsHelper(this.hitPoints.max, "MaxHitPoints") +
