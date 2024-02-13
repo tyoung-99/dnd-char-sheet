@@ -38,6 +38,17 @@
   line-height: 50%;
   margin-bottom: 1rem;
 }
+.name-header h1,
+.name-header textarea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 2rem;
+  font-family: inherit;
+  text-align: center;
+}
 .name-header h2 {
   font-style: italic;
   font-weight: normal;
@@ -79,4 +90,16 @@
 }
 .filled {
   background-color: black;
+}
+
+.saved-message {
+  margin: 0px 1em;
+}
+.saved-message-shown {
+  opacity: 1;
+  transition: all 250ms linear;
+}
+.saved-message-hidden {
+  opacity: 0;
+  transition: all 250ms linear 2s;
 }

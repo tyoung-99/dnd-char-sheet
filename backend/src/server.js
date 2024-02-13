@@ -1,7 +1,9 @@
 import express from "express";
 import getCharacters from "./getCharacters.js";
+import setCharacter from "./setCharacter.js";
 
 const app = express();
+app.use(express.json());
 
 app.get("/api/characters", async (req, res) => {
   const charList = await getCharacters();
@@ -23,6 +25,12 @@ app.get("/api/characters/:id", async (req, res) => {
   } else {
     res.sendStatus(404);
   }
+});
+
+app.put("/api/characters/:id/update", async (req, res) => {
+  const { id } = req.params;
+  const { newChar } = req.body;
+  res.send(await setCharacter(parseInt(id), newChar));
 });
 
 const PORT = process.env.PORT || 8000;

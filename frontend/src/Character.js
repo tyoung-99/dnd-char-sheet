@@ -1,5 +1,8 @@
 // Represents 1 character and all its data, performs various calculations on data to allow easier external access to elements of character that depend on other elements
 
+import axios from "axios";
+import Timer from "./Timer";
+
 class Character {
   // Order of groups reversed b/c when inserting into list of profs, order gets reversed again
   WEAPON_PROF_GROUPS = [
@@ -71,6 +74,24 @@ class Character {
     },
     { name: "Light", profs: ["Padded", "Leather", "Studded Leather"] },
   ];
+
+  constructor(setShowingSavedMessage) {
+    this.queueSave = Timer(this.saveCharacter, 5000);
+    this.setShowingSavedMessage = setShowingSavedMessage;
+  }
+
+  async saveCharacter() {
+    const response = await axios.put(`/api/characters/${this.id}/update`, {
+      newChar: this,
+    });
+    if (response.data.success) this.setShowingSavedMessage(true);
+    else window.alert(response.data.reason);
+  }
+
+  setName(newName) {
+    this.name = newName;
+    this.saveCharacter();
+  }
 
   getAbilities() {
     return this.abilities.map((ability) => ({
@@ -174,7 +195,6 @@ class Character {
       first.name > second.name ? 1 : first.name === second.name ? 0 : -1
     );
 
-    console.log(skills);
     return skills;
   }
 

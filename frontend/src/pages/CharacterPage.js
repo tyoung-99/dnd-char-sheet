@@ -22,10 +22,16 @@ const CharacterPage = () => {
   const { characterID } = useParams();
   const [character, setCharacter] = useState();
 
+  const [showingSavedMessage, setShowingSavedMessage] = useState(false);
+  const [editingCharName, setEditingCharName] = useState(false);
+
   useEffect(() => {
     const loadCharacter = async () => {
       const response = await axios.get(`/api/characters/${characterID}`);
-      const newChar = Object.assign(new Character(), response.data);
+      const newChar = Object.assign(
+        new Character(setShowingSavedMessage),
+        response.data
+      );
       setCharacter(newChar);
     };
 
@@ -38,7 +44,7 @@ const CharacterPage = () => {
 
   return (
     <div>
-      <div className="menu-bar">
+      <div className="menu-bar row-flex">
         <Link to="/">
           <input
             type="button"
@@ -47,6 +53,14 @@ const CharacterPage = () => {
             value="< Back to List"
           ></input>
         </Link>
+        <p
+          className={`saved-message ${
+            showingSavedMessage ? "saved-message-shown" : "saved-message-hidden"
+          }`}
+          onTransitionEnd={() => setShowingSavedMessage(false)}
+        >
+          Saved
+        </p>
       </div>
       <div className="name-header">
         <img
@@ -55,7 +69,23 @@ const CharacterPage = () => {
           className="avatar"
         ></img>
         <div className="avatar-label">
-          <h1>{character.name} </h1>
+          {editingCharName ? (
+            <textarea
+              id="char-name"
+              name="char-name"
+              autoFocus
+              defaultValue={character.name}
+              placeholder="Character Name"
+              onBlur={(event) => {
+                character.setName(event.target.value);
+                setEditingCharName(false);
+              }}
+            ></textarea>
+          ) : (
+            <h1 onClick={() => setEditingCharName(true)}>
+              {character.name || "Character Name"}
+            </h1>
+          )}
           <h2>{character.player}</h2>
           <p>{character.alignment}</p>
           <p>
