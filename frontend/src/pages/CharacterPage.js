@@ -11,6 +11,7 @@ import TabContentComp from "../components/TabContentComp";
 import CharacterMainTab from "./page-tabs/CharacterMainTab";
 import CharacterBackgroundTab from "./page-tabs/CharacterBackgroundTab";
 import CharacterFeaturesTab from "./page-tabs/CharacterFeaturesTab";
+import CharacterBuffsTab from "./page-tabs/CharacterBuffsTab";
 import CharacterEquipmentTab from "./page-tabs/CharacterEquipmentTab";
 import CharacterSpellcastingTab from "./page-tabs/CharacterSpellcastingTab";
 import DeathSavesComp from "../components/DeathSavesComp";
@@ -122,6 +123,12 @@ const CharacterPage = () => {
           setActiveTab={setActiveTab}
         />
         <TabNavComp
+          id={"buffs"}
+          tabName={"Buffs/Debuffs"}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
+        <TabNavComp
           id={"equipment"}
           tabName={"Equipment/Treasure"}
           activeTab={activeTab}
@@ -143,6 +150,9 @@ const CharacterPage = () => {
         </TabContentComp>
         <TabContentComp id={"features"} activeTab={activeTab}>
           <CharacterFeaturesTab character={character} />
+        </TabContentComp>
+        <TabContentComp id={"buffs"} activeTab={activeTab}>
+          <CharacterBuffsTab character={character} />
         </TabContentComp>
         <TabContentComp id={"equipment"} activeTab={activeTab}>
           <CharacterEquipmentTab character={character} />

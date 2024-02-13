@@ -30,8 +30,18 @@ const CharacterStatsComp = ({ character }) => {
         <span className="not-proficient"></span>
       )}{" "}
       {(skill.mod >= 0 ? "+" : "") + skill.mod} {skill.name} ({skill.ability})
+      {skill.error ? (
+        <img
+          src={process.env.PUBLIC_URL + "/img/hover_icons/danger.png"}
+          alt={skill.error}
+          className="hover-icon"
+          title={skill.error}
+        ></img>
+      ) : null}
     </p>
   ));
+
+  const speeds = character.getSpeeds();
 
   return (
     <>
@@ -52,9 +62,9 @@ const CharacterStatsComp = ({ character }) => {
             <h2>Armor</h2>
             <p>{character.getArmorProfs().join(", ")}</p>
             <h2>Tools</h2>
-            <p>{character.toolProfs.join(", ")}</p>
+            <p>{character.getToolProfs().join(", ")}</p>
             <h1>Languages</h1>
-            <p>{character.languages.join(", ")}</p>
+            <p>{character.getLanguages().join(", ")}</p>
           </div>
         </div>
         <div className="col-1_2 col-flex">
@@ -67,9 +77,9 @@ const CharacterStatsComp = ({ character }) => {
           <div className="grid-tile">
             <h1>Speed</h1>
             <div className="row-flex">
-              <p className="col-1_3">Walk {character.speed.walk} ft</p>
-              <p className="col-1_3">Swim {character.speed.swim} ft</p>
-              <p className="col-1_3">Fly {character.speed.fly} ft</p>
+              <p className="col-1_3">Walk {speeds.walk} ft</p>
+              <p className="col-1_3">Swim {speeds.swim} ft</p>
+              <p className="col-1_3">Fly {speeds.fly} ft</p>
             </div>
           </div>
           <div className="grid-tile col-end">
