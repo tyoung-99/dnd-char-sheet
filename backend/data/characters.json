@@ -23,14 +23,21 @@
         "name": "STR",
         "score": 18,
         "saveProf": true,
-        "skillProfs": [{ "name": "Athletics", "proficiency": 2 }]
+        "skillProfs": [
+          {
+            "name": "Athletics",
+            "proficiency": 2,
+            "profSrc": "Fighter",
+            "expSrc": "Skill Expert"
+          }
+        ]
       },
       {
         "name": "DEX",
         "score": 10,
         "saveProf": false,
         "skillProfs": [
-          { "name": "Acrobatics", "proficiency": 1 },
+          { "name": "Acrobatics", "proficiency": 1, "profSrc": "Fighter" },
           { "name": "Sleight of Hand", "proficiency": 0 },
           { "name": "Stealth", "proficiency": 0 }
         ]
@@ -65,17 +72,40 @@
         "score": 16,
         "saveProf": false,
         "skillProfs": [
-          { "name": "Deception", "proficiency": 0 },
+          {
+            "name": "Deception",
+            "proficiency": 1,
+            "expSrc": "Skill Expert"
+          },
           { "name": "Intimidation", "proficiency": 0 },
-          { "name": "Performance", "proficiency": 1 },
-          { "name": "Persuasion", "proficiency": 2 }
+          { "name": "Performance", "proficiency": 1, "profSrc": "Fighter" },
+          {
+            "name": "Persuasion",
+            "proficiency": 2,
+            "profSrc": "Baldur's Gate Acolyte",
+            "expSrc": "Fighter"
+          }
         ]
       }
     ],
-    "weaponProfs": ["Daggers", "Shortswords", "Light Crossbows"],
-    "armorProfs": ["Armor 1", "Armor 2"],
-    "toolProfs": ["Tool 1", "Tool 2"],
-    "languages": ["Language 1", "Language 2"],
+    "weaponProfs": [
+      { "name": "Daggers", "src": "Fighter" },
+      { "name": "Shortswords", "src": "Fighter" },
+      { "name": "Light Crossbows", "src": "Fighter" },
+      { "name": "Daggers", "src": "Wizard" }
+    ],
+    "armorProfs": [
+      { "name": "Armor 1", "src": "Fighter" },
+      { "name": "Armor 2", "src": "Fighter" }
+    ],
+    "toolProfs": [
+      { "name": "Tool 1", "src": "Cleric" },
+      { "name": "Tool 2", "src": "Human" }
+    ],
+    "languages": [
+      { "name": "Language 1", "src": "Baldur's Gate Acolyte" },
+      { "name": "Language 2", "src": "Fighter" }
+    ],
     "backstory": [
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum. Sed vestibulum ac nulla eget dictum. Nulla blandit quam risus, in convallis lectus ultrices sed. Pellentesque non magna eu ipsum pharetra vulputate. Sed placerat sapien malesuada, faucibus lacus tristique, faucibus massa. Praesent vel nisi pulvinar, pellentesque elit quis, eleifend turpis. Pellentesque a erat ultrices, sagittis lorem sit amet, ullamcorper turpis. Aliquam imperdiet nulla et orci molestie, sollicitudin facilisis ante elementum. Duis vehicula sollicitudin rutrum. Nullam nec condimentum arcu, in congue risus. Suspendisse ut lectus nisi.",
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum. Sed vestibulum ac nulla eget dictum. Nulla blandit quam risus, in convallis lectus ultrices sed. Pellentesque non magna eu ipsum pharetra vulputate. Sed placerat sapien malesuada, faucibus lacus tristique, faucibus massa. Praesent vel nisi pulvinar, pellentesque elit quis, eleifend turpis. Pellentesque a erat ultrices, sagittis lorem sit amet, ullamcorper turpis. Aliquam imperdiet nulla et orci molestie, sollicitudin facilisis ante elementum. Duis vehicula sollicitudin rutrum. Nullam nec condimentum arcu, in congue risus. Suspendisse ut lectus nisi.ltiple",
@@ -97,7 +127,12 @@
     },
     "race": { "name": "Human", "subrace": null },
     "classes": [
-      { "className": "Fighter", "classLevel": 4, "hitDie": 10 },
+      {
+        "className": "Fighter",
+        "classLevel": 4,
+        "hitDie": 10,
+        "startingClass": true
+      },
       { "className": "Wizard", "classLevel": 2, "hitDie": 6 },
       { "className": "Druid", "classLevel": 2, "hitDie": 8 },
       { "className": "Cleric", "classLevel": 2, "hitDie": 8 }
@@ -232,6 +267,12 @@
               "bonus": 3
             },
             "classRestriction": "Fighter"
+          },
+          {
+            "category": "SavingThrow",
+            "changes": {
+              "flat": { "CON": 10 }
+            }
           }
         ]
       },
@@ -308,6 +349,19 @@
     ],
     "features": [
       {
+        "name": "Ability Score Increase",
+        "class": "Fighter",
+        "desc": ["Placeholder"],
+        "effects": [
+          {
+            "category": "AbilityScore",
+            "changes": {
+              "STR": 2
+            }
+          }
+        ]
+      },
+      {
         "name": "Dwarven Toughness",
         "race": "Dwarf",
         "desc": ["Placeholder"],
@@ -321,6 +375,21 @@
         ]
       },
       {
+        "name": "Squat Nimbleness",
+        "feat": "Squat Nimbleness",
+        "desc": ["Placeholder"],
+        "effects": [
+          {
+            "category": "Speed",
+            "changes": {
+              "walk": { "modifier": 5 },
+              "swim": { "modifier": 0 },
+              "fly": { "modifier": 0 }
+            }
+          }
+        ]
+      },
+      {
         "name": "Test flat attack bonus",
         "race": "Dwarf",
         "desc": ["Placeholder"],
@@ -329,6 +398,19 @@
             "category": "AttackMod",
             "changes": {
               "flat": 10
+            }
+          }
+        ]
+      },
+      {
+        "name": "Resilient",
+        "feat": "Resilient",
+        "desc": ["Resilient placeeholder"],
+        "effects": [
+          {
+            "category": "SavingThrow",
+            "changes": {
+              "prof": ["CHA"]
             }
           }
         ]
@@ -587,9 +669,55 @@
     },
     "buffs": [
       {
+        "name": "Passive Perception buff",
+        "desc": ["Passive Perception buff desc"],
+        "isDebuff": false,
+        "effects": [
+          {
+            "category": "PassivePerception",
+            "changes": {
+              "bonus": 5
+            }
+          }
+        ]
+      },
+      {
+        "name": "Skill buff",
+        "desc": ["Skill buff desc"],
+        "isDebuff": false,
+        "effects": [
+          {
+            "category": "Skill",
+            "changes": {
+              "proficiency": ["Religion"],
+              "expertise": ["Performance", "Investigation"],
+              "flat": {
+                "Survival": 5
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Save buff",
+        "desc": ["Save buff desc"],
+        "isDebuff": false,
+        "effects": [
+          {
+            "category": "SavingThrow",
+            "changes": {
+              "flat": {
+                "WIS": 5,
+                "STR": -2
+              }
+            }
+          }
+        ]
+      },
+      {
         "name": "Aid",
-        "spell": "Aid",
         "desc": ["Aid desc"],
+        "isDebuff": false,
         "effects": [
           {
             "category": "MaxHitPoints",
@@ -607,8 +735,8 @@
       },
       {
         "name": "Vampire Bite",
-        "monster": "Vampire",
         "desc": ["Bite desc"],
+        "isDebuff": true,
         "effects": [
           {
             "category": "MaxHitPoints",
@@ -620,8 +748,8 @@
       },
       {
         "name": "Bless",
-        "spell": "Bless",
         "desc": ["Bless desc"],
+        "isDebuff": false,
         "effects": [
           {
             "category": "AttackMod",
@@ -632,14 +760,29 @@
         ]
       },
       {
-        "name": "Test",
-        "spell": "Test",
+        "name": "Test slots max",
         "desc": ["Test desc"],
+        "isDebuff": false,
         "effects": [
           {
             "category": "SpellSlotsMax",
             "changes": {
               "slots": [1, 2, 0, 0, 0, 0, 0, 0, 0]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Test speed",
+        "desc": ["Test desc"],
+        "isDebuff": true,
+        "effects": [
+          {
+            "category": "Speed",
+            "changes": {
+              "walk": { "multiplier": 0.5 },
+              "swim": { "multiplier": 0.5 },
+              "fly": { "multiplier": 0.5 }
             }
           }
         ]
@@ -666,24 +809,21 @@
       {
         "name": "STR",
         "score": 17,
-        "saveProf": true,
         "skillProfs": [{ "name": "Athletics", "proficiency": 0 }]
       },
       {
         "name": "DEX",
         "score": 14,
-        "saveProf": false,
         "skillProfs": [
-          { "name": "Acrobatics", "proficiency": 1 },
+          { "name": "Acrobatics", "proficiency": 1, "profSrc": "Entertainer" },
           { "name": "Sleight of Hand", "proficiency": 0 },
           { "name": "Stealth", "proficiency": 0 }
         ]
       },
-      { "name": "CON", "score": 14, "saveProf": true, "skillProfs": [] },
+      { "name": "CON", "score": 14, "skillProfs": [] },
       {
         "name": "INT",
         "score": 8,
-        "saveProf": false,
         "skillProfs": [
           { "name": "Arcana", "proficiency": 0 },
           { "name": "History", "proficiency": 0 },
@@ -695,82 +835,90 @@
       {
         "name": "WIS",
         "score": 9,
-        "saveProf": false,
         "skillProfs": [
-          { "name": "Animal Handling", "proficiency": 1 },
+          {
+            "name": "Animal Handling",
+            "proficiency": 1,
+            "profSrc": "Barbarian"
+          },
           { "name": "Insight", "proficiency": 0 },
           { "name": "Medicine", "proficiency": 0 },
-          { "name": "Perception", "proficiency": 1 },
+          { "name": "Perception", "proficiency": 1, "profSrc": "Barbarian" },
           { "name": "Survival", "proficiency": 0 }
         ]
       },
       {
         "name": "CHA",
         "score": 13,
-        "saveProf": false,
         "skillProfs": [
           { "name": "Deception", "proficiency": 0 },
           { "name": "Intimidation", "proficiency": 0 },
-          { "name": "Performance", "proficiency": 1 },
+          { "name": "Performance", "proficiency": 1, "profSrc": "Entertainer" },
           { "name": "Persuasion", "proficiency": 0 }
         ]
       }
     ],
     "armorProfs": [
-      "Padded",
-      "Leather",
-      "Studded Leather",
-      "Hide",
-      "Chain Shirt",
-      "Scale Mail",
-      "Breastplate",
-      "Half Plate",
-      "Spiked Armor",
-      "Shields"
+      { "name": "Padded", "src": "Barbarian" },
+      { "name": "Leather", "src": "Barbarian" },
+      { "name": "Studded Leather", "src": "Barbarian" },
+      { "name": "Hide", "src": "Barbarian" },
+      { "name": "Chain Shirt", "src": "Barbarian" },
+      { "name": "Scale Mail", "src": "Barbarian" },
+      { "name": "Breastplate", "src": "Barbarian" },
+      { "name": "Half Plate", "src": "Barbarian" },
+      { "name": "Spiked Armor", "src": "Barbarian" },
+      { "name": "Shields", "src": "Barbarian" }
     ],
     "weaponProfs": [
-      "Clubs",
-      "Daggers",
-      "Greatclubs",
-      "Handaxes",
-      "Javelins",
-      "Light Hammers",
-      "Maces",
-      "Quarterstaffs",
-      "Sickles",
-      "Spears",
-      "Yklwas",
-      "Light Crossbows",
-      "Darts",
-      "Shortbows",
-      "Slings",
-      "Battleaxes",
-      "Double-bladed Scimitars",
-      "Flails",
-      "Glaives",
-      "Greataxes",
-      "Greatswords",
-      "Halberds",
-      "Lances",
-      "Longswords",
-      "Mauls",
-      "Morningstars",
-      "Pikes",
-      "Rapiers",
-      "Scimitars",
-      "Shortswords",
-      "Tridents",
-      "War Picks",
-      "Warhammers",
-      "Whips",
-      "Blowguns",
-      "Hand Crossbows",
-      "Heavy Crossbows",
-      "Longbows",
-      "Nets"
+      { "name": "Clubs", "src": "Barbarian" },
+      { "name": "Daggers", "src": "Barbarian" },
+      { "name": "Greatclubs", "src": "Barbarian" },
+      { "name": "Handaxes", "src": "Barbarian" },
+      { "name": "Javelins", "src": "Barbarian" },
+      { "name": "Light Hammers", "src": "Barbarian" },
+      { "name": "Maces", "src": "Barbarian" },
+      { "name": "Quarterstaffs", "src": "Barbarian" },
+      { "name": "Sickles", "src": "Barbarian" },
+      { "name": "Spears", "src": "Barbarian" },
+      { "name": "Yklwas", "src": "Barbarian" },
+      { "name": "Light Crossbows", "src": "Barbarian" },
+      { "name": "Darts", "src": "Barbarian" },
+      { "name": "Shortbows", "src": "Barbarian" },
+      { "name": "Slings", "src": "Barbarian" },
+      { "name": "Battleaxes", "src": "Barbarian" },
+      { "name": "Double-bladed Scimitars", "src": "Barbarian" },
+      { "name": "Flails", "src": "Barbarian" },
+      { "name": "Glaives", "src": "Barbarian" },
+      { "name": "Greataxes", "src": "Barbarian" },
+      { "name": "Greatswords", "src": "Barbarian" },
+      { "name": "Halberds", "src": "Barbarian" },
+      { "name": "Lances", "src": "Barbarian" },
+      { "name": "Longswords", "src": "Barbarian" },
+      { "name": "Mauls", "src": "Barbarian" },
+      { "name": "Morningstars", "src": "Barbarian" },
+      { "name": "Pikes", "src": "Barbarian" },
+      { "name": "Rapiers", "src": "Barbarian" },
+      { "name": "Scimitars", "src": "Barbarian" },
+      { "name": "Shortswords", "src": "Barbarian" },
+      { "name": "Tridents", "src": "Barbarian" },
+      { "name": "War Picks", "src": "Barbarian" },
+      { "name": "Warhammers", "src": "Barbarian" },
+      { "name": "Whips", "src": "Barbarian" },
+      { "name": "Blowguns", "src": "Barbarian" },
+      { "name": "Hand Crossbows", "src": "Barbarian" },
+      { "name": "Heavy Crossbows", "src": "Barbarian" },
+      { "name": "Longbows", "src": "Barbarian" },
+      { "name": "Nets", "src": "Barbarian" }
     ],
-    "toolProfs": ["Disguise Kit", "Horn"],
-    "languages": ["Common", "Gnomish"],
+    "toolProfs": [
+      { "name": "Disguise Kit", "src": "Entertainer" },
+      { "name": "Horn", "src": "Entertainer" }
+    ],
+    "languages": [
+      { "name": "Common", "src": "Gnome" },
+      { "name": "Gnomish", "src": "Gnome" }
+    ],
     "backstory": [
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum. Sed vestibulum ac nulla eget dictum. Nulla blandit quam risus, in convallis lectus ultrices sed. Pellentesque non magna eu ipsum pharetra vulputate. Sed placerat sapien malesuada, faucibus lacus tristique, faucibus massa. Praesent vel nisi pulvinar, pellentesque elit quis, eleifend turpis. Pellentesque a erat ultrices, sagittis lorem sit amet, ullamcorper turpis. Aliquam imperdiet nulla et orci molestie, sollicitudin facilisis ante elementum. Duis vehicula sollicitudin rutrum. Nullam nec condimentum arcu, in congue risus. Suspendisse ut lectus nisi.",
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc faucibus nisi turpis, ut pulvinar justo tempus fermentum. Sed vestibulum ac nulla eget dictum. Nulla blandit quam risus, in convallis lectus ultrices sed. Pellentesque non magna eu ipsum pharetra vulputate. Sed placerat sapien malesuada, faucibus lacus tristique, faucibus massa. Praesent vel nisi pulvinar, pellentesque elit quis, eleifend turpis. Pellentesque a erat ultrices, sagittis lorem sit amet, ullamcorper turpis. Aliquam imperdiet nulla et orci molestie, sollicitudin facilisis ante elementum. Duis vehicula sollicitudin rutrum. Nullam nec condimentum arcu, in congue risus. Suspendisse ut lectus nisi.ltiple",
@@ -791,7 +939,14 @@
       "flaws": ["I'm a sucker for a pretty face."]
     },
     "race": { "name": "Gnome", "subrace": "Forest" },
-    "classes": [{ "className": "Barbarian", "classLevel": 1, "hitDie": 12 }],
+    "classes": [
+      {
+        "className": "Barbarian",
+        "classLevel": 1,
+        "hitDie": 12,
+        "startingClass": true
+      }
+    ],
     "equipment": [
       {
         "name": "Scale Mail",

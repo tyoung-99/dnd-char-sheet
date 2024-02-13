@@ -75,19 +75,34 @@ class Character {
   getAbilities() {
     return this.abilities.map((ability) => ({
       name: ability.name,
-      score: ability.score,
+      score: this.getAbilityScore(ability.name),
       mod: this.getAbilityMod(ability.name),
     }));
   }
 
   getAbilityScore(ability) {
-    return this.abilities.find((stat) => stat.name === ability).score;
+    const category = "AbilityScore";
+    const bonuses = this.#getEffects(category);
+
+    return (
+      this.abilities.find((stat) => stat.name === ability).score +
+      bonuses.reduce(
+        (total, elem) =>
+          total +
+          elem.effects.reduce(
+            (subtotal, effect) =>
+              effect.category === category
+                ? subtotal + effect.changes[ability] || 0
+                : subtotal,
+            0
+          ),
+        0
+      )
+    );
   }
 
   getAbilityMod(ability) {
-    return Math.floor(
-      (this.abilities.find((stat) => stat.name === ability).score - 10) / 2
-    );
+    return Math.floor((this.getAbilityScore(ability) - 10) / 2);
   }
 
   getProfBonus() {
@@ -105,20 +120,61 @@ class Character {
     let skills = [];
     this.abilities.forEach((ability) => {
       ability.skillProfs.forEach((skill) => {
-        skills.push({
+        const newSkill = {
           name: skill.name,
-          prof: skill.proficiency,
-          mod:
-            this.getAbilityMod(ability.name) +
-            skill.proficiency * this.getProfBonus(),
+          prof: 0,
+          mod: this.getAbilityMod(ability.name),
           ability: ability.name,
-        });
+        };
+
+        if (skill.expSrc && !skill.profSrc) {
+          newSkill.error = `Ineligible for expertise in ${skill.name}`;
+        } else {
+          newSkill.prof = skill.proficiency;
+          newSkill.mod += skill.proficiency * this.getProfBonus();
+        }
+
+        skills.push(newSkill);
+      });
+    });
+
+    const category = "Skill";
+    this.#getEffects(category).forEach((bonus) => {
+      const effect = bonus.effects.find(
+        (checkEffect) => checkEffect.category === category
+      );
+
+      Object.keys(effect.changes.flat).forEach((skillName) => {
+        skills.find((checkSkill) => checkSkill.name === skillName).mod +=
+          effect.changes.flat[skillName];
+      });
+
+      effect.changes.proficiency.forEach((skillName) => {
+        const skill = skills.find(
+          (checkSkill) => checkSkill.name === skillName
+        );
+        skill.prof += 1;
+        skill.mod += this.getProfBonus();
+      });
+
+      effect.changes.expertise.forEach((skillName) => {
+        const skill = skills.find(
+          (checkSkill) => checkSkill.name === skillName
+        );
+        if (skill.prof !== 1) {
+          skill.error = `Ineligible for expertise in ${skill.name}`;
+          return;
+        }
+        skill.prof += 1;
+        skill.mod += this.getProfBonus();
       });
     });
 
     skills.sort((first, second) =>
       first.name > second.name ? 1 : first.name === second.name ? 0 : -1
     );
+
+    console.log(skills);
     return skills;
   }
 
@@ -135,21 +191,122 @@ class Character {
   }
 
   getPassivePerception() {
-    return 10 + this.getSkillByName("Perception");
+    const category = "PassivePerception";
+    return (
+      10 +
+      this.getSkillByName("Perception") +
+      this.#getEffects(category).reduce(
+        (total, elem) =>
+          total +
+          elem.effects.reduce(
+            (subtotal, effect) =>
+              effect.category === category
+                ? subtotal + effect.changes.bonus
+                : subtotal,
+            0
+          ),
+        0
+      )
+    );
   }
 
   getSaves() {
-    return this.abilities.map((ability) => ({
+    const saves = this.abilities.map((ability) => ({
       name: ability.name,
-      prof: ability.saveProf,
-      mod:
-        this.getAbilityMod(ability.name) +
-        ability.saveProf * this.getProfBonus(),
+      prof: false,
+      mod: this.getAbilityMod(ability.name),
     }));
+
+    const saveProfs = this.#getSaveProfBonuses();
+    saveProfs.forEach((saveName) => {
+      const current = saves.find((checkSave) => checkSave.name === saveName);
+      current.prof = true;
+      current.mod += this.getProfBonus();
+    });
+
+    const bonuses = this.#getSaveOtherBonuses();
+    Object.keys(bonuses).forEach((ability) => {
+      saves.find((checkSave) => checkSave.name === ability).mod +=
+        bonuses[ability];
+    });
+
+    return saves;
+  }
+
+  #getSaveProfBonuses() {
+    const baseClass = this.classes.find(
+      (checkClass) => checkClass.startingClass
+    ).className;
+    const saveProfs = [];
+
+    if (["Barbarian", "Fighter", "Monk", "Ranger"].includes(baseClass)) {
+      saveProfs.push("STR");
+    }
+    if (["Bard", "Monk", "Ranger", "Rogue"].includes(baseClass)) {
+      saveProfs.push("DEX");
+    }
+    if (["Artificer", "Barbarian", "Fighter", "Sorcerer"].includes(baseClass)) {
+      saveProfs.push("CON");
+    }
+    if (["Artificer", "Druid", "Rogue", "Wizard"].includes(baseClass)) {
+      saveProfs.push("INT");
+    }
+    if (
+      ["Cleric", "Druid", "Paladin", "Warlock", "Wizard"].includes(baseClass)
+    ) {
+      saveProfs.push("WIS");
+    }
+    if (
+      ["Bard", "Cleric", "Paladin", "Sorcerer", "Warlock"].includes(baseClass)
+    ) {
+      saveProfs.push("CHA");
+    }
+
+    const category = "SavingThrow";
+    this.#getEffects(category).forEach((bonus) => {
+      const effect = bonus.effects.find(
+        (checkEffect) => checkEffect.category === category
+      );
+      if (effect.changes.prof) {
+        effect.changes.prof.forEach((ability) => {
+          if (!saveProfs.includes(ability)) saveProfs.push(ability);
+        });
+      }
+    });
+
+    return saveProfs;
+  }
+
+  #getSaveOtherBonuses() {
+    const category = "SavingThrow";
+    const bonuses = this.#getEffects(category);
+    const bonusesParsed = {
+      STR: 0,
+      DEX: 0,
+      CON: 0,
+      INT: 0,
+      WIS: 0,
+      CHA: 0,
+    };
+
+    bonuses.forEach((bonus) => {
+      const effect = bonus.effects.find(
+        (checkEffect) => checkEffect.category === category
+      );
+      if (effect.changes.flat) {
+        Object.keys(effect.changes.flat).forEach((ability) => {
+          bonusesParsed[ability] += effect.changes.flat[ability];
+        });
+      }
+    });
+
+    return bonusesParsed;
   }
 
   getWeaponProfs() {
-    let cleanProfs = [...this.weaponProfs];
+    let cleanProfs = [
+      ...new Set([...this.weaponProfs].map((prof) => prof.name)),
+    ];
     this.WEAPON_PROF_GROUPS.forEach((group) => {
       if (group.profs.every((prof) => cleanProfs.includes(prof))) {
         cleanProfs.unshift(group.name);
@@ -160,7 +317,9 @@ class Character {
   }
 
   getArmorProfs() {
-    let cleanProfs = [...this.armorProfs];
+    let cleanProfs = [
+      ...new Set([...this.armorProfs].map((prof) => prof.name)),
+    ];
     this.ARMOR_PROF_GROUPS.forEach((group) => {
       if (group.profs.every((prof) => cleanProfs.includes(prof))) {
         cleanProfs.unshift(group.name);
@@ -168,6 +327,14 @@ class Character {
       }
     });
     return cleanProfs;
+  }
+
+  getToolProfs() {
+    return [...new Set([...this.toolProfs].map((prof) => prof.name))];
+  }
+
+  getLanguages() {
+    return [...new Set([...this.languages].map((prof) => prof.name))];
   }
 
   isProficientWithItem(item) {
@@ -285,8 +452,44 @@ class Character {
     return bonuses;
   }
 
+  getSpeeds() {
+    const speeds = Object.assign({}, this.speed);
+    const category = "Speed";
+    const bonuses = this.#getEffects(category);
+    const modifiers = { walk: 0, swim: 0, fly: 0 },
+      multipliers = { walk: 1, swim: 1, fly: 1 };
+
+    bonuses.forEach((bonus) => {
+      const effect = bonus.effects.find(
+        (checkEffect) => checkEffect.category === category
+      );
+      Object.keys(effect.changes).forEach((speedType) => {
+        modifiers[speedType] += effect.changes[speedType].modifier || 0;
+        multipliers[speedType] *= effect.changes[speedType].multiplier || 1;
+      });
+    });
+
+    /* RAW doesn't address order of operations, using modifiers before multipliers 
+    b/c it's consistent w/ how damage resistance is handled, and it makes modifiers 
+    consistent in effect, rather than being devestating or negligible, as they would 
+    when applied after a halving/doubling of speed, respectively */
+    Object.keys(modifiers).forEach((speedType) => {
+      speeds[speedType] += modifiers[speedType];
+      speeds[speedType] *= multipliers[speedType];
+    });
+
+    return speeds;
+  }
+
   getMaxHitPoints() {
-    return this.#getHitPointsHelper(this.hitPoints.max, "MaxHitPoints");
+    return (
+      this.#getHitPointsHelper(this.hitPoints.max, "MaxHitPoints") +
+      this.getAbilityMod("CON") *
+        this.classes.reduce(
+          (total, charClass) => total + charClass.classLevel,
+          0
+        )
+    );
   }
 
   getCurrentHitPoints() {
