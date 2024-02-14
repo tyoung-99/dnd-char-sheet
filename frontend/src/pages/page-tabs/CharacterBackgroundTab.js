@@ -59,7 +59,7 @@ const CharacterBackgroundTab = ({ character }) => {
         {character.appearance.pictures.map((pic, i) => (
           <img
             key={i}
-            src={process.env.PUBLIC_URL + `/img/${pic}`}
+            src={process.env.PUBLIC_URL + `/img/char_pics/${pic}`}
             alt={`${character.name}`}
             className="height-8"
           ></img>
@@ -84,7 +84,7 @@ const CharacterBackgroundTab = ({ character }) => {
               {ally.symbols.map((sym, j) => (
                 <img
                   key={j}
-                  src={process.env.PUBLIC_URL + `/img/${sym}`}
+                  src={process.env.PUBLIC_URL + `/img/char_pics/${sym}`}
                   alt={`${ally.name}`}
                   className="height-8 float-right"
                 ></img>

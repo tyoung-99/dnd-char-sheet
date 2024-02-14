@@ -158,7 +158,7 @@ const CharacterSpellcastingTab = ({ character }) => {
           {spell.hoverIcons.map((icon) => (
             <img
               key={icon[1]}
-              src={process.env.PUBLIC_URL + `/img/hover_icons/${icon[0]}`}
+              src={process.env.PUBLIC_URL + `/img/icons/hover_icons/${icon[0]}`}
               alt={icon[1]}
               className="hover-icon"
               title={icon[1]}

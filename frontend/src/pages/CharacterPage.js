@@ -64,7 +64,7 @@ const CharacterPage = () => {
       </div>
       <div className="name-header">
         <img
-          src={process.env.PUBLIC_URL + `/img/${character.avatarSrc}`}
+          src={process.env.PUBLIC_URL + `/img/char_pics/${character.avatarSrc}`}
           alt="Avatar"
           className="avatar"
         ></img>
