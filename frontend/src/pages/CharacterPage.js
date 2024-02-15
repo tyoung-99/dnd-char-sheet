@@ -1,7 +1,7 @@
 // Full character sheet
 
 import "../styling/pages/CharacterPage.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import Character from "../Character";
@@ -21,8 +21,11 @@ const CharacterPage = () => {
 
   const { characterID } = useParams();
   const [character, setCharacter] = useState();
+  const [avatarURL, setAvatarURL] = useState();
 
   const [showingSavedMessage, setShowingSavedMessage] = useState(false);
+  const fileInput = useRef(null);
+
   const [editingCharName, setEditingCharName] = useState(false);
 
   useEffect(() => {
@@ -33,10 +36,39 @@ const CharacterPage = () => {
         response.data
       );
       setCharacter(newChar);
+      refreshAvatarImg(newChar);
     };
 
     loadCharacter();
   }, [characterID]);
+
+  const refreshAvatarImg = async (character) => {
+    try {
+      const imgBlob = await axios.get(`/api/img/char/${character.avatarId}`, {
+        responseType: "blob",
+      });
+      setAvatarURL(URL.createObjectURL(imgBlob.data));
+    } catch (error) {} // No need to do anything if there was no image, alt text will display
+  };
+
+  const applyNewAvatar = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await axios.put("api/img/char/add", formData, {
+      headers: { "content-type": "multipart/form-data" },
+    });
+
+    if (character.avatarId !== 0) {
+      axios.post(`/api/img/char/${character.avatarId}/remove`);
+    }
+
+    character.setAvatar(response.data);
+    refreshAvatarImg(character);
+  };
 
   if (!character) {
     return <div>Loading...</div>;
@@ -63,11 +95,28 @@ const CharacterPage = () => {
         </p>
       </div>
       <div className="name-header">
-        <img
-          src={process.env.PUBLIC_URL + `/img/char_pics/${character.avatarSrc}`}
-          alt="Avatar"
-          className="avatar"
-        ></img>
+        <div
+          className="avatar-container"
+          onClick={() => {
+            fileInput.current.click();
+          }}
+        >
+          <img src={avatarURL} alt="Avatar" className="avatar"></img>
+          <img
+            src={process.env.PUBLIC_URL + "/icons/edit.png"}
+            alt=""
+            className="avatar-edit"
+          ></img>
+          <input
+            type="file"
+            id="avatar-input"
+            name="avatar-input"
+            className="hidden-file-input"
+            ref={fileInput}
+            accept="image/*"
+            onChange={applyNewAvatar}
+          ></input>
+        </div>
         <div className="avatar-label">
           {editingCharName ? (
             <textarea

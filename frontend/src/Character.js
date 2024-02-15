@@ -93,6 +93,11 @@ class Character {
     this.saveCharacter();
   }
 
+  setAvatar(newFileId) {
+    this.avatarId = newFileId;
+    this.saveCharacter();
+  }
+
   getAbilities() {
     return this.abilities.map((ability) => ({
       name: ability.name,

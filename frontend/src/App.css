@@ -129,14 +129,22 @@ p:has(> .hover-icon) {
   display: inline;
 }
 
-img.avatar {
+.avatar {
   height: 3rlh;
   width: 3rlh;
-  display: inline-block;
   vertical-align: middle;
-  margin: 0.5rlh;
 }
 .avatar-label {
   display: inline-block;
   vertical-align: middle;
+}
+.avatar-container {
+  display: inline-block;
+  height: 3rlh;
+  width: 3rlh;
+  margin: 0.5rlh;
+}
+
+.hidden-file-input {
+  display: none;
 }
