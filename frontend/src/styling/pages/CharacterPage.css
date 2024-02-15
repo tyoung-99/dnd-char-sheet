@@ -65,6 +65,15 @@
   position: absolute;
   top: 1rem;
   right: 1rem;
+  text-align: right;
+  display: inline-block;
+}
+.xp-inspire-header p,
+.xp-inspire-header input,
+.xp-inspire-header img {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0.25rem;
 }
 /* Combat-related info for easy reference */
 .combat-header {

@@ -15,7 +15,7 @@ import CharacterBuffsTab from "./page-tabs/CharacterBuffsTab";
 import CharacterEquipmentTab from "./page-tabs/CharacterEquipmentTab";
 import CharacterSpellcastingTab from "./page-tabs/CharacterSpellcastingTab";
 import DeathSavesComp from "../components/DeathSavesComp";
-
+import XpComp from "../components/XpComp";
 import MultiColumnDropdownComp from "../components/MultiColumnDropdownComp";
 
 const CharacterPage = () => {
@@ -81,6 +81,10 @@ const CharacterPage = () => {
   if (!character) {
     return <div>Loading...</div>;
   }
+
+  const inspirationHeader = (
+    <p>Inspiration: {character.inspiration ? "Yes" : "No"}</p>
+  );
 
   return (
     <div>
@@ -159,8 +163,8 @@ const CharacterPage = () => {
         </div>
       </div>
       <div className="xp-inspire-header">
-        <div>XP: {character.xp}</div>
-        <div>Inspiration: {character.inspiration ? "Yes" : "No"}</div>
+        {character.xp.uses && <XpComp character={character}></XpComp>}
+        {inspirationHeader}
       </div>
       <div className="combat-header">
         <div>

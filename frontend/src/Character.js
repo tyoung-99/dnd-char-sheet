@@ -103,6 +103,11 @@ class Character {
     this.saveCharacter();
   }
 
+  setXp(newXp) {
+    this.xp.amount = newXp;
+    this.saveCharacter();
+  }
+
   getAbilities() {
     return this.abilities.map((ability) => ({
       name: ability.name,
