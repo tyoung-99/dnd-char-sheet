@@ -83,7 +83,16 @@ const CharacterPage = () => {
   }
 
   const inspirationHeader = (
-    <p>Inspiration: {character.inspiration ? "Yes" : "No"}</p>
+    <div>
+      <p>Inspiration:</p>
+      <input
+        type="button"
+        id="toggleInspiration"
+        name="toggleInspiration"
+        value={character.inspiration ? "Yes" : "No"}
+        onClick={() => character.setInspiration(!character.inspiration)}
+      ></input>
+    </div>
   );
 
   return (

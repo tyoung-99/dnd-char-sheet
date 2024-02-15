@@ -108,6 +108,11 @@ class Character {
     this.saveCharacter();
   }
 
+  setInspiration(newInspiration) {
+    this.inspiration = newInspiration;
+    this.saveCharacter();
+  }
+
   getAbilities() {
     return this.abilities.map((ability) => ({
       name: ability.name,
