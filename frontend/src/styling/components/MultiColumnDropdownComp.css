@@ -1,0 +1,55 @@
+.dropdown {
+  position: relative;
+  display: inline-block;
+  margin: 1px;
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+}
+
+.toggled-open {
+  border: 1px solid black;
+  margin: 0px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: -1px;
+  display: flex;
+  background-color: white;
+  border: 1px solid black;
+}
+
+.dropdown-column {
+  flex: 1;
+}
+
+.dropdown-item {
+  border-bottom: 1px solid lightgray;
+  border-right: 1px solid lightgray;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: lightgray;
+}
+
+.dropdown-column:last-child > .dropdown-item {
+  border-right: none;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.catch-outside-clicks {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  position: fixed;
+  overflow: auto;
+}

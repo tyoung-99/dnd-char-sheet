@@ -16,7 +16,15 @@ import CharacterEquipmentTab from "./page-tabs/CharacterEquipmentTab";
 import CharacterSpellcastingTab from "./page-tabs/CharacterSpellcastingTab";
 import DeathSavesComp from "../components/DeathSavesComp";
 
+import MultiColumnDropdownComp from "../components/MultiColumnDropdownComp";
+
 const CharacterPage = () => {
+  const ALIGNMENTS = [
+    ["Lawful Good", "Lawful Neutral", "Lawful Evil"],
+    ["Neutral Good", "True Neutral", "Neutral Evil"],
+    ["Chaotic Good", "Chaotic Neutral", "Chaotic Evil"],
+  ];
+
   const [activeTab, setActiveTab] = useState("main");
 
   const { characterID } = useParams();
@@ -136,7 +144,11 @@ const CharacterPage = () => {
             </h1>
           )}
           <h2>{character.player}</h2>
-          <p>{character.alignment}</p>
+          <MultiColumnDropdownComp
+            buttonText={character.alignment}
+            contents={ALIGNMENTS}
+            onSelect={(newAlignment) => character.setAlignment(newAlignment)}
+          ></MultiColumnDropdownComp>
           <p>
             {character.race.name}{" "}
             {character.race.subrace !== null

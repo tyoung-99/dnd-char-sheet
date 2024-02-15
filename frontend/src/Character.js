@@ -98,6 +98,11 @@ class Character {
     this.saveCharacter();
   }
 
+  setAlignment(newAlignment) {
+    this.alignment = newAlignment;
+    this.saveCharacter();
+  }
+
   getAbilities() {
     return this.abilities.map((ability) => ({
       name: ability.name,
