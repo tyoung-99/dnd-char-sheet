@@ -19,17 +19,12 @@ import XpComp from "../components/XpComp";
 import MultiColumnDropdownComp from "../components/MultiColumnDropdownComp";
 
 const CharacterPage = () => {
-  const ALIGNMENTS = [
-    ["Lawful Good", "Lawful Neutral", "Lawful Evil"],
-    ["Neutral Good", "True Neutral", "Neutral Evil"],
-    ["Chaotic Good", "Chaotic Neutral", "Chaotic Evil"],
-  ];
-
   const [activeTab, setActiveTab] = useState("main");
 
   const { characterID } = useParams();
   const [character, setCharacter] = useState();
   const [avatarURL, setAvatarURL] = useState();
+  const [alignmentList, setAlignmentList] = useState();
 
   const [showingSavedMessage, setShowingSavedMessage] = useState(false);
   const fileInput = useRef(null);
@@ -37,17 +32,20 @@ const CharacterPage = () => {
   const [editingCharName, setEditingCharName] = useState(false);
 
   useEffect(() => {
-    const loadCharacter = async () => {
-      const response = await axios.get(`/api/characters/${characterID}`);
+    const loadData = async () => {
+      let response = await axios.get(`/api/characters/${characterID}`);
       const newChar = Object.assign(
         new Character(setShowingSavedMessage),
         response.data
       );
       setCharacter(newChar);
       refreshAvatarImg(newChar);
+
+      response = await axios.get("/api/alignments");
+      setAlignmentList(response.data);
     };
 
-    loadCharacter();
+    loadData();
   }, [characterID]);
 
   const refreshAvatarImg = async (character) => {
@@ -159,7 +157,7 @@ const CharacterPage = () => {
           <h2>{character.player}</h2>
           <MultiColumnDropdownComp
             buttonText={character.alignment}
-            contents={ALIGNMENTS}
+            contents={alignmentList}
             onSelect={(newAlignment) => character.setAlignment(newAlignment)}
           ></MultiColumnDropdownComp>
           <p>

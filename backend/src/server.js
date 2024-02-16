@@ -4,6 +4,7 @@ import getCharacters from "./getCharacters.js";
 import setCharacter from "./setCharacter.js";
 import getImg from "./getImg.js";
 import removeImg from "./removeImg.js";
+import getAlignments from "./handleAlignments.js";
 
 const app = express();
 app.use(express.json());
@@ -28,6 +29,7 @@ app.get("/api/characters", async (req, res) => {
   }
 });
 
+// Character specific
 app.get("/api/characters/:id", async (req, res) => {
   const { id } = req.params;
   const charList = await getCharacters();
@@ -61,6 +63,12 @@ app.put("/api/img/char/add", imgUpload.single("file"), async (req, res) => {
 app.post("/api/img/char/:id/remove", async (req, res) => {
   const { id } = req.params;
   res.send(await removeImg(id));
+});
+
+// Alignments
+app.get("/api/alignments", async (req, res) => {
+  console.log("here");
+  res.send(await getAlignments());
 });
 
 const PORT = process.env.PORT || 8000;
