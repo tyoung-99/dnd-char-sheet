@@ -28,14 +28,14 @@ const CharacterListComp = ({ characters }) => {
   }, [characters]);
 
   return (
-    <div>
+    <div className="character-list">
       {characters.map((character, i) => (
         <Link
           key={`${character.id}`}
-          className="character-list-item"
+          className="character-list-link"
           to={`/${character.id}`}
         >
-          <div>
+          <div className="character-list-info">
             <div className="avatar-label">
               <h2>{character.name}</h2>
               <InlineClassListComp classes={character.classes} />

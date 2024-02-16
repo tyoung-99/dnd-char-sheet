@@ -17,9 +17,11 @@ import CharacterSpellcastingTab from "./page-tabs/CharacterSpellcastingTab";
 import DeathSavesComp from "../components/DeathSavesComp";
 import XpComp from "../components/XpComp";
 import MultiColumnDropdownComp from "../components/MultiColumnDropdownComp";
+import RaceModal from "../components/modals/RaceModal";
 
 const CharacterPage = () => {
   const [activeTab, setActiveTab] = useState("main");
+  const [currentModal, setCurrentModal] = useState("");
 
   const { characterID } = useParams();
   const [character, setCharacter] = useState();
@@ -47,6 +49,19 @@ const CharacterPage = () => {
 
     loadData();
   }, [characterID]);
+
+  const openModal = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const modal = event.target.dataset.modal;
+    if (modal) {
+      setCurrentModal(modal);
+    }
+  };
+
+  const closeModal = () => {
+    setCurrentModal("");
+  };
 
   const refreshAvatarImg = async (character) => {
     try {
@@ -141,6 +156,7 @@ const CharacterPage = () => {
             <textarea
               id="char-name"
               name="char-name"
+              className="char-name"
               autoFocus
               defaultValue={character.name}
               placeholder="Character Name"
@@ -150,22 +166,33 @@ const CharacterPage = () => {
               }}
             ></textarea>
           ) : (
-            <h1 onClick={() => setEditingCharName(true)}>
+            <h1 className="char-name" onClick={() => setEditingCharName(true)}>
               {character.name || "Character Name"}
             </h1>
           )}
-          <h2>{character.player}</h2>
+          <h2 className="player-name">{character.player}</h2>
           <MultiColumnDropdownComp
             buttonText={character.alignment}
             contents={alignmentList}
             onSelect={(newAlignment) => character.setAlignment(newAlignment)}
           ></MultiColumnDropdownComp>
-          <p>
+          <p
+            className="race"
+            data-modal="race"
+            onClick={() => {
+              setCurrentModal("race");
+            }}
+          >
             {character.race.name}{" "}
             {character.race.subrace !== null
               ? `(${character.race.subrace})`
               : ""}
           </p>
+          <RaceModal
+            character={character}
+            closeModal={closeModal}
+            isOpen={currentModal === "race"}
+          />
           <InlineClassListComp classes={character.classes} />
         </div>
       </div>

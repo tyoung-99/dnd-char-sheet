@@ -10,16 +10,18 @@ const CharacterSpellcastingTab = ({ character }) => {
     const srcName = castSrc.class || castSrc.other;
     const spellAttackBonus = character.getSpellAttackBonus(srcName);
     return (
-      <div key={srcName} className="col-flex col-1_2">
+      <div key={srcName} className="col-flex col-1_2 data-grid">
         <div className="row-flex col-1">
-          <h1 className="col-1_2">{srcName}</h1>
-          <h1 className="col-1_2">Spellcasting Ability: {castSrc.ability}</h1>
+          <h1 className="col-1_2 data-cell">{srcName}</h1>
+          <h1 className="col-1_2 data-cell">
+            Spellcasting Ability: {castSrc.ability}
+          </h1>
         </div>
         <div className="row-flex col-1">
-          <h1 className="col-1_2">
+          <h1 className="col-1_2 data-cell">
             Spell Save DC: {character.getSpellSaveDC(srcName)}
           </h1>
-          <h1 className="col-1_2">
+          <h1 className="col-1_2 data-cell">
             Spell Attack Bonus: {spellAttackBonus > 0 ? "+" : null}
             {spellAttackBonus}
           </h1>
@@ -27,10 +29,10 @@ const CharacterSpellcastingTab = ({ character }) => {
         <div className="row-flex col-1">
           {!(srcName in spellsPreparedCounts) ? null : (
             <>
-              <h1 className="col-1_2">
+              <h1 className="col-1_2 data-cell">
                 Max Spells Prepared: {spellsPreparedCounts[srcName].maxPrepped}
               </h1>
-              <h1 className="col-1_2">
+              <h1 className="col-1_2 data-cell">
                 Current Spells Prepared:{" "}
                 {spellsPreparedCounts[srcName].currentPrepped || 0}
               </h1>

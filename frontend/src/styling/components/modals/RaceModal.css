@@ -1,0 +1,17 @@
+.race-modal-container {
+  width: 50%;
+}
+
+.race-modal-container .race-header {
+  text-align: left;
+}
+
+.race-modal-container .race-body {
+  border-top: none;
+  border-bottom: none;
+}
+
+.race-modal-container .race-footer {
+  display: block;
+  text-align: left;
+}

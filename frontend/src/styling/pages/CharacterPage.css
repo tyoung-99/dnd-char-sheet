@@ -16,17 +16,17 @@
   border: 1px solid black;
   padding-left: 0px;
 }
-.nav li {
+.nav > li {
   width: 50%;
   padding: 1rem;
   list-style: none;
   text-align: center;
   cursor: pointer;
 }
-.nav li:hover {
+.nav > li:hover {
   background: lightgray;
 }
-.nav li.active {
+.nav > li.active {
   background: black;
   color: white;
 }
@@ -37,8 +37,7 @@
   text-align: center;
   margin-bottom: 1rem;
 }
-.name-header h1,
-.name-header textarea {
+.name-header .char-name {
   margin: 0.5rem 0;
   display: flex;
   align-items: center;
@@ -49,7 +48,7 @@
   font-family: inherit;
   text-align: center;
 }
-.name-header h2 {
+.name-header .player-name {
   margin: 0.5rem 0;
   font-style: italic;
   font-weight: normal;
@@ -59,6 +58,9 @@
 .name-header p {
   display: inline-block;
   margin: 0.5rem;
+}
+.race {
+  cursor: pointer;
 }
 /* XP total/inspiration */
 .xp-inspire-header {

@@ -26,9 +26,6 @@
   display: inline-block;
   text-align: center;
 }
-.modal-container .header h1 {
-  font-size: 2em;
-}
 
 .modal-container .body {
   text-align: left;
@@ -39,4 +36,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.modal-container h1 {
+  font-weight: bold;
+  font-style: normal;
+  font-size: 2rem;
+}
+.modal-container h2 {
+  font-weight: bold;
+  font-style: normal;
+  font-size: 1rem;
+}
+.modal-container p {
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1rem;
 }
