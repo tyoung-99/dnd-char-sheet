@@ -3,16 +3,27 @@
   text-align: center;
 }
 
-div:has(> .spell) {
+div:has(> .spell-label) {
   display: flex;
   align-items: center;
 }
-.spell {
+.spell-label {
   font-weight: bold;
   font-size: 0.75rem;
   text-align: center;
   display: inline-block;
   width: 100%;
+  cursor: pointer;
+}
+.spell-entry {
+  border-bottom: 1px solid gray;
+  padding: 0.25rem 0px;
+}
+.spell-entry:last-child {
+  border-bottom: none;
+}
+.spell-entry img.hover-icon {
+  cursor: pointer;
 }
 
 /* Spellcasting classes displayed in dynamic grid w/ appropriate spacing */

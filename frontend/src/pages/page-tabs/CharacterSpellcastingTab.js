@@ -135,7 +135,7 @@ const CharacterSpellcastingTab = ({ character }) => {
         " " +
         (spell.class || spell.race || spell.background || spell.feat);
       level[i] = (
-        <div key={key}>
+        <div key={key} className="spell-entry">
           <div>
             {spell.level > 0 && spell.prepared !== 2 ? (
               <input
@@ -148,7 +148,7 @@ const CharacterSpellcastingTab = ({ character }) => {
             ) : null}
             <label
               htmlFor={"prep " + key}
-              className="spell"
+              className="spell-label"
               data-modal={key}
               onClick={openModal}
             >
