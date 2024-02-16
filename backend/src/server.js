@@ -3,6 +3,7 @@ import multer from "multer";
 import { getCharacters, setCharacter } from "./handleCharacters.js";
 import { getImg, removeImg } from "./handleImg.js";
 import { getAlignments } from "./handleAlignments.js";
+import { getWeaponProfs, getArmorProfs } from "./handleOtherProfs.js";
 
 const app = express();
 app.use(express.json());
@@ -65,8 +66,16 @@ app.post("/api/img/char/:id/remove", async (req, res) => {
 
 // Alignments
 app.get("/api/alignments", async (req, res) => {
-  console.log("here");
   res.send(await getAlignments());
+});
+
+// Proficiencies
+app.get("/api/proficiencies/weapons", async (req, res) => {
+  res.send(await getWeaponProfs());
+});
+
+app.get("/api/proficiencies/armor", async (req, res) => {
+  res.send(await getArmorProfs());
 });
 
 const PORT = process.env.PORT || 8000;

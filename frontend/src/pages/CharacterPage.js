@@ -35,7 +35,7 @@ const CharacterPage = () => {
     const loadData = async () => {
       let response = await axios.get(`/api/characters/${characterID}`);
       const newChar = Object.assign(
-        new Character(setShowingSavedMessage),
+        await Character.create(setShowingSavedMessage),
         response.data
       );
       setCharacter(newChar);
