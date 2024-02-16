@@ -1,10 +1,8 @@
 import express from "express";
 import multer from "multer";
-import getCharacters from "./getCharacters.js";
-import setCharacter from "./setCharacter.js";
-import getImg from "./getImg.js";
-import removeImg from "./removeImg.js";
-import getAlignments from "./handleAlignments.js";
+import { getCharacters, setCharacter } from "./handleCharacters.js";
+import { getImg, removeImg } from "./handleImg.js";
+import { getAlignments } from "./handleAlignments.js";
 
 const app = express();
 app.use(express.json());

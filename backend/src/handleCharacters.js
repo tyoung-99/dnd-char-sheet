@@ -1,7 +1,11 @@
-import { writeFile } from "fs/promises";
-import getCharacters from "./getCharacters.js";
+import { readFile } from "fs/promises";
 
-const setCharacter = async (id, newChar) => {
+export const getCharacters = async () => {
+  let characters = JSON.parse(await readFile("data/characters.json"));
+  return characters;
+};
+
+export const setCharacter = async (id, newChar) => {
   const characters = await getCharacters();
   const charIndex = characters.findIndex((char) => char.id === id);
 
@@ -15,5 +19,3 @@ const setCharacter = async (id, newChar) => {
   }
   return { success: true };
 };
-
-export default setCharacter;
