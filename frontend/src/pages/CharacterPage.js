@@ -176,13 +176,7 @@ const CharacterPage = () => {
             contents={alignmentList}
             onSelect={(newAlignment) => character.setAlignment(newAlignment)}
           ></MultiColumnDropdownComp>
-          <p
-            className="race"
-            data-modal="race"
-            onClick={() => {
-              setCurrentModal("race");
-            }}
-          >
+          <p className="race" data-modal="race" onClick={openModal}>
             {character.race.name}{" "}
             {character.race.subrace !== null
               ? `(${character.race.subrace})`
