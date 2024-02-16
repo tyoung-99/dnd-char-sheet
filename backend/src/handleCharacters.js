@@ -1,4 +1,4 @@
-import { readFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
 
 export const getCharacters = async () => {
   let characters = JSON.parse(await readFile("data/characters.json"));
