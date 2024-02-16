@@ -1,17 +1,17 @@
-.modal_container {
+.spell-modal-container {
   width: 50%;
 }
 
-.modal_container .header {
+.spell-modal-container .spell-header {
   text-align: left;
 }
 
-.modal_container .body {
+.spell-modal-container .spell-body {
   border-top: 2px solid black;
   border-bottom: 2px solid black;
 }
 
-.modal_container .footer {
+.spell-modal-container .spell-footer {
   display: block;
   text-align: left;
 }

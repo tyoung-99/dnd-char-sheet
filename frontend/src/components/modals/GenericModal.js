@@ -9,7 +9,7 @@ const GenericModal = ({
   header,
   body,
   footer,
-  extraStyling,
+  category,
 }) => {
   // Prevent scroll while open
   useEffect(() => {
@@ -22,17 +22,17 @@ const GenericModal = ({
 
   return isOpen ? (
     <div
-      className={`modal-background ${extraStyling.modal_background}`}
+      className={`modal-background ${category}-modal-background`}
       onClick={(event) => {
         if (!event.target.closest(".modal-container")) {
           closeModal();
         }
       }}
     >
-      <div className={`modal-container ${extraStyling.modal_container}`}>
-        <div className={`header ${extraStyling.header}`}>{header}</div>
-        <div className={`body ${extraStyling.body}`}>{body}</div>
-        <div className={`footer ${extraStyling.footer}`}>{footer}</div>
+      <div className={`modal-container ${category}-modal-container`}>
+        <div className={`header ${category}-header`}>{header}</div>
+        <div className={`body ${category}-body`}>{body}</div>
+        <div className={`footer ${category}-footer`}>{footer}</div>
       </div>
     </div>
   ) : null;

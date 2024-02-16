@@ -1,7 +1,7 @@
 // Modal to view full details of a spell
 
 import GenericModal from "./GenericModal";
-import styling from "../../styling/components/modals/SpellModal.module.css";
+import "../../styling/components/modals/SpellModal.css";
 
 const SpellModal = ({ spell, character, closeModal, isOpen }) => {
   const getNumSuffix = (number) => {
@@ -78,7 +78,7 @@ const SpellModal = ({ spell, character, closeModal, isOpen }) => {
       header={header}
       body={body}
       footer={footer}
-      extraStyling={styling}
+      category={"spell"}
     />
   );
 };
