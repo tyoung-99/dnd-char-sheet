@@ -676,12 +676,42 @@ class Character {
     return this.features.find((feature) => feature.name === featureName);
   }
 
-  getClassFeatures() {
-    return this.features.filter((feature) => feature.class);
-  }
+  getFeatures({
+    fromClass,
+    fromRace,
+    fromSubrace,
+    fromBackground,
+    fromFeat,
+  } = {}) {
+    let features = [];
 
-  getOtherFeatures() {
-    return this.features.filter((feature) => !feature.class);
+    if (fromClass) {
+      features = features.concat(
+        this.features.filter((feature) => feature.class)
+      );
+    }
+    if (fromRace) {
+      features = features.concat(
+        this.features.filter((feature) => feature.race)
+      );
+    }
+    if (fromSubrace) {
+      features = features.concat(
+        this.features.filter((feature) => feature.subrace)
+      );
+    }
+    if (fromBackground) {
+      features = features.concat(
+        this.features.filter((feature) => feature.background)
+      );
+    }
+    if (fromFeat) {
+      features = features.concat(
+        this.features.filter((feature) => feature.feat)
+      );
+    }
+
+    return features;
   }
 
   #getFeatureEffects(category) {

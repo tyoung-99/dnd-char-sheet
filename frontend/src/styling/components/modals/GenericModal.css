@@ -43,14 +43,17 @@
   font-weight: bold;
   font-style: normal;
   font-size: 2rem;
+  margin: 1rem 0;
 }
 .modal-container h2 {
   font-weight: bold;
   font-style: normal;
   font-size: 1rem;
+  margin: 1rem 0;
 }
 .modal-container p {
   font-weight: normal;
   font-style: normal;
   font-size: 1rem;
+  margin: 1rem 0;
 }
