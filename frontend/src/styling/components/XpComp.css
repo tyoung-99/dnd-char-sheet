@@ -1,0 +1,7 @@
+.xp-popup {
+  border: 1px solid black;
+  background-color: white;
+  position: absolute;
+  right: 0;
+  display: flex;
+}

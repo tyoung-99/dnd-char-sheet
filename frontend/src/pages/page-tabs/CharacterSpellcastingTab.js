@@ -10,16 +10,18 @@ const CharacterSpellcastingTab = ({ character }) => {
     const srcName = castSrc.class || castSrc.other;
     const spellAttackBonus = character.getSpellAttackBonus(srcName);
     return (
-      <div key={srcName} className="col-flex col-1_2">
+      <div key={srcName} className="col-flex col-1_2 data-grid">
         <div className="row-flex col-1">
-          <h1 className="col-1_2">{srcName}</h1>
-          <h1 className="col-1_2">Spellcasting Ability: {castSrc.ability}</h1>
+          <h1 className="col-1_2 data-cell">{srcName}</h1>
+          <h1 className="col-1_2 data-cell">
+            Spellcasting Ability: {castSrc.ability}
+          </h1>
         </div>
         <div className="row-flex col-1">
-          <h1 className="col-1_2">
+          <h1 className="col-1_2 data-cell">
             Spell Save DC: {character.getSpellSaveDC(srcName)}
           </h1>
-          <h1 className="col-1_2">
+          <h1 className="col-1_2 data-cell">
             Spell Attack Bonus: {spellAttackBonus > 0 ? "+" : null}
             {spellAttackBonus}
           </h1>
@@ -27,10 +29,10 @@ const CharacterSpellcastingTab = ({ character }) => {
         <div className="row-flex col-1">
           {!(srcName in spellsPreparedCounts) ? null : (
             <>
-              <h1 className="col-1_2">
+              <h1 className="col-1_2 data-cell">
                 Max Spells Prepared: {spellsPreparedCounts[srcName].maxPrepped}
               </h1>
-              <h1 className="col-1_2">
+              <h1 className="col-1_2 data-cell">
                 Current Spells Prepared:{" "}
                 {spellsPreparedCounts[srcName].currentPrepped || 0}
               </h1>
@@ -135,7 +137,7 @@ const CharacterSpellcastingTab = ({ character }) => {
         " " +
         (spell.class || spell.race || spell.background || spell.feat);
       level[i] = (
-        <div key={key}>
+        <div key={key} className="spell-entry">
           <div>
             {spell.level > 0 && spell.prepared !== 2 ? (
               <input
@@ -148,7 +150,7 @@ const CharacterSpellcastingTab = ({ character }) => {
             ) : null}
             <label
               htmlFor={"prep " + key}
-              className="spell"
+              className="spell-label"
               data-modal={key}
               onClick={openModal}
             >
@@ -158,7 +160,7 @@ const CharacterSpellcastingTab = ({ character }) => {
           {spell.hoverIcons.map((icon) => (
             <img
               key={icon[1]}
-              src={process.env.PUBLIC_URL + `/img/hover_icons/${icon[0]}`}
+              src={process.env.PUBLIC_URL + `/icons/${icon[0]}`}
               alt={icon[1]}
               className="hover-icon"
               title={icon[1]}

@@ -9,6 +9,7 @@
   align-items: center;
   position: fixed;
   overflow: auto;
+  z-index: 9999;
 }
 
 .modal-container {
@@ -26,9 +27,6 @@
   display: inline-block;
   text-align: center;
 }
-.modal-container .header h1 {
-  font-size: 2em;
-}
 
 .modal-container .body {
   text-align: left;
@@ -39,4 +37,23 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.modal-container h1 {
+  font-weight: bold;
+  font-style: normal;
+  font-size: 2rem;
+  margin: 1rem 0;
+}
+.modal-container h2 {
+  font-weight: bold;
+  font-style: normal;
+  font-size: 1rem;
+  margin: 1rem 0;
+}
+.modal-container p {
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1rem;
+  margin: 1rem 0;
 }

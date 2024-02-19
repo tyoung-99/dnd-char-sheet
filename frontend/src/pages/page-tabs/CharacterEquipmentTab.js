@@ -1,7 +1,7 @@
 // Character's inventory/equipment
-import "../../styling/pages/page-tabs/CharacterInventoryTab.css";
+import "../../styling/pages/page-tabs/CharacterEquipmentTab.css";
 
-const CharacterInventoryTab = ({ character }) => {
+const CharacterEquipmentTab = ({ character }) => {
   let itemizedInventory = character.getItems();
   let treasure = character.getTreasure();
 
@@ -86,11 +86,11 @@ const CharacterInventoryTab = ({ character }) => {
       <div className="col-flex col-1_2">
         <div className="grid-tile">
           <div className="row-flex coins">
-            <h1 className="col-1_6">{character.coins.cp} CP</h1>
-            <h1 className="col-1_6">{character.coins.sp} SP</h1>
-            <h1 className="col-1_6">{character.coins.ep} EP</h1>
-            <h1 className="col-1_6">{character.coins.gp} GP</h1>
-            <h1 className="col-1_6">{character.coins.pp} PP</h1>
+            <h1 className="col-1_6 coin-entry">{character.coins.sp} SP</h1>
+            <h1 className="col-1_6 coin-entry">{character.coins.cp} CP</h1>
+            <h1 className="col-1_6 coin-entry">{character.coins.ep} EP</h1>
+            <h1 className="col-1_6 coin-entry">{character.coins.gp} GP</h1>
+            <h1 className="col-1_6 coin-entry">{character.coins.pp} PP</h1>
           </div>
         </div>
         <div className="grid-tile col-end">
@@ -106,4 +106,4 @@ const CharacterInventoryTab = ({ character }) => {
   );
 };
 
-export default CharacterInventoryTab;
+export default CharacterEquipmentTab;

@@ -1,8 +1,13 @@
 // Character's racial/class/background features, plus feats
 
 const CharacterAbilitiesTab = ({ character }) => {
-  let fromClass = character.getClassFeatures();
-  let fromOther = character.getOtherFeatures();
+  let fromClass = character.getFeatures({ fromClass: true });
+  let fromOther = character.getFeatures({
+    fromRace: true,
+    fromSubrace: true,
+    fromFeat: true,
+    fromBackground: true,
+  });
 
   fromClass = fromClass.map((ability, i) => (
     <div key={i}>
@@ -16,7 +21,7 @@ const CharacterAbilitiesTab = ({ character }) => {
   fromOther = fromOther.map((ability, i) => (
     <div key={i}>
       <h2 className="float-right">
-        {ability.background || ability.race || ability.feat}
+        {ability.background || ability.race || ability.subrace || ability.feat}
       </h2>
       <h1>{ability.name}</h1>
       {ability.desc.map((paragraph, j) => (

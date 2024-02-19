@@ -3,38 +3,49 @@
   text-align: center;
 }
 
-div:has(> .spell) {
+div:has(> .spell-label) {
   display: flex;
   align-items: center;
 }
-.spell {
+.spell-label {
   font-weight: bold;
   font-size: 0.75rem;
   text-align: center;
   display: inline-block;
   width: 100%;
+  cursor: pointer;
+}
+.spell-entry {
+  border-bottom: 1px solid gray;
+  padding: 0.25rem 0px;
+}
+.spell-entry:last-child {
+  border-bottom: none;
+}
+.spell-entry img.hover-icon {
+  cursor: pointer;
 }
 
 /* Spellcasting classes displayed in dynamic grid w/ appropriate spacing */
 .cast-classes {
   flex-wrap: wrap;
 }
-.cast-classes > div:nth-child(odd) {
+.cast-classes .data-grid:nth-child(odd) {
   border-right: 1px solid black;
   border-bottom: 1px solid black;
 }
-.cast-classes > div:nth-child(even) {
+.cast-classes .data-grid:nth-child(even) {
   border-bottom: 1px solid black;
 }
-.cast-classes > div:nth-last-child(1) {
+.cast-classes .data-grid:nth-last-child(1) {
   border-bottom: none;
 }
-.cast-classes > div:nth-last-child(2):nth-child(odd) {
+.cast-classes .data-grid:nth-last-child(2):nth-child(odd) {
   border-bottom: none;
 }
-.cast-classes > div:only-child {
+.cast-classes .data-grid:only-child {
   border-right: none;
 }
-.cast-classes h1 {
+.cast-classes .data-cell {
   margin: 0.5em;
 }
