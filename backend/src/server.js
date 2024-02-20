@@ -75,11 +75,11 @@ app.get("/api/alignments", async (req, res) => {
 
 // Proficiencies
 app.get("/api/proficiencies/weapons", async (req, res) => {
-  res.send(await getWeaponProfs());
+  res.send(await getWeaponProfs(db));
 });
 
 app.get("/api/proficiencies/armor", async (req, res) => {
-  res.send(await getArmorProfs());
+  res.send(await getArmorProfs(db));
 });
 
 const PORT = process.env.PORT || 8000;
