@@ -178,15 +178,17 @@ const CharacterPage = () => {
           ></MultiColumnDropdownComp>
           <p className="race" data-modal="race" onClick={openModal}>
             {character.race.name}{" "}
-            {character.race.subrace !== null
+            {character.race.subrace !== "None"
               ? `(${character.race.subrace})`
               : ""}
           </p>
-          <RaceModal
-            character={character}
-            closeModal={closeModal}
-            isOpen={currentModal === "race"}
-          />
+          {currentModal === "race" && (
+            <RaceModal
+              character={character}
+              closeModal={closeModal}
+              isOpen={currentModal === "race"}
+            />
+          )}
           <InlineClassListComp classes={character.classes} />
         </div>
       </div>

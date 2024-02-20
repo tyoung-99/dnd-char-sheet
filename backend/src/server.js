@@ -4,6 +4,14 @@ import { getCharacters, setCharacter } from "./handleCharacters.js";
 import { getImg, removeImg } from "./handleImg.js";
 import { getAlignments } from "./handleAlignments.js";
 import { getWeaponProfs, getArmorProfs } from "./handleOtherProfs.js";
+import {
+  getRaces,
+  getRaceSrcbooks,
+  getRaceFeatures,
+  getSubraces,
+  getSubraceSrcbooks,
+  getSubraceFeatures,
+} from "./handleRaces.js";
 
 const app = express();
 app.use(express.json());
@@ -77,6 +85,43 @@ app.get("/api/proficiencies/weapons", async (req, res) => {
 app.get("/api/proficiencies/armor", async (req, res) => {
   res.send(await getArmorProfs());
 });
+
+// Races
+app.get("/api/races/list", async (req, res) => {
+  res.send(await getRaces());
+});
+app.get("/api/races/:raceName/sources", async (req, res) => {
+  const { raceName } = req.params;
+  res.send(await getRaceSrcbooks());
+});
+app.get(
+  "/api/races/:raceName/sources/:raceSrcBook/features",
+  async (req, res) => {
+    const { raceName, raceSrcBook } = req.params;
+    res.send(await getRaceFeatures());
+  }
+);
+app.get(
+  "/api/races/:raceName/sources/:raceSrcBook/subraces/list",
+  async (req, res) => {
+    const { raceName, raceSrcBook } = req.params;
+    res.send(await getSubraces());
+  }
+);
+app.get(
+  "/api/races/:raceName/sources/:raceSrcBook/subraces/:subraceName/sources",
+  async (req, res) => {
+    const { raceName, raceSrcBook, subraceName } = req.params;
+    res.send(await getSubraceSrcbooks());
+  }
+);
+app.get(
+  "/api/races/:raceName/sources/:raceSrcBook/subraces/:subraceName/sources/:subraceSrcBook/features",
+  async (req, res) => {
+    const { raceName, raceSrcBook, subraceName, subraceSrcBook } = req.params;
+    res.send(await getSubraceFeatures());
+  }
+);
 
 const PORT = process.env.PORT || 8000;
 

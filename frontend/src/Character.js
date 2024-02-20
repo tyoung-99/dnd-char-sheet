@@ -59,6 +59,30 @@ class Character {
     this.saveCharacter();
   }
 
+  setRace(newRace, newSubrace, newFeatures) {
+    this.#removeFeatures("race");
+    this.#removeFeatures("subrace");
+
+    this.race.name = newRace.name;
+    this.race.raceSrcbook = newRace.src;
+    this.race.subrace = newSubrace.name;
+    this.race.subraceSrcbook = newSubrace.src;
+
+    let newFeaturesFormatted = [];
+    newFeatures[0].forEach((feature) => {
+      feature.race = newRace.name;
+      newFeaturesFormatted.push(feature);
+    });
+    newFeatures[1].forEach((feature) => {
+      feature.subrace = newSubrace.name;
+      newFeaturesFormatted.push(feature);
+    });
+
+    this.features = this.features.concat(newFeaturesFormatted);
+
+    this.saveCharacter();
+  }
+
   getAbilities() {
     return this.abilities.map((ability) => ({
       name: ability.name,
@@ -1090,6 +1114,10 @@ class Character {
     return this.#getFeatureEffects(category)
       .concat(this.#getBuffEffects(category))
       .concat(this.#getItemEffects(category));
+  }
+
+  #removeFeatures(category) {
+    this.features = this.features.filter((feature) => !feature[category]);
   }
 }
 

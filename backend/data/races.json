@@ -1,0 +1,239 @@
+[
+  {
+    "name": "Gnome",
+    "srcBooks": [
+      {
+        "name": "PHB",
+        "features": [
+          {
+            "name": "Ability Score Increase",
+            "desc": "Your Intelligence score increases by 2.",
+            "effects": [{ "category": "AbilityScore", "changes": { "INT": 2 } }]
+          },
+          {
+            "name": "Age",
+            "desc": "Gnomes mature at the same rate humans do, and most are expected to settle down into an adult life by around age 40. They can live 350 to almost 500 years.",
+            "effects": []
+          },
+          {
+            "name": "Size",
+            "desc": "Gnomes are between 3 and 4 feet tall and average about 40 pounds. Your size is Small.",
+            "effects": []
+          },
+          {
+            "name": "Speed",
+            "desc": "Your base walking speed is 25 feet.",
+            "speed": 25,
+            "effects": []
+          },
+          {
+            "name": "Darkvision",
+            "desc": "Accustomed to life underground, you have superior vision in dark and dim conditions. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray.",
+            "effects": []
+          },
+          {
+            "name": "Gnome Cunning",
+            "desc": "You have advantage on all Intelligence, Wisdom, and Charisma saving throws against magic.",
+            "effects": []
+          },
+          {
+            "name": "Languages",
+            "desc": "You can speak, read, and write Common and Gnomish. The Gnomish language, which uses the Dwarvish script, is renowned for its technical treatises and its catalogs of knowledge about the natural world.",
+            "languages": ["Common", "Gnomish"],
+            "effects": []
+          }
+        ],
+        "subraces": [
+          {
+            "name": "Deep/Svirfneblin",
+            "srcBooks": [
+              {
+                "name": "MTF",
+                "features": [
+                  {
+                    "name": "Ability Score Increase",
+                    "desc": "Your Intelligence score increases by 2 and your Dexterity score increases by 1.",
+                    "replaces": "Ability Score Increase",
+                    "effects": [
+                      {
+                        "category": "AbilityScore",
+                        "changes": { "INT": 2, "DEX": 1 }
+                      }
+                    ]
+                  },
+                  {
+                    "name": "Age",
+                    "desc": "Deep gnomes are short-lived for gnomes. They mature at the same rate humans do and are considered full-grown adults by 25. They live 200 to 250 years, although hard toil and the dangers of the Underdark often claim them before their time.",
+                    "replaces": "Age",
+                    "effects": []
+                  },
+                  {
+                    "name": "Size",
+                    "desc": "Unlike other gnomes, svirfneblin tend to weigh 80 to 120 pounds. Your size is Small.",
+                    "replaces": "Size",
+                    "effects": []
+                  },
+                  {
+                    "name": "Superior Darkvision",
+                    "desc": "Accustomed to life underground, you have superior vision in dark and dim conditions. You can see in dim light within 120 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray.",
+                    "replaces": "Darkvision",
+                    "effects": []
+                  },
+                  {
+                    "name": "Languages",
+                    "desc": "You can speak, read, and write Common, Gnomish, and Undercommon.",
+                    "replaces": "Languages",
+                    "languages": ["Common", "Gnomish", "Undercommon"],
+                    "effects": []
+                  },
+                  {
+                    "name": "Alignment",
+                    "desc": "Svirfneblin believe that survival depends on avoiding entanglements with other creatures and not making enemies, so they favor neutral alignments. They rarely wish others ill, and they are unlikely to take risks on behalf of others, except those dearest to them.",
+                    "effects": []
+                  },
+                  {
+                    "name": "Stone Camouflage",
+                    "desc": "You have advantage on Dexterity (Stealth) checks to hide in rocky terrain.",
+                    "effects": []
+                  }
+                ]
+              },
+              {
+                "name": "SCAG",
+                "features": [
+                  {
+                    "name": "Ability Score Increase",
+                    "desc": "Your Intelligence score increases by 2 and your Dexterity score increases by 1.",
+                    "replaces": "Ability Score Increase",
+                    "effects": [
+                      {
+                        "category": "AbilityScore",
+                        "changes": { "INT": 2, "DEX": 1 }
+                      }
+                    ]
+                  },
+                  {
+                    "name": "Age",
+                    "desc": "Deep gnomes are short-lived for gnomes. They mature at the same rate humans do and are considered full-grown adults by 25. They live 200 to 250 years, although hard toil and the dangers of the Underdark often claim them before their time.",
+                    "replaces": "Age",
+                    "effects": []
+                  },
+                  {
+                    "name": "Size",
+                    "desc": "A typical svirfneblin stands about 3 to 3½ feet tall and weighs 80 to 120 pounds. Your size is Small.",
+                    "replaces": "Size",
+                    "effects": []
+                  },
+                  {
+                    "name": "Superior Darkvision",
+                    "desc": "Accustomed to life underground, you have superior vision in dark and dim conditions. You can see in dim light within 120 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray.",
+                    "replaces": "Darkvision",
+                    "effects": []
+                  },
+                  {
+                    "name": "Languages",
+                    "desc": "You can speak, read, and write Common, Gnomish, and Undercommon. The svirfneblin dialect is more guttural than surface Gnomish, and most svirfneblin know only a little bit of Common, but those who deal with outsiders (and that includes you as an adventurer) pick up enough Common to get by in other lands.",
+                    "replaces": "Languages",
+                    "languages": ["Common", "Gnomish", "Undercommon"],
+                    "effects": []
+                  },
+                  {
+                    "name": "Alignment",
+                    "desc": "Svirfneblin believe that survival depends on avoiding entanglements with other creatures and not making enemies, so they favor neutral alignments. They rarely wish others ill, and they are unlikely to take risks on behalf of others, except those dearest to them.",
+                    "effects": []
+                  },
+                  {
+                    "name": "Stone Camouflage",
+                    "desc": "You have advantage on Dexterity (Stealth) checks to hide in rocky terrain.",
+                    "effects": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Forest",
+            "srcBook": "PHB",
+            "features": [
+              {
+                "name": "Ability Score Increase",
+                "desc": "Your Intelligence score increases by 2 and your Dexterity score increases by 1.",
+                "replaces": "Ability Score Increase",
+                "effects": [
+                  {
+                    "category": "AbilityScore",
+                    "changes": { "INT": 2, "DEX": 1 }
+                  }
+                ]
+              },
+              {
+                "name": "Natural Illusionist",
+                "desc": "You know the Minor Illusion cantrip. Intelligence is your spellcasting ability for it.",
+                "spellcastingAbility": "INT",
+                "spells": [
+                  {
+                    "name": "Minor Illusion",
+                    "level": 0,
+                    "school": "Illusion",
+                    "ritual": false,
+                    "castTime": "1 action",
+                    "range": "30 ft",
+                    "components": {
+                      "v": false,
+                      "s": true,
+                      "m": {
+                        "text": "a bit of fleece",
+                        "costly": false,
+                        "consumed": false
+                      }
+                    },
+                    "duration": "1 minute",
+                    "concentration": false,
+                    "description": [
+                      "You create a sound or an image of an object within range that lasts for the duration. The illusion also ends if you dismiss it as an action or cast this spell again.",
+                      "If you create a sound, its volume can range from a whisper to a scream. It can be your voice, someone else's voice, a lion's roar, a beating of drums, or any other sound you choose. The sound continues unabated throughout the duration, or you can make discrete sounds at different times before the spell ends.",
+                      "If you create an image of an object — such as a chair, muddy footprints, or a small chest — it must be no larger than a 5-foot cube. The image can't create sound, light, smell, or any other sensory effect. Physical interaction with the image reveals it to be an illusion, because things can pass through it.",
+                      "If a creature uses its action to examine the sound or image, the creature can determine that it is an illusion with a successful Intelligence (Investigation) check against your spell save DC. If a creature discerns the illusion for what it is, the illusion becomes faint to the creature."
+                    ],
+                    "upcast": false,
+                    "race": "Gnome",
+                    "prepared": 2
+                  }
+                ],
+                "effects": []
+              },
+              {
+                "name": "Speak with Small Beasts",
+                "desc": "Through sounds and gestures, you can communicate simple ideas with Small or smaller beasts. Forest gnomes love animals and often keep squirrels, badgers, rabbits, moles, woodpeckers, and other creatures as beloved pets.",
+                "effects": []
+              }
+            ]
+          },
+          {
+            "name": "Rock",
+            "srcBook": "PHB",
+            "features": [
+              {
+                "name": "Ability Score Increase",
+                "desc": "Your Intelligence score increases by 2.",
+                "effects": [
+                  { "category": "AbilityScore", "changes": { "INT": 2 } }
+                ]
+              },
+              {
+                "name": "Age",
+                "desc": "Gnomes mature at the same rate humans do, and most are expected to settle down into an adult life by around age 40. They can live 350 to almost 500 years.",
+                "effects": []
+              },
+              {
+                "name": "Size",
+                "desc": "Gnomes are between 3 and 4 feet tall and average about 40 pounds. Your size is Small.",
+                "effects": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
