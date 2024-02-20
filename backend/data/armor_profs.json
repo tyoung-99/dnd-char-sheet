@@ -14,5 +14,9 @@
   {
     "name": "Heavy",
     "profs": ["Ring Mail", "Chain Mail", "Splint", "Plate"]
+  },
+  {
+    "name": "Shields",
+    "profs": ["Shields"]
   }
 ]
