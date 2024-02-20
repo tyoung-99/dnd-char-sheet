@@ -34,7 +34,7 @@ app.get("/api/characters", async (req, res) => {
 app.get("/api/characters/:id", async (req, res) => {
   const { id } = req.params;
 
-  // Getting object _id from mongodb format:
+  // If we want to use the MongoDB id: Getting object _id from mongodb format:
   // var o_id = new ObjectId('65d3d20f6bce77f479d8babc');
   const char = await getOneCharacter(db, parseInt(id));
 
@@ -70,7 +70,7 @@ app.post("/api/img/char/:id/remove", async (req, res) => {
 
 // Alignments
 app.get("/api/alignments", async (req, res) => {
-  res.send(await getAlignments());
+  res.send(await getAlignments(db));
 });
 
 // Proficiencies

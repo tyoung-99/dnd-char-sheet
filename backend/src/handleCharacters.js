@@ -15,7 +15,8 @@ export const getOneCharacter = async (db, id) => {
 
 export const setCharacter = async (db, id, newChar) => {
   try {
-    await db.collection('characters').updateOne({ "id": id }, newChar);
+    delete newChar._id; // Without this line, the replace changes the _id on replace
+    await db.collection('characters').replaceOne({ "id": id }, newChar);
   } catch (error) {
     return { success: false, reason: "Couldn't write to characters file." };
   }
