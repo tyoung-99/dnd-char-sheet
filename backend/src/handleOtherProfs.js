@@ -1,5 +1,3 @@
-import { readFile } from "fs/promises";
-
 export const getWeaponProfs = async (db) => {
   const collection = db.collection('proficiencies');
   const weaponProfs = await collection.find({ "profType": "Weapon" }).toArray();

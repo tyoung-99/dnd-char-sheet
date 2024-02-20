@@ -1,5 +1,3 @@
-import { readFile, writeFile } from "fs/promises";
-
 export const getCharacters = async (db) => {
   // specifically for the mongodb find method, you must seperate the collection and find method on two lines
   const collection = db.collection('characters');
