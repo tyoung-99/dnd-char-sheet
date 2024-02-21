@@ -5,7 +5,7 @@ import axios from "axios";
 import GenericModal from "./GenericModal";
 import "../../styling/components/modals/RaceModal.css";
 
-const RaceModal = ({ character, closeModal, isOpen }) => {
+const RaceModal = ({ character, closeModal }) => {
   const [raceName, setRaceName] = useState(character.race.name);
   const [raceSrcbook, setRaceSrcbook] = useState(character.race.raceSrcbook);
   const [raceFeatureList, setRaceFeatureList] = useState(
@@ -355,7 +355,6 @@ const RaceModal = ({ character, closeModal, isOpen }) => {
 
   return (
     <GenericModal
-      isOpen={isOpen}
       closeModal={closeModal}
       header={header}
       body={body}

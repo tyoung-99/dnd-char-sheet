@@ -4,7 +4,6 @@ import "../../styling//components/modals/GenericModal.css";
 import { useEffect } from "react";
 
 const GenericModal = ({
-  isOpen = false,
   closeModal,
   header,
   body,

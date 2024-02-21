@@ -173,7 +173,6 @@ const CharacterSpellcastingTab = ({ character }) => {
               spell={spell}
               character={character}
               closeModal={closeModal}
-              isOpen={currentModal === key}
             />
           )}
         </div>

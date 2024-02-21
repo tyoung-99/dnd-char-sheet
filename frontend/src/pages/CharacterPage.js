@@ -183,11 +183,7 @@ const CharacterPage = () => {
               : ""}
           </p>
           {currentModal === "race" && (
-            <RaceModal
-              character={character}
-              closeModal={closeModal}
-              isOpen={currentModal === "race"}
-            />
+            <RaceModal character={character} closeModal={closeModal} />
           )}
           <InlineClassListComp classes={character.classes} />
         </div>
