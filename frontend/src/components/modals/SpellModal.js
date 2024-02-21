@@ -52,8 +52,8 @@ const SpellModal = ({ spell, character, closeModal, isOpen }) => {
 
   const body = (
     <>
-      {spell.description.map((paragraph) => (
-        <p>{paragraph}</p>
+      {spell.description.map((paragraph, i) => (
+        <p key={i}>{paragraph}</p>
       ))}
     </>
   );
@@ -78,6 +78,7 @@ const SpellModal = ({ spell, character, closeModal, isOpen }) => {
       header={header}
       body={body}
       footer={footer}
+      category={"spell"}
     />
   );
 };

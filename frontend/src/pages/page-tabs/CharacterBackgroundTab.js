@@ -1,6 +1,28 @@
 // Character's background details/backstory
 
+import axios from "axios";
+import { useState, useEffect } from "react";
+
 const CharacterBackgroundTab = ({ character }) => {
+  const [imgURLs, setImgURLs] = useState([]);
+
+  useEffect(() => {
+    const loadImgURLs = async () => {
+      const newImgURLs = [];
+      for (const id of character.appearance.pictureIds) {
+        try {
+          const imgBlob = await axios.get(`/api/img/char/${id}`, {
+            responseType: "blob",
+          });
+          newImgURLs.push(URL.createObjectURL(imgBlob.data));
+        } catch (error) {}
+      }
+      setImgURLs(newImgURLs);
+    };
+
+    loadImgURLs();
+  }, [character.appearance.pictureIds]);
+
   const background = (
     <>
       <h1>Background: {character.background.name}</h1>
@@ -56,10 +78,10 @@ const CharacterBackgroundTab = ({ character }) => {
       </div>
       <h2>Description</h2>
       <div className="float-right col-flex">
-        {character.appearance.pictures.map((pic, i) => (
+        {imgURLs.map((src, i) => (
           <img
             key={i}
-            src={process.env.PUBLIC_URL + `/img/${pic}`}
+            src={src}
             alt={`${character.name}`}
             className="height-8"
           ></img>
@@ -84,7 +106,7 @@ const CharacterBackgroundTab = ({ character }) => {
               {ally.symbols.map((sym, j) => (
                 <img
                   key={j}
-                  src={process.env.PUBLIC_URL + `/img/${sym}`}
+                  src={process.env.PUBLIC_URL + `/img/char_pics/${sym}`}
                   alt={`${ally.name}`}
                   className="height-8 float-right"
                 ></img>

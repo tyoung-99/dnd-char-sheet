@@ -120,18 +120,6 @@
   height: 100%;
 }
 
-/* Specify headers to allow default size ones inside grid tiles */
-h1 {
-  font-style: normal;
-  font-weight: bold;
-  font-size: 2rem;
-}
-h1.header-override {
-  font-style: normal;
-  font-weight: bold;
-  font-size: 2rem;
-}
-
 .hover-icon {
   height: 1rlh;
   margin: 1px;
@@ -141,14 +129,32 @@ p:has(> .hover-icon) {
   display: inline;
 }
 
-img.avatar {
+.avatar {
   height: 3rlh;
   width: 3rlh;
-  display: inline-block;
   vertical-align: middle;
-  margin: 0.5rlh;
 }
 .avatar-label {
   display: inline-block;
   vertical-align: middle;
+}
+.avatar-container {
+  display: inline-block;
+  height: 3rlh;
+  width: 3rlh;
+  margin: 0.5rlh;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.catch-outside-clicks {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  position: fixed;
+  overflow: auto;
 }

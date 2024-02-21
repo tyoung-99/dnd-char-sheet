@@ -16,17 +16,17 @@
   border: 1px solid black;
   padding-left: 0px;
 }
-.nav li {
+.nav > li {
   width: 50%;
   padding: 1rem;
   list-style: none;
   text-align: center;
   cursor: pointer;
 }
-.nav li:hover {
+.nav > li:hover {
   background: lightgray;
 }
-.nav li.active {
+.nav > li.active {
   background: black;
   color: white;
 }
@@ -35,10 +35,21 @@
 /* Character name/other basic info */
 .name-header {
   text-align: center;
-  line-height: 50%;
   margin-bottom: 1rem;
 }
-.name-header h2 {
+.name-header .char-name {
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 2rem;
+  font-family: inherit;
+  text-align: center;
+}
+.name-header .player-name {
+  margin: 0.5rem 0;
   font-style: italic;
   font-weight: normal;
   font-size: 1rem;
@@ -48,11 +59,23 @@
   display: inline-block;
   margin: 0.5rem;
 }
+.race {
+  cursor: pointer;
+}
 /* XP total/inspiration */
 .xp-inspire-header {
   position: absolute;
   top: 1rem;
   right: 1rem;
+  text-align: right;
+  display: inline-block;
+}
+.xp-inspire-header p,
+.xp-inspire-header input,
+.xp-inspire-header img {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0.25rem;
 }
 /* Combat-related info for easy reference */
 .combat-header {
@@ -79,4 +102,34 @@
 }
 .filled {
   background-color: black;
+}
+
+.saved-message {
+  margin: 0px 1em;
+}
+.saved-message-shown {
+  opacity: 1;
+  transition: all 250ms linear;
+}
+.saved-message-hidden {
+  opacity: 0;
+  transition: all 250ms linear 2s;
+}
+
+.avatar-edit {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  height: 1rlh;
+  width: 1rlh;
+  margin: 1px;
+  opacity: 0.75;
+  display: none;
+}
+.avatar-container {
+  position: relative;
+  cursor: pointer;
+}
+.avatar-container:hover .avatar-edit {
+  display: block;
 }

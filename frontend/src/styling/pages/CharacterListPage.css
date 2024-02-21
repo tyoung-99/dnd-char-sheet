@@ -1,5 +1,10 @@
-/* Buttons to access characters */
-.character-list-item {
+.character-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.character-list-link {
   text-decoration: none;
   color: black;
   padding: 10px 10px;
@@ -13,18 +18,12 @@
   justify-content: center;
 }
 
-.character-list-item:hover {
+.character-list-link:hover {
   background-color: lightgray;
 }
 
-.character-list-item > div {
+.character-list-info {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-div:has(> .character-list-item) {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
 }

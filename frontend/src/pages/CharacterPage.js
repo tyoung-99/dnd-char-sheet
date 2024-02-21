@@ -1,7 +1,7 @@
 // Full character sheet
 
 import "../styling/pages/CharacterPage.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import Character from "../Character";
@@ -15,30 +15,102 @@ import CharacterBuffsTab from "./page-tabs/CharacterBuffsTab";
 import CharacterEquipmentTab from "./page-tabs/CharacterEquipmentTab";
 import CharacterSpellcastingTab from "./page-tabs/CharacterSpellcastingTab";
 import DeathSavesComp from "../components/DeathSavesComp";
+import XpComp from "../components/XpComp";
+import MultiColumnDropdownComp from "../components/MultiColumnDropdownComp";
+import RaceModal from "../components/modals/RaceModal";
 
 const CharacterPage = () => {
   const [activeTab, setActiveTab] = useState("main");
+  const [currentModal, setCurrentModal] = useState("");
 
   const { characterID } = useParams();
   const [character, setCharacter] = useState();
+  const [avatarURL, setAvatarURL] = useState();
+  const [alignmentList, setAlignmentList] = useState();
+
+  const [showingSavedMessage, setShowingSavedMessage] = useState(false);
+  const fileInput = useRef(null);
+
+  const [editingCharName, setEditingCharName] = useState(false);
 
   useEffect(() => {
-    const loadCharacter = async () => {
-      const response = await axios.get(`/api/characters/${characterID}`);
-      const newChar = Object.assign(new Character(), response.data);
+    const loadData = async () => {
+      let response = await axios.get(`/api/characters/${characterID}`);
+      const newChar = Object.assign(
+        await Character.create(setShowingSavedMessage),
+        response.data
+      );
       setCharacter(newChar);
+      refreshAvatarImg(newChar);
+
+      response = await axios.get("/api/alignments");
+      setAlignmentList(response.data);
     };
 
-    loadCharacter();
+    loadData();
   }, [characterID]);
+
+  const openModal = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const modal = event.target.dataset.modal;
+    if (modal) {
+      setCurrentModal(modal);
+    }
+  };
+
+  const closeModal = () => {
+    setCurrentModal("");
+  };
+
+  const refreshAvatarImg = async (character) => {
+    try {
+      const imgBlob = await axios.get(`/api/img/char/${character.avatarId}`, {
+        responseType: "blob",
+      });
+      setAvatarURL(URL.createObjectURL(imgBlob.data));
+    } catch (error) {} // No need to do anything if there was no image, alt text will display
+  };
+
+  const applyNewAvatar = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await axios.put("api/img/char/add", formData, {
+      headers: { "content-type": "multipart/form-data" },
+    });
+
+    if (character.avatarId !== 0) {
+      axios.post(`/api/img/char/${character.avatarId}/remove`);
+    }
+
+    character.setAvatar(response.data);
+    refreshAvatarImg(character);
+  };
 
   if (!character) {
     return <div>Loading...</div>;
   }
 
+  const inspirationHeader = (
+    <div>
+      <p>Inspiration:</p>
+      <input
+        type="button"
+        id="toggleInspiration"
+        name="toggleInspiration"
+        value={character.inspiration ? "Yes" : "No"}
+        onClick={() => character.setInspiration(!character.inspiration)}
+      ></input>
+    </div>
+  );
+
   return (
     <div>
-      <div className="menu-bar">
+      <div className="menu-bar row-flex">
         <Link to="/">
           <input
             type="button"
@@ -47,29 +119,80 @@ const CharacterPage = () => {
             value="< Back to List"
           ></input>
         </Link>
+        <p
+          className={`saved-message ${
+            showingSavedMessage ? "saved-message-shown" : "saved-message-hidden"
+          }`}
+          onTransitionEnd={() => setShowingSavedMessage(false)}
+        >
+          Saved
+        </p>
       </div>
       <div className="name-header">
-        <img
-          src={process.env.PUBLIC_URL + `/img/${character.avatarSrc}`}
-          alt="Avatar"
-          className="avatar"
-        ></img>
+        <div
+          className="avatar-container"
+          onClick={() => {
+            fileInput.current.click();
+          }}
+        >
+          <img src={avatarURL} alt="Avatar" className="avatar"></img>
+          <img
+            src={process.env.PUBLIC_URL + "/icons/edit.png"}
+            alt=""
+            className="avatar-edit"
+          ></img>
+          <input
+            type="file"
+            id="avatar-input"
+            name="avatar-input"
+            className="hidden-file-input"
+            ref={fileInput}
+            accept="image/*"
+            onChange={applyNewAvatar}
+          ></input>
+        </div>
         <div className="avatar-label">
-          <h1>{character.name} </h1>
-          <h2>{character.player}</h2>
-          <p>{character.alignment}</p>
-          <p>
+          {editingCharName ? (
+            <textarea
+              id="char-name"
+              name="char-name"
+              className="char-name"
+              autoFocus
+              defaultValue={character.name}
+              placeholder="Character Name"
+              onBlur={(event) => {
+                character.setName(event.target.value);
+                setEditingCharName(false);
+              }}
+            ></textarea>
+          ) : (
+            <h1 className="char-name" onClick={() => setEditingCharName(true)}>
+              {character.name || "Character Name"}
+            </h1>
+          )}
+          <h2 className="player-name">{character.player}</h2>
+          <MultiColumnDropdownComp
+            buttonText={character.alignment}
+            contents={alignmentList}
+            onSelect={(newAlignment) => character.setAlignment(newAlignment)}
+          ></MultiColumnDropdownComp>
+          <p className="race" data-modal="race" onClick={openModal}>
             {character.race.name}{" "}
             {character.race.subrace !== null
               ? `(${character.race.subrace})`
               : ""}
           </p>
+          <RaceModal
+            character={character}
+            closeModal={closeModal}
+            isOpen={currentModal === "race"}
+          />
           <InlineClassListComp classes={character.classes} />
         </div>
       </div>
       <div className="xp-inspire-header">
-        <div>XP: {character.xp}</div>
-        <div>Inspiration: {character.inspiration ? "Yes" : "No"}</div>
+        {character.xp.uses && <XpComp character={character}></XpComp>}
+        {inspirationHeader}
       </div>
       <div className="combat-header">
         <div>

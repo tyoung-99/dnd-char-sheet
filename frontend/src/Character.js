@@ -1,76 +1,63 @@
 // Represents 1 character and all its data, performs various calculations on data to allow easier external access to elements of character that depend on other elements
 
+import axios from "axios";
+import Timer from "./Timer";
+
 class Character {
-  // Order of groups reversed b/c when inserting into list of profs, order gets reversed again
-  WEAPON_PROF_GROUPS = [
-    {
-      name: "Martial",
-      profs: [
-        "Battleaxes",
-        "Double-bladed Scimitars",
-        "Flails",
-        "Glaives",
-        "Greataxes",
-        "Greatswords",
-        "Halberds",
-        "Lances",
-        "Longswords",
-        "Mauls",
-        "Morningstars",
-        "Pikes",
-        "Rapiers",
-        "Scimitars",
-        "Shortswords",
-        "Tridents",
-        "War Picks",
-        "Warhammers",
-        "Whips",
-        "Blowguns",
-        "Hand Crossbows",
-        "Heavy Crossbows",
-        "Longbows",
-        "Nets",
-      ],
-    },
-    {
-      name: "Simple",
-      profs: [
-        "Clubs",
-        "Daggers",
-        "Greatclubs",
-        "Handaxes",
-        "Javelins",
-        "Light Hammers",
-        "Maces",
-        "Quarterstaffs",
-        "Sickles",
-        "Spears",
-        "Yklwas",
-        "Light Crossbows",
-        "Darts",
-        "Shortbows",
-        "Slings",
-      ],
-    },
-  ];
-  ARMOR_PROF_GROUPS = [
-    {
-      name: "Heavy",
-      profs: ["Ring Mail", "Chain Mail", "Splint", "Plate"],
-    },
-    {
-      name: "Medium",
-      profs: [
-        "Hide",
-        "Chain Shirt",
-        "Scale Mail",
-        "Breastplate",
-        "Half Plate",
-        "Spiked Armor",
-      ],
-    },
-    { name: "Light", profs: ["Padded", "Leather", "Studded Leather"] },
-  ];
+  static async create(setShowingSavedMessage) {
+    // Reverse order of groups b/c when inserting into list of profs, order gets reversed again
+    const weaponProfGroups = (
+      await axios.get("/api/proficiencies/weapons")
+    ).data.reverse();
+    const armorProfGroups = (
+      await axios.get("/api/proficiencies/armor")
+    ).data.reverse();
+    return new Character(
+      setShowingSavedMessage,
+      weaponProfGroups,
+      armorProfGroups
+    );
+  }
+
+  constructor(setShowingSavedMessage, weaponProfGroups, armorProfGroups) {
+    this.queueSave = Timer(this.saveCharacter, 5000);
+    this.setShowingSavedMessage = setShowingSavedMessage;
+    this.weaponProfGroups = weaponProfGroups;
+    this.armorProfGroups = armorProfGroups;
+  }
+
+  async saveCharacter() {
+    const response = await axios.put(`/api/characters/${this.id}/update`, {
+      newChar: this,
+    });
+    if (response.data.success) this.setShowingSavedMessage(true);
+    else window.alert(response.data.reason);
+  }
+
+  setName(newName) {
+    this.name = newName;
+    this.saveCharacter();
+  }
+
+  setAvatar(newFileId) {
+    this.avatarId = newFileId;
+    this.saveCharacter();
+  }
+
+  setAlignment(newAlignment) {
+    this.alignment = newAlignment;
+    this.saveCharacter();
+  }
+
+  setXp(newXp) {
+    this.xp.amount = newXp;
+    this.saveCharacter();
+  }
+
+  setInspiration(newInspiration) {
+    this.inspiration = newInspiration;
+    this.saveCharacter();
+  }
 
   getAbilities() {
     return this.abilities.map((ability) => ({
@@ -174,7 +161,6 @@ class Character {
       first.name > second.name ? 1 : first.name === second.name ? 0 : -1
     );
 
-    console.log(skills);
     return skills;
   }
 
@@ -307,7 +293,8 @@ class Character {
     let cleanProfs = [
       ...new Set([...this.weaponProfs].map((prof) => prof.name)),
     ];
-    this.WEAPON_PROF_GROUPS.forEach((group) => {
+
+    this.weaponProfGroups.forEach((group) => {
       if (group.profs.every((prof) => cleanProfs.includes(prof))) {
         cleanProfs.unshift(group.name);
         cleanProfs = cleanProfs.filter((prof) => !group.profs.includes(prof));
@@ -320,7 +307,7 @@ class Character {
     let cleanProfs = [
       ...new Set([...this.armorProfs].map((prof) => prof.name)),
     ];
-    this.ARMOR_PROF_GROUPS.forEach((group) => {
+    this.armorProfGroups.forEach((group) => {
       if (group.profs.every((prof) => cleanProfs.includes(prof))) {
         cleanProfs.unshift(group.name);
         cleanProfs = cleanProfs.filter((prof) => !group.profs.includes(prof));
@@ -689,12 +676,42 @@ class Character {
     return this.features.find((feature) => feature.name === featureName);
   }
 
-  getClassFeatures() {
-    return this.features.filter((feature) => feature.class);
-  }
+  getFeatures({
+    fromClass,
+    fromRace,
+    fromSubrace,
+    fromBackground,
+    fromFeat,
+  } = {}) {
+    let features = [];
 
-  getOtherFeatures() {
-    return this.features.filter((feature) => !feature.class);
+    if (fromClass) {
+      features = features.concat(
+        this.features.filter((feature) => feature.class)
+      );
+    }
+    if (fromRace) {
+      features = features.concat(
+        this.features.filter((feature) => feature.race)
+      );
+    }
+    if (fromSubrace) {
+      features = features.concat(
+        this.features.filter((feature) => feature.subrace)
+      );
+    }
+    if (fromBackground) {
+      features = features.concat(
+        this.features.filter((feature) => feature.background)
+      );
+    }
+    if (fromFeat) {
+      features = features.concat(
+        this.features.filter((feature) => feature.feat)
+      );
+    }
+
+    return features;
   }
 
   #getFeatureEffects(category) {

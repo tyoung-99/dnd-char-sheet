@@ -3,7 +3,14 @@
 import "../../styling//components/modals/GenericModal.css";
 import { useEffect } from "react";
 
-const GenericModal = ({ isOpen = false, closeModal, header, body, footer }) => {
+const GenericModal = ({
+  isOpen = false,
+  closeModal,
+  header,
+  body,
+  footer,
+  category,
+}) => {
   // Prevent scroll while open
   useEffect(() => {
     if (isOpen) {
@@ -15,17 +22,17 @@ const GenericModal = ({ isOpen = false, closeModal, header, body, footer }) => {
 
   return isOpen ? (
     <div
-      className="modal-background"
+      className={`modal-background ${category}-modal-background`}
       onClick={(event) => {
         if (!event.target.closest(".modal-container")) {
           closeModal();
         }
       }}
     >
-      <div className="modal-container">
-        <div className="header">{header}</div>
-        <div className="body">{body}</div>
-        <div className="footer">{footer}</div>
+      <div className={`modal-container ${category}-modal-container`}>
+        <div className={`header ${category}-header`}>{header}</div>
+        <div className={`body ${category}-body`}>{body}</div>
+        <div className={`footer ${category}-footer`}>{footer}</div>
       </div>
     </div>
   ) : null;
