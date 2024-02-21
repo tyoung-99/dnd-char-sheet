@@ -333,8 +333,8 @@ class Character {
     ];
     this.armorProfGroups.forEach((group) => {
       if (group.profs.every((prof) => cleanProfs.includes(prof))) {
-        cleanProfs.unshift(group.name);
         cleanProfs = cleanProfs.filter((prof) => !group.profs.includes(prof));
+        cleanProfs.unshift(group.name);
       }
     });
     return cleanProfs;
@@ -464,7 +464,7 @@ class Character {
   }
 
   getSpeeds() {
-    const speeds = Object.assign({}, this.speed);
+    const speeds = { walk: 0, swim: 0, fly: 0 };
     const category = "Speed";
     const bonuses = this.#getEffects(category);
     const modifiers = { walk: 0, swim: 0, fly: 0 },
@@ -483,7 +483,9 @@ class Character {
     /* RAW doesn't address order of operations, using modifiers before multipliers 
     b/c it's consistent w/ how damage resistance is handled, and it makes modifiers 
     consistent in effect, rather than being devestating or negligible, as they would 
-    when applied after a halving/doubling of speed, respectively */
+    when applied after a halving/doubling of speed, respectively.
+
+    This also allows base speed to be just a modifier w/in a feature, since all modifiers are added first. */
     Object.keys(modifiers).forEach((speedType) => {
       speeds[speedType] += modifiers[speedType];
       speeds[speedType] *= multipliers[speedType];
