@@ -14,12 +14,11 @@ const GenericModal = ({
 }) => {
   // Prevent scroll while open
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
+    document.body.style.overflow = "hidden";
+    return () => {
       document.body.style.overflow = "";
-    }
-  }, [isOpen]);
+    };
+  }, []);
 
   return (
     <div
