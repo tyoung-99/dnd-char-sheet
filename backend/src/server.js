@@ -1,5 +1,6 @@
 import express from "express";
 import multer from "multer";
+import 'dotenv/config';
 import { db, connectToDb } from './db.js';
 import { MongoClient, ObjectId } from 'mongodb';
 import { getCharacters, getOneCharacter, setCharacter } from "./handleCharacters.js";
