@@ -92,34 +92,41 @@ app.get("/api/races/list", async (req, res) => {
 });
 app.get("/api/races/:raceName/sources", async (req, res) => {
   const { raceName } = req.params;
-  res.send(await getRaceSrcbooks());
+  res.send(await getRaceSrcbooks(raceName));
 });
 app.get(
   "/api/races/:raceName/sources/:raceSrcBook/features",
   async (req, res) => {
     const { raceName, raceSrcBook } = req.params;
-    res.send(await getRaceFeatures());
+    res.send(await getRaceFeatures(raceName, raceSrcBook));
   }
 );
 app.get(
   "/api/races/:raceName/sources/:raceSrcBook/subraces/list",
   async (req, res) => {
     const { raceName, raceSrcBook } = req.params;
-    res.send(await getSubraces());
+    res.send(await getSubraces(raceName, raceSrcBook));
   }
 );
 app.get(
   "/api/races/:raceName/sources/:raceSrcBook/subraces/:subraceName/sources",
   async (req, res) => {
     const { raceName, raceSrcBook, subraceName } = req.params;
-    res.send(await getSubraceSrcbooks());
+    res.send(await getSubraceSrcbooks(raceName, raceSrcBook, subraceName));
   }
 );
 app.get(
   "/api/races/:raceName/sources/:raceSrcBook/subraces/:subraceName/sources/:subraceSrcBook/features",
   async (req, res) => {
     const { raceName, raceSrcBook, subraceName, subraceSrcBook } = req.params;
-    res.send(await getSubraceFeatures());
+    res.send(
+      await getSubraceFeatures(
+        raceName,
+        raceSrcBook,
+        subraceName,
+        subraceSrcBook
+      )
+    );
   }
 );
 

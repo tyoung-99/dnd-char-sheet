@@ -1,5 +1,299 @@
 [
   {
+    "name": "Race1",
+    "srcBooks": [
+      {
+        "name": "Src1.1",
+        "features": [
+          { "name": "Feature1.1.1", "desc": ["Feature1.1.1Desc"] },
+          { "name": "Feature1.1.2", "desc": ["Feature1.1.2Desc"] }
+        ],
+        "subraces": [
+          {
+            "name": "Subrace1.1.1",
+            "srcBooks": [
+              {
+                "name": "Src1.1.1.1",
+                "features": [
+                  {
+                    "name": "Feature1.1.1.1.1",
+                    "desc": ["Feature1.1.1.1.1Desc"]
+                  },
+                  {
+                    "name": "Feature1.1.1.1.2",
+                    "desc": ["Feature1.1.1.1.2Desc"]
+                  }
+                ]
+              },
+              {
+                "name": "Src1.1.1.2",
+                "features": [
+                  {
+                    "name": "Feature1.1.1.2.1",
+                    "desc": ["Feature1.1.1.2.1Desc"]
+                  },
+                  {
+                    "name": "Feature1.1.1.2.2",
+                    "desc": ["Feature1.1.1.2.2Desc"]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Subrace1.1.2",
+            "srcBooks": [
+              {
+                "name": "Src1.1.2.1",
+                "features": [
+                  {
+                    "name": "Feature1.1.2.1.1",
+                    "desc": ["Feature1.1.2.1.1Desc"]
+                  },
+                  {
+                    "name": "Feature1.1.2.1.2",
+                    "desc": ["Feature1.1.2.1.2Desc"]
+                  }
+                ]
+              },
+              {
+                "name": "Src1.1.2.2",
+                "features": [
+                  {
+                    "name": "Feature1.1.2.2.1",
+                    "desc": ["Feature1.1.2.2.1Desc"]
+                  },
+                  {
+                    "name": "Feature1.1.2.2.2",
+                    "desc": ["Feature1.1.2.2.2Desc"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Src1.2",
+        "features": [
+          { "name": "Feature1.2.1", "desc": ["Feature1.2.1Desc"] },
+          { "name": "Feature1.2.2", "desc": ["Feature1.2.2Desc"] }
+        ],
+        "subraces": [
+          {
+            "name": "Subrace1.2.1",
+            "srcBooks": [
+              {
+                "name": "Src1.2.1.1",
+                "features": [
+                  {
+                    "name": "Feature1.2.1.1.1",
+                    "desc": ["Feature1.2.1.1.1Desc"]
+                  },
+                  {
+                    "name": "Feature1.2.1.1.2",
+                    "desc": ["Feature1.2.1.1.2Desc"]
+                  }
+                ]
+              },
+              {
+                "name": "Src1.2.1.2",
+                "features": [
+                  {
+                    "name": "Feature1.2.1.2.1",
+                    "desc": ["Feature1.2.1.2.1Desc"]
+                  },
+                  {
+                    "name": "Feature1.2.1.2.2",
+                    "desc": ["Feature1.2.1.2.2Desc"]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Subrace1.2.2",
+            "srcBooks": [
+              {
+                "name": "Src1.2.2.1",
+                "features": [
+                  {
+                    "name": "Feature1.2.2.1.1",
+                    "desc": ["Feature1.2.2.1.1Desc"]
+                  },
+                  {
+                    "name": "Feature1.2.2.1.2",
+                    "desc": ["Feature1.2.2.1.2Desc"]
+                  }
+                ]
+              },
+              {
+                "name": "Src1.2.2.2",
+                "features": [
+                  {
+                    "name": "Feature1.2.2.2.1",
+                    "desc": ["Feature1.2.2.2.1Desc"]
+                  },
+                  {
+                    "name": "Feature1.2.2.2.2",
+                    "desc": ["Feature1.2.2.2.2Desc"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Race2",
+    "srcBooks": [
+      {
+        "name": "Src2.1",
+        "features": [
+          { "name": "Feature2.1.1", "desc": ["Feature2.1.1Desc"] },
+          { "name": "Feature2.1.2", "desc": ["Feature2.1.2Desc"] }
+        ],
+        "subraces": [
+          {
+            "name": "Subrace2.1.1",
+            "srcBooks": [
+              {
+                "name": "Src2.1.1.1",
+                "features": [
+                  {
+                    "name": "Feature2.1.1.1.1",
+                    "desc": ["Feature2.1.1.1.1Desc"]
+                  },
+                  {
+                    "name": "Feature2.1.1.1.2",
+                    "desc": ["Feature2.1.1.1.2Desc"]
+                  }
+                ]
+              },
+              {
+                "name": "Src2.1.1.2",
+                "features": [
+                  {
+                    "name": "Feature2.1.1.2.1",
+                    "desc": ["Feature2.1.1.2.1Desc"]
+                  },
+                  {
+                    "name": "Feature2.1.1.2.2",
+                    "desc": ["Feature2.1.1.2.2Desc"]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Subrace2.1.2",
+            "srcBooks": [
+              {
+                "name": "Src2.1.2.1",
+                "features": [
+                  {
+                    "name": "Feature2.1.2.1.1",
+                    "desc": ["Feature2.1.2.1.1Desc"]
+                  },
+                  {
+                    "name": "Feature2.1.2.1.2",
+                    "desc": ["Feature2.1.2.1.2Desc"]
+                  }
+                ]
+              },
+              {
+                "name": "Src2.1.2.2",
+                "features": [
+                  {
+                    "name": "Feature2.1.2.2.1",
+                    "desc": ["Feature2.1.2.2.1Desc"]
+                  },
+                  {
+                    "name": "Feature2.1.2.2.2",
+                    "desc": ["Feature2.1.2.2.2Desc"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Src2.2",
+        "features": [
+          { "name": "Feature2.2.1", "desc": ["Feature2.2.1Desc"] },
+          { "name": "Feature2.2.2", "desc": ["Feature2.2.2Desc"] }
+        ],
+        "subraces": [
+          {
+            "name": "Subrace2.2.1",
+            "srcBooks": [
+              {
+                "name": "Src2.2.1.1",
+                "features": [
+                  {
+                    "name": "Feature2.2.1.1.1",
+                    "desc": ["Feature2.2.1.1.1Desc"]
+                  },
+                  {
+                    "name": "Feature2.2.1.1.2",
+                    "desc": ["Feature2.2.1.1.2Desc"]
+                  }
+                ]
+              },
+              {
+                "name": "Src2.2.1.2",
+                "features": [
+                  {
+                    "name": "Feature2.2.1.2.1",
+                    "desc": ["Feature2.2.1.2.1Desc"]
+                  },
+                  {
+                    "name": "Feature2.2.1.2.2",
+                    "desc": ["Feature2.2.1.2.2Desc"]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Subrace2.2.2",
+            "srcBooks": [
+              {
+                "name": "Src2.2.2.1",
+                "features": [
+                  {
+                    "name": "Feature2.2.2.1.1",
+                    "desc": ["Feature2.2.2.1.1Desc"]
+                  },
+                  {
+                    "name": "Feature2.2.2.1.2",
+                    "desc": ["Feature2.2.2.1.2Desc"]
+                  }
+                ]
+              },
+              {
+                "name": "Src2.2.2.2",
+                "features": [
+                  {
+                    "name": "Feature2.2.2.2.1",
+                    "desc": ["Feature2.2.2.2.1Desc"]
+                  },
+                  {
+                    "name": "Feature2.2.2.2.2",
+                    "desc": ["Feature2.2.2.2.2Desc"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "name": "Gnome",
     "srcBooks": [
       {

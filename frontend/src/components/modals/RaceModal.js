@@ -19,10 +19,18 @@ const RaceModal = ({ character, closeModal, isOpen }) => {
     character.getFeatures({ fromSubrace: true })
   );
 
-  const [optionsRaces, optionsSetRaces] = useState(null);
-  const [optionsRaceSrcbooks, optionsSetRaceSrcbooks] = useState(null);
-  const [optionsSubraces, optionsSetSubraces] = useState(null);
-  const [optionsSubraceSrcbooks, optionsSetSubraceSrcbooks] = useState(null);
+  // Using arrays w/ current race choices as default to prevent warning sign flashing for a split second
+  // (Warning flashes if empty array used b/c current race choices aren't in it)
+  const [optionsRaces, optionsSetRaces] = useState([character.race.name]);
+  const [optionsRaceSrcbooks, optionsSetRaceSrcbooks] = useState([
+    character.race.raceSrcbook,
+  ]);
+  const [optionsSubraces, optionsSetSubraces] = useState([
+    character.race.subrace,
+  ]);
+  const [optionsSubraceSrcbooks, optionsSetSubraceSrcbooks] = useState([
+    character.race.subraceSrcbook,
+  ]);
 
   const changedRace = useRef(false);
   const changedSubrace = useRef(false);
@@ -161,167 +169,161 @@ const RaceModal = ({ character, closeModal, isOpen }) => {
     </>
   );
 
-  let raceSection = null;
-  if (optionsRaces && optionsRaceSrcbooks) {
-    const raceMissing =
-      optionsRaces && !optionsRaces.includes(raceName) && raceName !== "";
-    const raceSrcbookMissing =
-      optionsRaceSrcbooks &&
-      !optionsRaceSrcbooks.includes(raceSrcbook) &&
-      raceSrcbook !== "";
+  const raceMissing =
+    optionsRaces && !optionsRaces.includes(raceName) && raceName !== "";
+  const raceSrcbookMissing =
+    optionsRaceSrcbooks &&
+    !optionsRaceSrcbooks.includes(raceSrcbook) &&
+    raceSrcbook !== "";
 
-    raceSection = (
-      <>
-        <label htmlFor="race" className="category-name">
-          Race:{" "}
-        </label>
-        <select name="race" id="race" value={raceName} onChange={updateRace}>
-          <option hidden value={""}>
-            Select Race
-          </option>
-          {raceMissing && (
-            <option hidden key={raceName} value={raceName}>
-              {raceName}
-            </option>
-          )}
-          {optionsRaces &&
-            optionsRaces.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-        </select>
+  const raceSection = (
+    <>
+      <label htmlFor="race" className="category-name">
+        Race:{" "}
+      </label>
+      <select name="race" id="race" value={raceName} onChange={updateRace}>
+        <option hidden value={""}>
+          Select Race
+        </option>
         {raceMissing && (
-          <img
-            src={process.env.PUBLIC_URL + "/icons/danger.png"}
-            alt="Race not found"
-            className="hover-icon"
-            title="This race wasn't found in the available list. If you change it, it will be lost."
-          ></img>
-        )}
-        <label htmlFor="raceSrcbook" className="category-name">
-          {" "}
-          From:{" "}
-        </label>
-        <select
-          name="raceSrcbook"
-          id="raceSrcbook"
-          value={raceSrcbook}
-          onChange={updateRaceSrcbook}
-          disabled={raceName === ""}
-        >
-          <option hidden value={""}>
-            Select Sourcebook
+          <option hidden key={raceName} value={raceName}>
+            {raceName}
           </option>
-          {raceSrcbookMissing && (
-            <option hidden key={raceSrcbook} value={raceSrcbook}>
-              {raceSrcbook}
+        )}
+        {optionsRaces &&
+          optionsRaces.map((option) => (
+            <option key={option} value={option}>
+              {option}
             </option>
-          )}
-          {optionsRaceSrcbooks &&
-            optionsRaceSrcbooks.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-        </select>
+          ))}
+      </select>
+      {raceMissing && (
+        <img
+          src={process.env.PUBLIC_URL + "/icons/danger.png"}
+          alt="Race not found"
+          className="hover-icon"
+          title="This race wasn't found in the available list. If you change it, it will be lost."
+        ></img>
+      )}
+      <label htmlFor="raceSrcbook" className="category-name">
+        {" "}
+        From:{" "}
+      </label>
+      <select
+        name="raceSrcbook"
+        id="raceSrcbook"
+        value={raceSrcbook}
+        onChange={updateRaceSrcbook}
+        disabled={raceName === ""}
+      >
+        <option hidden value={""}>
+          Select Sourcebook
+        </option>
         {raceSrcbookMissing && (
-          <img
-            src={process.env.PUBLIC_URL + "/icons/danger.png"}
-            alt="Sourcebook not found"
-            className="hover-icon"
-            title="This sourcebook wasn't found in the available list. If you change it, it will be lost."
-          ></img>
-        )}
-        {raceFeaturesDisplay}
-      </>
-    );
-  }
-
-  let subraceSection = null;
-  if (optionsSubraces && optionsSubraceSrcbooks) {
-    const subraceMissing =
-      optionsSubraces &&
-      !optionsSubraces.includes(subraceName) &&
-      subraceName !== "";
-    const subraceSrcbookMissing =
-      optionsSubraceSrcbooks &&
-      !optionsSubraceSrcbooks.includes(subraceSrcbook) &&
-      subraceSrcbook !== "";
-
-    subraceSection = (
-      <>
-        <label htmlFor="subrace" className="category-name">
-          Subrace:{" "}
-        </label>
-        <select
-          name="subrace"
-          id="subrace"
-          value={subraceName}
-          onChange={updateSubrace}
-          disabled={raceSrcbook === ""}
-        >
-          <option hidden value={""}>
-            Select Subrace
+          <option hidden key={raceSrcbook} value={raceSrcbook}>
+            {raceSrcbook}
           </option>
-          {subraceMissing && (
-            <option hidden key={subraceName} value={subraceName}>
-              {subraceName}
+        )}
+        {optionsRaceSrcbooks &&
+          optionsRaceSrcbooks.map((option) => (
+            <option key={option} value={option}>
+              {option}
             </option>
-          )}
-          {optionsSubraces &&
-            optionsSubraces.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-        </select>
+          ))}
+      </select>
+      {raceSrcbookMissing && (
+        <img
+          src={process.env.PUBLIC_URL + "/icons/danger.png"}
+          alt="Sourcebook not found"
+          className="hover-icon"
+          title="This sourcebook wasn't found in the available list. If you change it, it will be lost."
+        ></img>
+      )}
+      {raceFeaturesDisplay}
+    </>
+  );
+
+  const subraceMissing =
+    optionsSubraces &&
+    !optionsSubraces.includes(subraceName) &&
+    subraceName !== "";
+  const subraceSrcbookMissing =
+    optionsSubraceSrcbooks &&
+    !optionsSubraceSrcbooks.includes(subraceSrcbook) &&
+    subraceSrcbook !== "";
+
+  const subraceSection = (
+    <>
+      <label htmlFor="subrace" className="category-name">
+        Subrace:{" "}
+      </label>
+      <select
+        name="subrace"
+        id="subrace"
+        value={subraceName}
+        onChange={updateSubrace}
+        disabled={raceSrcbook === ""}
+      >
+        <option hidden value={""}>
+          Select Subrace
+        </option>
         {subraceMissing && (
-          <img
-            src={process.env.PUBLIC_URL + "/icons/danger.png"}
-            alt="Subrace not found"
-            className="hover-icon"
-            title="This subrace wasn't found in the available list. If you change it, it will be lost."
-          ></img>
-        )}
-        <label htmlFor="subraceSrcbook" className="category-name">
-          {" "}
-          From:{" "}
-        </label>
-        <select
-          name="subraceSrcbook"
-          id="subraceSrcbook"
-          value={subraceSrcbook}
-          onChange={updateSubraceSrcbook}
-          disabled={subraceName === ""}
-        >
-          <option hidden value={""}>
-            Select Sourcebook
+          <option hidden key={subraceName} value={subraceName}>
+            {subraceName}
           </option>
-          {subraceSrcbookMissing && (
-            <option hidden key={subraceSrcbook} value={subraceSrcbook}>
-              {subraceSrcbook}
-            </option>
-          )}
-          {optionsSubraceSrcbooks &&
-            optionsSubraceSrcbooks.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-        </select>
-        {subraceSrcbookMissing && (
-          <img
-            src={process.env.PUBLIC_URL + "/icons/danger.png"}
-            alt="Sourcebook not found"
-            className="hover-icon"
-            title="This sourcebook wasn't found in the available list. If you change it, it will be lost."
-          ></img>
         )}
-        {subraceFeaturesDisplay}
-      </>
-    );
-  }
+        {optionsSubraces &&
+          optionsSubraces.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+      </select>
+      {subraceMissing && (
+        <img
+          src={process.env.PUBLIC_URL + "/icons/danger.png"}
+          alt="Subrace not found"
+          className="hover-icon"
+          title="This subrace wasn't found in the available list. If you change it, it will be lost."
+        ></img>
+      )}
+      <label htmlFor="subraceSrcbook" className="category-name">
+        {" "}
+        From:{" "}
+      </label>
+      <select
+        name="subraceSrcbook"
+        id="subraceSrcbook"
+        value={subraceSrcbook}
+        onChange={updateSubraceSrcbook}
+        disabled={subraceName === ""}
+      >
+        <option hidden value={""}>
+          Select Sourcebook
+        </option>
+        {subraceSrcbookMissing && (
+          <option hidden key={subraceSrcbook} value={subraceSrcbook}>
+            {subraceSrcbook}
+          </option>
+        )}
+        {optionsSubraceSrcbooks &&
+          optionsSubraceSrcbooks.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+      </select>
+      {subraceSrcbookMissing && (
+        <img
+          src={process.env.PUBLIC_URL + "/icons/danger.png"}
+          alt="Sourcebook not found"
+          className="hover-icon"
+          title="This sourcebook wasn't found in the available list. If you change it, it will be lost."
+        ></img>
+      )}
+      {subraceFeaturesDisplay}
+    </>
+  );
 
   const body =
     raceSection && subraceSection ? (

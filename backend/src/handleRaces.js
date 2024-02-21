@@ -2,25 +2,41 @@ import { readFile } from "fs/promises";
 
 export const getRaces = async () => {
   const races = JSON.parse(await readFile("data/races.json"));
-  return ["Race1", "Race2"];
+  return races.map((race) => race.name);
 };
 
 export const getRaceSrcbooks = async (raceName) => {
   const races = JSON.parse(await readFile("data/races.json"));
-  return ["RaceSrc1", "RaceSrc2"];
+  try {
+    return races
+      .find((race) => race.name === raceName)
+      .srcBooks.map((book) => book.name);
+  } catch (error) {
+    return [];
+  }
 };
 
 export const getRaceFeatures = async (raceName, raceSrcBook) => {
   const races = JSON.parse(await readFile("data/races.json"));
-  return [
-    { name: "RaceFeat1", desc: ["RaceFeat1Desc"] },
-    { name: "RaceFeat2", desc: ["RaceFeat2Desc"] },
-  ];
+  try {
+    return races
+      .find((race) => race.name === raceName)
+      .srcBooks.find((book) => book.name === raceSrcBook).features;
+  } catch (error) {
+    return [];
+  }
 };
 
 export const getSubraces = async (raceName, raceSrcBook) => {
   const races = JSON.parse(await readFile("data/races.json"));
-  return ["Subrace1", "Subrace2"];
+  try {
+    return races
+      .find((race) => race.name === raceName)
+      .srcBooks.find((book) => book.name === raceSrcBook)
+      .subraces.map((subrace) => subrace.name);
+  } catch (error) {
+    return [];
+  }
 };
 
 export const getSubraceSrcbooks = async (
@@ -29,7 +45,15 @@ export const getSubraceSrcbooks = async (
   subraceName
 ) => {
   const races = JSON.parse(await readFile("data/races.json"));
-  return ["SubraceSrc1"];
+  try {
+    return races
+      .find((race) => race.name === raceName)
+      .srcBooks.find((book) => book.name === raceSrcBook)
+      .subraces.find((subrace) => subrace.name === subraceName)
+      .srcBooks.map((book) => book.name);
+  } catch (error) {
+    return [];
+  }
 };
 
 export const getSubraceFeatures = async (
@@ -39,8 +63,13 @@ export const getSubraceFeatures = async (
   subraceSrcBook
 ) => {
   const races = JSON.parse(await readFile("data/races.json"));
-  return [
-    { name: "SubraceFeat1", desc: ["SubraceFeat1Desc"] },
-    { name: "SubraceFeat2", desc: ["SubraceFeat2Desc"] },
-  ];
+  try {
+    return races
+      .find((race) => race.name === raceName)
+      .srcBooks.find((book) => book.name === raceSrcBook)
+      .subraces.find((subrace) => subrace.name === subraceName)
+      .srcBooks.find((book) => book.name === subraceSrcBook).features;
+  } catch (error) {
+    return [];
+  }
 };
