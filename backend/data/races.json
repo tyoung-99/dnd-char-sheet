@@ -6,7 +6,21 @@
         "name": "Src1.1",
         "features": [
           { "name": "Feature1.1.1", "desc": ["Feature1.1.1Desc"] },
-          { "name": "Feature1.1.2", "desc": ["Feature1.1.2Desc"] }
+          { "name": "Feature1.1.2", "desc": ["Feature1.1.2Desc"] },
+          {
+            "name": "Test Speed",
+            "desc": ["Test Speed Desc"],
+            "effects": [
+              {
+                "category": "Speed",
+                "changes": {
+                  "walk": { "modifier": 25 },
+                  "swim": { "modifier": 0 },
+                  "fly": { "modifier": 0 }
+                }
+              }
+            ]
+          }
         ],
         "subraces": [
           {

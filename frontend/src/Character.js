@@ -464,11 +464,10 @@ class Character {
   }
 
   getSpeeds() {
-    const speeds = { walk: 0, swim: 0, fly: 0 };
     const category = "Speed";
     const bonuses = this.#getEffects(category);
-    const modifiers = { walk: 0, swim: 0, fly: 0 },
-      multipliers = { walk: 1, swim: 1, fly: 1 };
+    const modifiers = { walk: 0, swim: 0, fly: 0 };
+    const multipliers = { walk: 1, swim: 1, fly: 1 };
 
     bonuses.forEach((bonus) => {
       const effect = bonus.effects.find(
@@ -487,11 +486,10 @@ class Character {
 
     This also allows base speed to be just a modifier w/in a feature, since all modifiers are added first. */
     Object.keys(modifiers).forEach((speedType) => {
-      speeds[speedType] += modifiers[speedType];
-      speeds[speedType] *= multipliers[speedType];
+      modifiers[speedType] *= multipliers[speedType];
     });
 
-    return speeds;
+    return modifiers;
   }
 
   getMaxHitPoints() {
