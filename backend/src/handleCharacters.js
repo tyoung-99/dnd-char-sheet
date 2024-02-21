@@ -1,21 +1,23 @@
-import { readFile, writeFile } from "fs/promises";
-
-export const getCharacters = async () => {
-  let characters = JSON.parse(await readFile("data/characters.json"));
+export const getCharacters = async (db) => {
+  // specifically for the mongodb find method, you must seperate the collection and find method on two lines
+  const collection = db.collection('characters');
+  const characters = await collection.find({}).toArray();
   return characters;
 };
 
-export const setCharacter = async (id, newChar) => {
-  const characters = await getCharacters();
-  const charIndex = characters.findIndex((char) => char.id === id);
 
-  if (charIndex < 0)
-    return { success: false, reason: "Character doesn't exist." };
-  characters[charIndex] = newChar;
+export const getOneCharacter = async (db, id) => {
+  const char = await db.collection('characters').findOne({ "id": id });
+  return char;
+};
+
+export const setCharacter = async (db, id, newChar) => {
   try {
-    await writeFile("data/characters.json", JSON.stringify(characters));
+    delete newChar._id; // Without this line, the replace changes the _id on replace
+    await db.collection('characters').replaceOne({ "id": id }, newChar);
   } catch (error) {
     return { success: false, reason: "Couldn't write to characters file." };
   }
+  
   return { success: true };
 };

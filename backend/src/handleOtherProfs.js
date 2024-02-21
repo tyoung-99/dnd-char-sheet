@@ -1,11 +1,11 @@
-import { readFile } from "fs/promises";
-
-export const getWeaponProfs = async () => {
-  const weaponProfs = JSON.parse(await readFile("data/weapon_profs.json"));
+export const getWeaponProfs = async (db) => {
+  const collection = db.collection('proficiencies');
+  const weaponProfs = await collection.find({ "profType": "Weapon" }).toArray();
   return weaponProfs;
 };
 
-export const getArmorProfs = async () => {
-  const armorProfs = JSON.parse(await readFile("data/armor_profs.json"));
+export const getArmorProfs = async (db) => {
+  const collection = db.collection('proficiencies');
+  const armorProfs = await collection.find({ "profType": "Armor" }).toArray();
   return armorProfs;
 };
