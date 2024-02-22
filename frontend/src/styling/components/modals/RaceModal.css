@@ -2,7 +2,8 @@
   width: 50%;
 }
 
-.race-modal-container p {
+.race-modal-container p,
+.race-modal-container input {
   display: block;
 }
 

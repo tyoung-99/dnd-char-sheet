@@ -20,6 +20,20 @@
                 }
               }
             ]
+          },
+          {
+            "name": "Test Languages",
+            "desc": ["Test Languages Desc"],
+            "effects": [
+              {
+                "category": "Languages",
+                "changes": {
+                  "required": ["Common", "Elvish"],
+                  "choices": [""],
+                  "choicePrompt": "Language"
+                }
+              }
+            ]
           }
         ],
         "subraces": [

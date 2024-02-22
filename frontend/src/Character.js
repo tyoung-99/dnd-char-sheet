@@ -345,7 +345,21 @@ class Character {
   }
 
   getLanguages() {
-    return [...new Set([...this.languages].map((prof) => prof.name))];
+    let languages = [];
+    const category = "Languages";
+    const langEffects = this.#getEffects(category);
+
+    langEffects.forEach((langEffect) => {
+      const effect = langEffect.effects.find(
+        (checkEffect) => checkEffect.category === category
+      );
+
+      languages = languages
+        .concat(effect.changes.required)
+        .concat(effect.changes.choices);
+    });
+
+    return [...new Set(languages)];
   }
 
   isProficientWithItem(item) {

@@ -130,16 +130,30 @@ const RaceModal = ({ character, closeModal }) => {
     <>
       {raceFeatureList.length > 0 ? (
         raceFeatureList.map((feature, i) => (
-          <p
-            key={i}
-            className="feature-name"
-            title={feature.desc.reduce(
-              (fullText, paragraph) => (fullText += "\n" + paragraph),
-              ""
-            )}
-          >
-            {feature.name}
-          </p>
+          <>
+            <p
+              key={i}
+              className="feature-name"
+              title={feature.desc.reduce(
+                (fullText, paragraph) => (fullText += "\n" + paragraph),
+                ""
+              )}
+            >
+              {feature.name}
+            </p>
+            {feature.effects &&
+              feature.effects.map(
+                (effect, j) =>
+                  effect.changes.choices &&
+                  effect.changes.choices.map((_, k) => (
+                    <input
+                      key={`${j} ${k}`}
+                      type="text"
+                      placeholder={effect.changes.choicePrompt}
+                    ></input>
+                  ))
+              )}
+          </>
         ))
       ) : (
         <p className="feature-name placeholder">Select a race and sourcebook</p>
