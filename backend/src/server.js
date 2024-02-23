@@ -1,12 +1,17 @@
 import express from "express";
 import multer from "multer";
-import 'dotenv/config';
-import { db, connectToDb } from './db.js';
-import { MongoClient, ObjectId } from 'mongodb';
-import { getCharacters, getOneCharacter, setCharacter } from "./handleCharacters.js";
+import "dotenv/config";
+import { db, connectToDb } from "./db.js";
+import { MongoClient, ObjectId } from "mongodb";
+import {
+  getCharacters,
+  getOneCharacter,
+  setCharacter,
+} from "./handleCharacters.js";
 import { getImg, removeImg } from "./handleImg.js";
 import { getAlignments } from "./handleAlignments.js";
 import { getWeaponProfs, getArmorProfs } from "./handleOtherProfs.js";
+import { getRaces } from "./handleRaces.js";
 
 const app = express();
 app.use(express.json());
@@ -21,9 +26,19 @@ const storage = multer.diskStorage({
 });
 const imgUpload = multer({ storage: storage });
 
+app.get("/api/races", async (req, res) => {
+  const racesList = await getRaces(db);
+
+  if (racesList) {
+    res.json(racesList);
+  } else {
+    res.sendStatus(404);
+  }
+});
+
 app.get("/api/characters", async (req, res) => {
   const charList = await getCharacters(db);
-  
+
   if (charList) {
     res.json(charList);
   } else {
@@ -86,8 +101,8 @@ app.get("/api/proficiencies/armor", async (req, res) => {
 const PORT = process.env.PORT || 8000;
 
 connectToDb(() => {
-  console.log('Successfully connected to database!');
+  console.log("Successfully connected to database!");
   app.listen(PORT, () => {
-      console.log(`Server is listening on port ${PORT}`);
+    console.log(`Server is listening on port ${PORT}`);
   });
-})
+});
