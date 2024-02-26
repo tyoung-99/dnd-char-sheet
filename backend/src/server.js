@@ -1,19 +1,21 @@
 import express from "express";
 import multer from "multer";
-import 'dotenv/config';
-import { db, connectToDb } from './db.js';
-import { MongoClient, ObjectId } from 'mongodb';
-import { getCharacters, getOneCharacter, setCharacter } from "./handleCharacters.js";
+import "dotenv/config";
+import { db, connectToDb } from "./db.js";
+import { MongoClient, ObjectId } from "mongodb";
+import {
+  getCharacters,
+  getOneCharacter,
+  setCharacter,
+} from "./handleCharacters.js";
 import { getImg, removeImg } from "./handleImg.js";
 import { getAlignments } from "./handleAlignments.js";
 import { getWeaponProfs, getArmorProfs } from "./handleOtherProfs.js";
 import {
   getRaces,
-  getRaceSrcbooks,
-  getRaceFeatures,
+  getOneRace,
   getSubraces,
-  getSubraceSrcbooks,
-  getSubraceFeatures,
+  getOneSubrace,
 } from "./handleRaces.js";
 
 const app = express();
@@ -31,7 +33,7 @@ const imgUpload = multer({ storage: storage });
 
 app.get("/api/characters", async (req, res) => {
   const charList = await getCharacters(db);
-  
+
   if (charList) {
     res.json(charList);
   } else {
@@ -92,54 +94,27 @@ app.get("/api/proficiencies/armor", async (req, res) => {
 });
 
 // Races
-app.get("/api/races/list", async (req, res) => {
-  res.send(await getRaces());
+app.get("/api/races", async (req, res) => {
+  res.send(await getRaces(db));
 });
-app.get("/api/races/:raceName/sources", async (req, res) => {
-  const { raceName } = req.params;
-  res.send(await getRaceSrcbooks(raceName));
+app.get("/api/races/:raceId", async (req, res) => {
+  const { raceId } = req.params;
+  res.send(await getOneRace(db, raceId));
 });
-app.get(
-  "/api/races/:raceName/sources/:raceSrcBook/features",
-  async (req, res) => {
-    const { raceName, raceSrcBook } = req.params;
-    res.send(await getRaceFeatures(raceName, raceSrcBook));
-  }
-);
-app.get(
-  "/api/races/:raceName/sources/:raceSrcBook/subraces/list",
-  async (req, res) => {
-    const { raceName, raceSrcBook } = req.params;
-    res.send(await getSubraces(raceName, raceSrcBook));
-  }
-);
-app.get(
-  "/api/races/:raceName/sources/:raceSrcBook/subraces/:subraceName/sources",
-  async (req, res) => {
-    const { raceName, raceSrcBook, subraceName } = req.params;
-    res.send(await getSubraceSrcbooks(raceName, raceSrcBook, subraceName));
-  }
-);
-app.get(
-  "/api/races/:raceName/sources/:raceSrcBook/subraces/:subraceName/sources/:subraceSrcBook/features",
-  async (req, res) => {
-    const { raceName, raceSrcBook, subraceName, subraceSrcBook } = req.params;
-    res.send(
-      await getSubraceFeatures(
-        raceName,
-        raceSrcBook,
-        subraceName,
-        subraceSrcBook
-      )
-    );
-  }
-);
+app.get("/api/races/:raceId/subraces", async (req, res) => {
+  const { raceId } = req.params;
+  res.send(await getSubraces(db, raceId));
+});
+app.get("/api/subraces/:subraceId", async (req, res) => {
+  const { subraceId } = req.params;
+  res.send(await getOneSubrace(db, subraceId));
+});
 
 const PORT = process.env.PORT || 8000;
 
 connectToDb(() => {
-  console.log('Successfully connected to database!');
+  console.log("Successfully connected to database!");
   app.listen(PORT, () => {
-      console.log(`Server is listening on port ${PORT}`);
+    console.log(`Server is listening on port ${PORT}`);
   });
-})
+});
