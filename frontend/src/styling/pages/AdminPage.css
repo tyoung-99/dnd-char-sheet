@@ -1,0 +1,34 @@
+.admin-create {
+  height: 2rlh;
+  width: 8rlh;
+  margin-left: 1rem;
+  border-radius: 0.5rem;
+  background-color: #52e352;
+  font: small-caps bold 32px/1 sans-serif;
+}
+
+.admin-create:hover {
+  background-color: #0d8a0d;
+}
+
+.row-flex:has(> .admin-create) {
+  align-items: center;
+}
+
+.catalogue-item {
+  margin: 1rem;
+}
+
+.catalogue-item > span {
+  color: rgb(255, 255, 255);
+  border-radius: 0.5rem;
+  border-style: solid;
+  border-width: 0.1rem;
+  background-color: rgb(80, 83, 87);
+  padding: 0.5rem;
+  margin: 1rem;
+}
+
+.catalogue-item > span:hover {
+  background-color: rgb(104, 108, 112);
+}

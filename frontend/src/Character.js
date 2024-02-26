@@ -952,6 +952,7 @@ class Character {
     );
   }
 
+  // returns all spells known organized by level
   getSpellsKnown() {
     const spellsKnown = [...Array(10)].map(() => []);
     this.spellcasting.spellsKnown.forEach((spell) => {

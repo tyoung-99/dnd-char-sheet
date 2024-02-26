@@ -11,7 +11,7 @@ import {
 import { getImg, removeImg } from "./handleImg.js";
 import { getAlignments } from "./handleAlignments.js";
 import { getWeaponProfs, getArmorProfs } from "./handleOtherProfs.js";
-import { getRaces } from "./handleRaces.js";
+import { getRaces, deleteRace } from "./handleRaces.js";
 
 const app = express();
 app.use(express.json());
@@ -26,6 +26,7 @@ const storage = multer.diskStorage({
 });
 const imgUpload = multer({ storage: storage });
 
+// Races, subraces
 app.get("/api/races", async (req, res) => {
   const racesList = await getRaces(db);
 
@@ -34,6 +35,14 @@ app.get("/api/races", async (req, res) => {
   } else {
     res.sendStatus(404);
   }
+});
+
+app.delete("/api/races/:id/delete", async (req, res) => {
+  const { id } = req.params;
+
+  deleteRace(db, ObjectId.createFromHexString(id));
+  const racesList = await getRaces(db);
+  res.json(racesList);
 });
 
 app.get("/api/characters", async (req, res) => {
@@ -51,7 +60,8 @@ app.get("/api/characters/:id", async (req, res) => {
   const { id } = req.params;
 
   // If we want to use the MongoDB id: Getting object _id from mongodb format:
-  // var o_id = new ObjectId('65d3d20f6bce77f479d8babc');
+  // var o_id = ObjectId.createFromHexString('65d3d20f6bce77f479d8babc');
+
   const char = await getOneCharacter(db, parseInt(id));
 
   if (char) {

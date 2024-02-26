@@ -17,11 +17,24 @@ const AdminRacesTab = () => {
     return <div>Loading...</div>;
   }
 
+  const handleDelete = async (id) => {
+    try {
+      const response = await axios.delete(`/api/races/${id}/delete`);
+      setRaceList(response.data);
+    } catch (error) {
+      console.log("Error deleting race, id:", id);
+    }
+  };
+
   // const
   return (
     <>
-      <h1>Races Tab</h1>
-      <CatalogueListComp />
+      <div className="row-flex">
+        <button className="admin-create">+</button>
+      </div>
+      <div className="row-flex">
+        <CatalogueListComp itemList={raceList} handleDelete={handleDelete} />
+      </div>
     </>
   );
 };

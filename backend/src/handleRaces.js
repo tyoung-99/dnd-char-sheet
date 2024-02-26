@@ -4,3 +4,7 @@ export const getRaces = async (db) => {
   const races = await collection.find({}).toArray();
   return races;
 };
+
+export const deleteRace = async (db, id) => {
+  db.collection("races").deleteOne({ _id: id });
+};
