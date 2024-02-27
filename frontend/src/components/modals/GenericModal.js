@@ -3,13 +3,13 @@
 import "../../styling//components/modals/GenericModal.css";
 import { useEffect } from "react";
 
+// closeModal defaults to nothing so if it isn't passed, clicking outside won't affect the modal
 const GenericModal = ({
-  closeModal,
+  closeModal = () => {},
   header,
   body,
   footer,
   category,
-  closeOnOutsideClick = true,
 }) => {
   // Prevent scroll while open
   useEffect(() => {
@@ -23,7 +23,7 @@ const GenericModal = ({
     <div
       className={`modal-background ${category}-modal-background`}
       onClick={(event) => {
-        if (closeOnOutsideClick && !event.target.closest(".modal-container")) {
+        if (!event.target.closest(".modal-container")) {
           closeModal();
         }
       }}
