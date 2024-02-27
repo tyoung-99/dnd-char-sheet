@@ -27,3 +27,11 @@ export const getOneSubrace = async (db, subraceId) => {
   });
   return subrace;
 };
+
+export const getOneRacialFeature = async (db, featureId) => {
+  const collection = db.collection("racialFeatures");
+  const feature = await collection.findOne({
+    _id: ObjectId.createFromHexString(featureId),
+  });
+  return feature;
+};

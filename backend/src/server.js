@@ -9,13 +9,15 @@ import {
   setCharacter,
 } from "./handleCharacters.js";
 import { getImg, removeImg } from "./handleImg.js";
+import { getOneSource } from "./handleSources.js";
 import { getAlignments } from "./handleAlignments.js";
 import { getWeaponProfs, getArmorProfs } from "./handleOtherProfs.js";
 import {
   getRaces,
   getOneRace,
-  getSubraces,
+  getSubracesFromParent,
   getOneSubrace,
+  getOneRacialFeature,
 } from "./handleRaces.js";
 
 const app = express();
@@ -79,6 +81,11 @@ app.post("/api/img/char/:id/remove", async (req, res) => {
   res.send(await removeImg(id));
 });
 
+// Sources
+app.get("/api/source/:sourceId", async (req, res) => {
+  res.send(await getOneSource(db));
+});
+
 // Alignments
 app.get("/api/alignments", async (req, res) => {
   res.send(await getAlignments(db));
@@ -103,11 +110,15 @@ app.get("/api/races/:raceId", async (req, res) => {
 });
 app.get("/api/races/:raceId/subraces", async (req, res) => {
   const { raceId } = req.params;
-  res.send(await getSubraces(db, raceId));
+  res.send(await getSubracesFromParent(db, raceId));
 });
 app.get("/api/subraces/:subraceId", async (req, res) => {
   const { subraceId } = req.params;
   res.send(await getOneSubrace(db, subraceId));
+});
+app.get("/api/racialFeatures/:featureId", async (req, res) => {
+  const { featureId } = req.params;
+  res.send(await getOneRacialFeature(db, featureId));
 });
 
 const PORT = process.env.PORT || 8000;
