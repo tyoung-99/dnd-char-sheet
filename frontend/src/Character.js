@@ -13,9 +13,15 @@ class Character {
       await axios.get("/api/proficiencies/armor")
     ).data.reverse();
 
-    const raceName = (await axios.get(`/api/races/${raceId}`)).data.name;
-    const subraceName = (await axios.get(`/api/subraces/${subraceId}`)).data
-      .displayName;
+    const raceName = raceId
+      ? (await axios.get(`/api/races/${raceId}`)).data.name
+      : null;
+
+    const subraceName = subraceId
+      ? (await axios.get(`/api/subraces/${subraceId}`)).data.displayName
+      : !raceId
+      ? "[Select Race]"
+      : `${raceName} [Select Subrace]`;
 
     return new Character(
       setShowingSavedMessage,

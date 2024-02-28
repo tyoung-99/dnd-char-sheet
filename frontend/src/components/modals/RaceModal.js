@@ -21,6 +21,7 @@ const RaceModal = ({ character, closeModal }) => {
   const sourceList = useRef([]);
 
   const [displayedFeature, setDisplayedFeature] = useState(["race", 0]);
+  const featureChoices = useRef([]);
 
   const replaceRaceData = useCallback(
     async (races) => {
@@ -131,9 +132,7 @@ const RaceModal = ({ character, closeModal }) => {
     <>
       {!currentSubrace ? (
         <p className="feature-name placeholder">Select a subrace</p>
-      ) : currentSubrace.features.length === 0 ? (
-        <p className="feature-name">None</p>
-      ) : (
+      ) : currentSubrace.features.length === 0 ? null : (
         currentSubrace.features.map((feature, i) => (
           <p
             key={i}
@@ -276,16 +275,34 @@ const RaceModal = ({ character, closeModal }) => {
       <button
         onClick={() => {
           character.setRace(
-            {
-              name: currentRace.name,
-              id: currentRace._id,
-              src: currentRace.source._id,
-            },
-            {
-              name: currentSubrace.displayName,
-              id: currentSubrace._id,
-              src: currentSubrace.source._id,
-            }
+            currentRace
+              ? {
+                  name: currentRace.name,
+                  id: currentRace._id,
+                  src: currentRace.source._id,
+                }
+              : {
+                  name: null,
+                  id: null,
+                  src: null,
+                },
+            !currentRace
+              ? {
+                  name: "[Select race]",
+                  id: null,
+                  src: null,
+                }
+              : currentSubrace
+              ? {
+                  name: currentSubrace.displayName,
+                  id: currentSubrace._id,
+                  src: currentSubrace.source._id,
+                }
+              : {
+                  name: currentRace.name + " [Select subrace]",
+                  id: null,
+                  src: null,
+                }
           );
           closeModal();
         }}

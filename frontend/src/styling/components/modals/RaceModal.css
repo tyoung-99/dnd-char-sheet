@@ -2,8 +2,7 @@
   width: 50%;
 }
 
-.race-modal-container p,
-.race-modal-container input {
+.race-modal-container p {
   display: block;
 }
 
@@ -18,15 +17,21 @@
   font-style: normal;
   font-size: 1rem;
   margin: 0.25rem 0;
+}
+.race-modal-container .feature-name:not(.placeholder) {
   cursor: pointer;
 }
-.race-modal-container .feature-name.placeholder {
+.race-modal-container .feature-name:not(.placeholder):hover {
+  background-color: lightgray;
+}
+.race-modal-container .feature-name.placeholder:hover {
   cursor: default;
 }
 
 .race-modal-container .selected-feature {
   border: 1px solid black;
   padding: 0.5rem;
+  margin: 0.5rem;
 }
 
 .race-modal-container .selected-feature h1 {
