@@ -106,9 +106,7 @@ const RaceModal = ({ character, closeModal }) => {
     <>
       {!currentRace ? (
         <p className="feature-name placeholder">Select a race</p>
-      ) : currentRace.features.length === 0 ? (
-        <p className="feature-name">None</p>
-      ) : (
+      ) : currentRace.features.length === 0 ? null : (
         currentRace.features.map((feature, i) => (
           <p
             key={i}
@@ -176,7 +174,10 @@ const RaceModal = ({ character, closeModal }) => {
   );
 
   const subraceSection =
-    currentRace && !subraceDropdownOptions ? null : (
+    currentRace && !subraceDropdownOptions ? null : currentRace &&
+      subraceDropdownOptions.length === 0 ? (
+      <></>
+    ) : (
       <>
         <label htmlFor="subrace" className="category-name">
           Subrace:{" "}
@@ -292,16 +293,22 @@ const RaceModal = ({ character, closeModal }) => {
                   id: null,
                   src: null,
                 }
-              : currentSubrace
+              : subraceDropdownOptions.length === 0
               ? {
-                  name: currentSubrace.displayName,
-                  id: currentSubrace._id,
-                  src: currentSubrace.source._id,
+                  name: currentRace.name,
+                  id: null,
+                  src: null,
                 }
-              : {
+              : !currentSubrace
+              ? {
                   name: currentRace.name + " [Select subrace]",
                   id: null,
                   src: null,
+                }
+              : {
+                  name: currentSubrace.displayName,
+                  id: currentSubrace._id,
+                  src: currentSubrace.source._id,
                 }
           );
           closeModal();
