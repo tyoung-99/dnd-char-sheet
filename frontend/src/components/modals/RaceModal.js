@@ -1,173 +1,144 @@
 // Modal to view current race/features and change either race or available feature choices
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import GenericModal from "./GenericModal";
 import "../../styling/components/modals/RaceModal.css";
 
 const RaceModal = ({ character, closeModal }) => {
-  const [raceName, setRaceName] = useState(character.race.name);
-  const [raceSrcbook, setRaceSrcbook] = useState(character.race.raceSrcbook);
-  const [raceFeatureList, setRaceFeatureList] = useState(
-    character.getFeatures({ fromRace: true })
+  const [currentRaceId, setCurrentRaceId] = useState(
+    character.race.raceId || ""
   );
-  const [subraceName, setSubraceName] = useState(character.race.subrace);
-  const [subraceSrcbook, setSubraceSrcbook] = useState(
-    character.race.subraceSrcbook
-  );
-  const [subraceFeatureList, setSubraceFeatureList] = useState(
-    character.getFeatures({ fromSubrace: true })
+  const [currentSubraceId, setCurrentSubraceId] = useState(
+    character.race.subraceId || ""
   );
 
-  // Using arrays w/ current race choices as default to prevent warning sign flashing for a split second
-  // (Warning flashes if empty array used b/c current race choices aren't in it)
-  const [optionsRaces, optionsSetRaces] = useState([character.race.name]);
-  const [optionsRaceSrcbooks, optionsSetRaceSrcbooks] = useState([
-    character.race.raceSrcbook,
-  ]);
-  const [optionsSubraces, optionsSetSubraces] = useState([
-    character.race.subrace,
-  ]);
-  const [optionsSubraceSrcbooks, optionsSetSubraceSrcbooks] = useState([
-    character.race.subraceSrcbook,
-  ]);
+  const [raceOptions, setRaceOptions] = useState([]);
+  const [raceDropdownOptions, setRaceDropdownOptions] = useState();
+  const [subraceOptions, setSubraceOptions] = useState([]);
+  const [subraceDropdownOptions, setSubraceDropdownOptions] = useState();
 
-  const changedRace = useRef(false);
-  const changedSubrace = useRef(false);
+  const sourceList = useRef([]);
 
-  useEffect(() => {
-    const loadRaces = async () => {
-      const response = await axios.get(`/api/races/list`);
-      optionsSetRaces(response.data);
-    };
-    loadRaces();
-  }, []);
+  const [displayedFeature, setDisplayedFeature] = useState(["race", 0]);
 
-  useEffect(() => {
-    const loadRaceSrcbooks = async () => {
-      const response = await axios.get(`/api/races/${raceName}/sources`);
-      const options = response.data;
-      optionsSetRaceSrcbooks(options);
-      if (options.length === 1 && changedRace.current)
-        setRaceSrcbook(options[0]);
-    };
-    if (raceName !== "") loadRaceSrcbooks();
-  }, [raceName]);
+  const replaceRaceData = useCallback(
+    async (races) => {
+      for (let race of races) {
+        race.source = sourceList.current.find(
+          (source) => source._id === race.source
+        );
 
-  useEffect(() => {
-    const loadRaceFeatures = async () => {
-      const response = await axios.get(
-        `/api/races/${raceName}/sources/${raceSrcbook}/features`
+        if (race.features.length > 0) {
+          const response = await axios.get(
+            `/api/racialFeatures/multiple/${race.features}`
+          );
+          race.features = response.data;
+        }
+      }
+
+      return races;
+    },
+    [sourceList]
+  );
+
+  const updateSubraceList = useCallback(
+    async (raceId) => {
+      const response = await axios.get(`/api/races/${raceId}/subraces`);
+      const subraces = await replaceRaceData(response.data);
+
+      setSubraceOptions(subraces);
+      setSubraceDropdownOptions(
+        subraces.map((subrace) => {
+          return {
+            _id: subrace._id,
+            name: `${subrace.name} (${subrace.source.abbr})`,
+          };
+        })
       );
-      setRaceFeatureList(response.data);
-    };
+    },
+    [replaceRaceData]
+  );
 
-    const loadSubraces = async () => {
-      const response = await axios.get(
-        `/api/races/${raceName}/sources/${raceSrcbook}/subraces/list`
-      );
-      const options = response.data;
-      optionsSetSubraces(options);
-      if (options.length === 1 && changedRace.current)
-        setSubraceName(options[0]);
-    };
-
-    if (raceSrcbook !== "") {
-      if (changedRace.current) loadRaceFeatures();
-      loadSubraces();
-    }
-  }, [raceName, raceSrcbook]);
+  const updateRaceSubrace = useCallback(
+    async (type, newId) => {
+      if (type === "race") {
+        await updateSubraceList(newId);
+        setCurrentRaceId(newId);
+      } else {
+        setCurrentSubraceId(newId);
+      }
+    },
+    [updateSubraceList]
+  );
 
   useEffect(() => {
-    const loadSubraceSrcbooks = async () => {
-      const response = await axios.get(
-        `/api/races/${raceName}/sources/${raceSrcbook}/subraces/${subraceName}/sources`
+    const loadData = async () => {
+      let response = await axios.get(`/api/sources`);
+      sourceList.current = response.data;
+
+      response = await axios.get(`/api/races`);
+      const races = await replaceRaceData(response.data);
+
+      setRaceOptions(races);
+      setRaceDropdownOptions(
+        races.map((race) => {
+          return {
+            _id: race._id,
+            name: `${race.name} (${race.source.abbr})`,
+          };
+        })
       );
-      const options = response.data;
-      optionsSetSubraceSrcbooks(options);
-      if (options.length === 1 && changedSubrace.current)
-        setSubraceSrcbook(options[0]);
+
+      if (character.race.raceId !== "") {
+        await updateSubraceList(character.race.raceId);
+      }
     };
-    if (subraceName !== "") loadSubraceSrcbooks();
-  }, [raceName, raceSrcbook, subraceName]);
 
-  useEffect(() => {
-    const loadSubraceFeatures = async () => {
-      const response = await axios.get(
-        `/api/races/${raceName}/sources/${raceSrcbook}/subraces/${subraceName}/sources/${subraceSrcbook}/features`
-      );
-      setSubraceFeatureList(response.data);
-    };
-    if (subraceSrcbook !== "" && changedSubrace.current) loadSubraceFeatures();
-  }, [raceName, raceSrcbook, subraceName, subraceSrcbook]);
-
-  const updateRace = (event) => {
-    setRaceName(event.target.value);
-    setRaceFeatureList([]);
-    updateRaceSrcbook({ target: { value: "" } });
-  };
-
-  const updateRaceSrcbook = (event) => {
-    changedRace.current = true;
-    setRaceSrcbook(event.target.value);
-    updateSubrace({ target: { value: "" } });
-  };
-
-  const updateSubrace = (event) => {
-    setSubraceName(event.target.value);
-    setSubraceFeatureList([]);
-    updateSubraceSrcbook({ target: { value: "" } });
-  };
-
-  const updateSubraceSrcbook = (event) => {
-    changedSubrace.current = true;
-    setSubraceSrcbook(event.target.value);
-  };
+    loadData();
+  }, [character.race.raceId, replaceRaceData, updateSubraceList]);
 
   const header = null;
 
+  const currentRace = raceOptions.find((race) => race._id === currentRaceId);
   const raceFeaturesDisplay = (
     <>
-      {raceFeatureList.length > 0 ? (
-        raceFeatureList.map((feature, i) => (
-          <>
-            <p
-              key={i}
-              className="feature-name"
-              title={feature.desc.reduce(
-                (fullText, paragraph) => (fullText += "\n" + paragraph),
-                ""
-              )}
-            >
-              {feature.name}
-            </p>
-            {feature.effects &&
-              feature.effects.map(
-                (effect, j) =>
-                  effect.changes.choices &&
-                  effect.changes.choices.map((_, k) => (
-                    <input
-                      key={`${j} ${k}`}
-                      type="text"
-                      placeholder={effect.changes.choicePrompt}
-                    ></input>
-                  ))
-              )}
-          </>
-        ))
+      {!currentRace ? (
+        <p className="feature-name placeholder">Select a race</p>
+      ) : currentRace.features.length === 0 ? (
+        <p className="feature-name">None</p>
       ) : (
-        <p className="feature-name placeholder">Select a race and sourcebook</p>
-      )}
-    </>
-  );
-  const subraceFeaturesDisplay = (
-    <>
-      {subraceFeatureList.length > 0 ? (
-        subraceFeatureList.map((feature, i) => (
+        currentRace.features.map((feature, i) => (
           <p
             key={i}
             className="feature-name"
-            title={feature.desc.reduce(
+            title={feature.description.reduce(
+              (fullText, paragraph) => (fullText += "\n" + paragraph),
+              ""
+            )}
+          >
+            {feature.displayName}
+          </p>
+        ))
+      )}
+    </>
+  );
+
+  const currentSubrace = subraceOptions.find(
+    (subrace) => subrace._id === currentSubraceId
+  );
+  const subraceFeaturesDisplay = (
+    <>
+      {!currentSubrace ? (
+        <p className="feature-name placeholder">Select a subrace</p>
+      ) : currentSubrace.features.length === 0 ? (
+        <p className="feature-name">None</p>
+      ) : (
+        currentSubrace.features.map((feature, i) => (
+          <p
+            key={i}
+            className="feature-name"
+            title={feature.description.reduce(
               (fullText, paragraph) => (fullText += "\n" + paragraph),
               ""
             )}
@@ -175,176 +146,126 @@ const RaceModal = ({ character, closeModal }) => {
             {feature.name}
           </p>
         ))
-      ) : (
-        <p className="feature-name placeholder">
-          Select a subrace and sourcebook
-        </p>
       )}
     </>
   );
 
-  const raceMissing =
-    optionsRaces && !optionsRaces.includes(raceName) && raceName !== "";
-  const raceSrcbookMissing =
-    optionsRaceSrcbooks &&
-    !optionsRaceSrcbooks.includes(raceSrcbook) &&
-    raceSrcbook !== "";
-
-  const raceSection = (
+  const raceSection = !raceDropdownOptions ? null : (
     <>
       <label htmlFor="race" className="category-name">
         Race:{" "}
       </label>
-      <select name="race" id="race" value={raceName} onChange={updateRace}>
+      <select
+        name="race"
+        id="race"
+        value={currentRaceId}
+        onChange={async (event) => {
+          await updateRaceSubrace("race", event.target.value);
+        }}
+      >
         <option hidden value={""}>
           Select Race
         </option>
-        {raceMissing && (
-          <option hidden key={raceName} value={raceName}>
-            {raceName}
+        {raceDropdownOptions.map((option) => (
+          <option key={option._id} value={option._id}>
+            {option.name}
           </option>
-        )}
-        {optionsRaces &&
-          optionsRaces.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
+        ))}
       </select>
-      {raceMissing && (
-        <img
-          src={process.env.PUBLIC_URL + "/icons/danger.png"}
-          alt="Race not found"
-          className="hover-icon"
-          title="This race wasn't found in the available list. If you change it, it will be lost."
-        ></img>
-      )}
-      <label htmlFor="raceSrcbook" className="category-name">
-        {" "}
-        From:{" "}
-      </label>
-      <select
-        name="raceSrcbook"
-        id="raceSrcbook"
-        value={raceSrcbook}
-        onChange={updateRaceSrcbook}
-        disabled={raceName === ""}
-      >
-        <option hidden value={""}>
-          Select Sourcebook
-        </option>
-        {raceSrcbookMissing && (
-          <option hidden key={raceSrcbook} value={raceSrcbook}>
-            {raceSrcbook}
-          </option>
-        )}
-        {optionsRaceSrcbooks &&
-          optionsRaceSrcbooks.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-      </select>
-      {raceSrcbookMissing && (
-        <img
-          src={process.env.PUBLIC_URL + "/icons/danger.png"}
-          alt="Sourcebook not found"
-          className="hover-icon"
-          title="This sourcebook wasn't found in the available list. If you change it, it will be lost."
-        ></img>
-      )}
       {raceFeaturesDisplay}
     </>
   );
 
-  const subraceMissing =
-    optionsSubraces &&
-    !optionsSubraces.includes(subraceName) &&
-    subraceName !== "";
-  const subraceSrcbookMissing =
-    optionsSubraceSrcbooks &&
-    !optionsSubraceSrcbooks.includes(subraceSrcbook) &&
-    subraceSrcbook !== "";
+  const subraceSection =
+    currentRace && !subraceDropdownOptions ? null : (
+      <>
+        <label htmlFor="subrace" className="category-name">
+          Subrace:{" "}
+        </label>
+        <select
+          name="subrace"
+          id="subrace"
+          value={currentSubraceId}
+          onChange={async (event) => {
+            await updateRaceSubrace("subrace", event.target.value);
+          }}
+          disabled={!currentRace}
+        >
+          <option hidden value={""}>
+            Select Subrace
+          </option>
+          {subraceDropdownOptions &&
+            subraceDropdownOptions.map((option) => (
+              <option key={option._id} value={option._id}>
+                {option.name}
+              </option>
+            ))}
+        </select>
+        {subraceFeaturesDisplay}
+      </>
+    );
 
-  const subraceSection = (
-    <>
-      <label htmlFor="subrace" className="category-name">
-        Subrace:{" "}
-      </label>
-      <select
-        name="subrace"
-        id="subrace"
-        value={subraceName}
-        onChange={updateSubrace}
-        disabled={raceSrcbook === ""}
-      >
-        <option hidden value={""}>
-          Select Subrace
-        </option>
-        {subraceMissing && (
-          <option hidden key={subraceName} value={subraceName}>
-            {subraceName}
-          </option>
-        )}
-        {optionsSubraces &&
-          optionsSubraces.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-      </select>
-      {subraceMissing && (
-        <img
-          src={process.env.PUBLIC_URL + "/icons/danger.png"}
-          alt="Subrace not found"
-          className="hover-icon"
-          title="This subrace wasn't found in the available list. If you change it, it will be lost."
-        ></img>
-      )}
-      <label htmlFor="subraceSrcbook" className="category-name">
-        {" "}
-        From:{" "}
-      </label>
-      <select
-        name="subraceSrcbook"
-        id="subraceSrcbook"
-        value={subraceSrcbook}
-        onChange={updateSubraceSrcbook}
-        disabled={subraceName === ""}
-      >
-        <option hidden value={""}>
-          Select Sourcebook
-        </option>
-        {subraceSrcbookMissing && (
-          <option hidden key={subraceSrcbook} value={subraceSrcbook}>
-            {subraceSrcbook}
-          </option>
-        )}
-        {optionsSubraceSrcbooks &&
-          optionsSubraceSrcbooks.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-      </select>
-      {subraceSrcbookMissing && (
-        <img
-          src={process.env.PUBLIC_URL + "/icons/danger.png"}
-          alt="Sourcebook not found"
-          className="hover-icon"
-          title="This sourcebook wasn't found in the available list. If you change it, it will be lost."
-        ></img>
-      )}
-      {subraceFeaturesDisplay}
-    </>
-  );
+  const getFeatureOptions = (category, choices) => {
+    let optionsDisplay;
+    switch (category) {
+      case "Language":
+        let inputs = [];
+        for (let i = 0; i < choices; i++)
+          inputs.push(
+            <input
+              key={i}
+              id={`Language ${i}`}
+              name={`Language ${i}`}
+              type="text"
+            ></input>
+          );
+        optionsDisplay = (
+          <>
+            <label>Language choice(s)</label>
+            {inputs}
+          </>
+        );
+        break;
+      default:
+        optionsDisplay = (
+          <p key={category}>Error. Feature category not recognized.</p>
+        );
+    }
+    return optionsDisplay;
+  };
+
+  let feature = null;
+  let selectedFeatureSection = null;
+  // if (currentRaceId && currentSubraceId) {
+  //   feature =
+  //     displayedFeature[0] === "race"
+  //       ? currentRaceIdFeatures[displayedFeature[1]]
+  //       : currentSubraceIdFeatures[displayedFeature[1]];
+
+  //   selectedFeatureSection = !feature.effects ? (
+  //     "unchanged"
+  //   ) : (
+  //     <>
+  //       <h1>{feature.displayName}</h1>
+  //       {feature.description.map((paragraph, i) => (
+  //         <p key={i}>{paragraph}</p>
+  //       ))}
+  //       {feature.effects.map((effect) =>
+  //         getFeatureOptions(effect.category, effect.changes.choices)
+  //       )}
+  //     </>
+  //   );
+  // }
 
   const body =
     raceSection && subraceSection ? (
-      <>
-        {raceSection}
-        {subraceSection}
-      </>
+      <div className="row-flex">
+        <div className="col-1_2">
+          {raceSection}
+          {subraceSection}
+        </div>
+        <div className="col-1_2 selected-feature">{selectedFeatureSection}</div>
+      </div>
     ) : (
       <p>Loading...</p>
     );
@@ -355,9 +276,16 @@ const RaceModal = ({ character, closeModal }) => {
       <button
         onClick={() => {
           character.setRace(
-            { name: raceName, src: raceSrcbook },
-            { name: subraceName, src: subraceSrcbook },
-            [raceFeatureList, subraceFeatureList]
+            {
+              name: currentRace.name,
+              id: currentRace._id,
+              src: currentRace.source._id,
+            },
+            {
+              name: currentSubrace.displayName,
+              id: currentSubrace._id,
+              src: currentSubrace.source._id,
+            }
           );
           closeModal();
         }}
@@ -369,12 +297,10 @@ const RaceModal = ({ character, closeModal }) => {
 
   return (
     <GenericModal
-      closeModal={closeModal}
       header={header}
       body={body}
       footer={footer}
       category={"race"}
-      closeOnOutsideClick={false}
     />
   );
 };

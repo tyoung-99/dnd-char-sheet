@@ -4,7 +4,7 @@ import axios from "axios";
 import Timer from "./Timer";
 
 class Character {
-  static async create(setShowingSavedMessage) {
+  static async create(setShowingSavedMessage, raceId, subraceId) {
     // Reverse order of groups b/c when inserting into list of profs, order gets reversed again
     const weaponProfGroups = (
       await axios.get("/api/proficiencies/weapons")
@@ -12,18 +12,33 @@ class Character {
     const armorProfGroups = (
       await axios.get("/api/proficiencies/armor")
     ).data.reverse();
+
+    const raceName = (await axios.get(`/api/races/${raceId}`)).data.name;
+    const subraceName = (await axios.get(`/api/subraces/${subraceId}`)).data
+      .displayName;
+
     return new Character(
       setShowingSavedMessage,
       weaponProfGroups,
-      armorProfGroups
+      armorProfGroups,
+      raceName,
+      subraceName
     );
   }
 
-  constructor(setShowingSavedMessage, weaponProfGroups, armorProfGroups) {
+  constructor(
+    setShowingSavedMessage,
+    ref_weaponProfGroups,
+    ref_armorProfGroups,
+    ref_raceName,
+    ref_subraceName
+  ) {
     this.queueSave = Timer(this.saveCharacter, 5000);
     this.setShowingSavedMessage = setShowingSavedMessage;
-    this.weaponProfGroups = weaponProfGroups;
-    this.armorProfGroups = armorProfGroups;
+    this.ref_weaponProfGroups = ref_weaponProfGroups;
+    this.ref_armorProfGroups = ref_armorProfGroups;
+    this.ref_raceName = ref_raceName;
+    this.ref_subraceName = ref_subraceName;
   }
 
   async saveCharacter() {
@@ -59,27 +74,17 @@ class Character {
     this.saveCharacter();
   }
 
-  setRace(newRace, newSubrace, newFeatures) {
-    this.#removeFeatures("race");
-    this.#removeFeatures("subrace");
+  setRace(newRace, newSubrace) {
+    this.ref_raceName = newRace.name;
+    this.race.raceId = newRace.id;
+    this.race.raceSourceId = newRace.src;
+    this.setSubrace(newSubrace);
+  }
 
-    this.race.name = newRace.name;
-    this.race.raceSrcbook = newRace.src;
-    this.race.subrace = newSubrace.name;
-    this.race.subraceSrcbook = newSubrace.src;
-
-    let newFeaturesFormatted = [];
-    newFeatures[0].forEach((feature) => {
-      feature.race = newRace.name;
-      newFeaturesFormatted.push(feature);
-    });
-    newFeatures[1].forEach((feature) => {
-      feature.subrace = newSubrace.name;
-      newFeaturesFormatted.push(feature);
-    });
-
-    this.features = this.features.concat(newFeaturesFormatted);
-
+  setSubrace(newSubrace) {
+    this.ref_subraceName = newSubrace.name;
+    this.race.subraceId = newSubrace.id;
+    this.race.subraceSourceId = newSubrace.src;
     this.saveCharacter();
   }
 
@@ -318,7 +323,7 @@ class Character {
       ...new Set([...this.weaponProfs].map((prof) => prof.name)),
     ];
 
-    this.weaponProfGroups.forEach((group) => {
+    this.ref_weaponProfGroups.forEach((group) => {
       if (group.profs.every((prof) => cleanProfs.includes(prof))) {
         cleanProfs.unshift(group.name);
         cleanProfs = cleanProfs.filter((prof) => !group.profs.includes(prof));
@@ -331,7 +336,7 @@ class Character {
     let cleanProfs = [
       ...new Set([...this.armorProfs].map((prof) => prof.name)),
     ];
-    this.armorProfGroups.forEach((group) => {
+    this.ref_armorProfGroups.forEach((group) => {
       if (group.profs.every((prof) => cleanProfs.includes(prof))) {
         cleanProfs = cleanProfs.filter((prof) => !group.profs.includes(prof));
         cleanProfs.unshift(group.name);
@@ -1128,10 +1133,6 @@ class Character {
     return this.#getFeatureEffects(category)
       .concat(this.#getBuffEffects(category))
       .concat(this.#getItemEffects(category));
-  }
-
-  #removeFeatures(category) {
-    this.features = this.features.filter((feature) => !feature[category]);
   }
 }
 

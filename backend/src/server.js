@@ -9,7 +9,7 @@ import {
   setCharacter,
 } from "./handleCharacters.js";
 import { getImg, removeImg } from "./handleImg.js";
-import { getOneSource } from "./handleSources.js";
+import { getSources, getOneSource } from "./handleSources.js";
 import { getAlignments } from "./handleAlignments.js";
 import { getWeaponProfs, getArmorProfs } from "./handleOtherProfs.js";
 import {
@@ -17,6 +17,7 @@ import {
   getOneRace,
   getSubracesFromParent,
   getOneSubrace,
+  getRacialFeaturesFromList,
   getOneRacialFeature,
 } from "./handleRaces.js";
 
@@ -82,8 +83,12 @@ app.post("/api/img/char/:id/remove", async (req, res) => {
 });
 
 // Sources
-app.get("/api/source/:sourceId", async (req, res) => {
-  res.send(await getOneSource(db));
+app.get("/api/sources", async (req, res) => {
+  res.send(await getSources(db));
+});
+app.get("/api/sources/:sourceId", async (req, res) => {
+  const { sourceId } = req.params;
+  res.send(await getOneSource(db, sourceId));
 });
 
 // Alignments
@@ -116,7 +121,12 @@ app.get("/api/subraces/:subraceId", async (req, res) => {
   const { subraceId } = req.params;
   res.send(await getOneSubrace(db, subraceId));
 });
-app.get("/api/racialFeatures/:featureId", async (req, res) => {
+app.get("/api/racialFeatures/multiple/:featureIds", async (req, res) => {
+  let { featureIds } = req.params;
+  featureIds = featureIds.split(",");
+  res.send(await getRacialFeaturesFromList(db, featureIds));
+});
+app.get("/api/racialFeatures/one/:featureId", async (req, res) => {
   const { featureId } = req.params;
   res.send(await getOneRacialFeature(db, featureId));
 });

@@ -37,7 +37,11 @@ const CharacterPage = () => {
     const loadData = async () => {
       let response = await axios.get(`/api/characters/${characterID}`);
       const newChar = Object.assign(
-        await Character.create(setShowingSavedMessage),
+        await Character.create(
+          setShowingSavedMessage,
+          response.data.race.raceId,
+          response.data.race.subraceId
+        ),
         response.data
       );
       setCharacter(newChar);
@@ -177,10 +181,7 @@ const CharacterPage = () => {
             onSelect={(newAlignment) => character.setAlignment(newAlignment)}
           ></MultiColumnDropdownComp>
           <p className="race" data-modal="race" onClick={openModal}>
-            {character.race.name}{" "}
-            {character.race.subrace !== "None"
-              ? `(${character.race.subrace})`
-              : ""}
+            {character.ref_subraceName}
           </p>
           {currentModal === "race" && (
             <RaceModal character={character} closeModal={closeModal} />
