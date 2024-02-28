@@ -9,12 +9,17 @@ import {
   setCharacter,
 } from "./handleCharacters.js";
 import { getImg, removeImg } from "./handleImg.js";
+import { getSources, getOneSource } from "./handleSources.js";
 import { getAlignments } from "./handleAlignments.js";
 import { getWeaponProfs, getArmorProfs } from "./handleOtherProfs.js";
 import {
   getRaces,
+  getOneRace,
+  getOneSubrace,
   getSubracesFromParent,
   getAllRacialFeatures,
+  getRacialFeaturesFromList,
+  getOneRacialFeature,
   deleteRace,
   deleteSubrace,
   deleteRacialFeature,
@@ -138,6 +143,15 @@ app.post("/api/img/char/:id/remove", async (req, res) => {
   res.send(await removeImg(id));
 });
 
+// Sources
+app.get("/api/sources", async (req, res) => {
+  res.send(await getSources(db));
+});
+app.get("/api/sources/:sourceId", async (req, res) => {
+  const { sourceId } = req.params;
+  res.send(await getOneSource(db, sourceId));
+});
+
 // Alignments
 app.get("/api/alignments", async (req, res) => {
   res.send(await getAlignments(db));
@@ -150,6 +164,32 @@ app.get("/api/proficiencies/weapons", async (req, res) => {
 
 app.get("/api/proficiencies/armor", async (req, res) => {
   res.send(await getArmorProfs(db));
+});
+
+// Races
+app.get("/api/races", async (req, res) => {
+  res.send(await getRaces(db));
+});
+app.get("/api/races/:raceId", async (req, res) => {
+  const { raceId } = req.params;
+  res.send(await getOneRace(db, raceId));
+});
+app.get("/api/races/:raceId/subraces", async (req, res) => {
+  const { raceId } = req.params;
+  res.send(await getSubracesFromParent(db, raceId));
+});
+app.get("/api/subraces/:subraceId", async (req, res) => {
+  const { subraceId } = req.params;
+  res.send(await getOneSubrace(db, subraceId));
+});
+app.get("/api/racialFeatures/multiple/:featureIds", async (req, res) => {
+  let { featureIds } = req.params;
+  featureIds = featureIds.split(",");
+  res.send(await getRacialFeaturesFromList(db, featureIds));
+});
+app.get("/api/racialFeatures/one/:featureId", async (req, res) => {
+  const { featureId } = req.params;
+  res.send(await getOneRacialFeature(db, featureId));
 });
 
 const PORT = process.env.PORT || 8000;

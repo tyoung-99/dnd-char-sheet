@@ -3,6 +3,7 @@
 import "../../styling//components/modals/GenericModal.css";
 import { useEffect } from "react";
 
+// closeModal defaults to nothing so if it isn't passed, clicking outside won't affect the modal
 const GenericModal = ({
   closeModal = () => {},
   header,

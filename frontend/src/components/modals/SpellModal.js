@@ -3,7 +3,7 @@
 import GenericModal from "./GenericModal";
 import "../../styling/components/modals/SpellModal.css";
 
-const SpellModal = ({ spell, character, closeModal, isOpen }) => {
+const SpellModal = ({ spell, character, closeModal }) => {
   const getNumSuffix = (number) => {
     if (number > 3 && number < 21) return "th";
     switch (number % 10) {
@@ -73,7 +73,6 @@ const SpellModal = ({ spell, character, closeModal, isOpen }) => {
 
   return (
     <GenericModal
-      isOpen={isOpen}
       closeModal={closeModal}
       header={header}
       body={body}

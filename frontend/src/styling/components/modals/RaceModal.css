@@ -2,6 +2,11 @@
   width: 50%;
 }
 
+.race-modal-container p,
+.race-modal-container input {
+  display: block;
+}
+
 .race-modal-container .category-name {
   font-weight: bold;
   font-style: normal;
@@ -14,4 +19,16 @@
   font-size: 1rem;
   margin: 0.25rem 0;
   cursor: pointer;
+}
+.race-modal-container .feature-name.placeholder {
+  cursor: default;
+}
+
+.race-modal-container .selected-feature {
+  border: 1px solid black;
+  padding: 0.5rem;
+}
+
+.race-modal-container .selected-feature h1 {
+  margin: 0;
 }

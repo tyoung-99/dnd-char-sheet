@@ -168,12 +168,13 @@ const CharacterSpellcastingTab = ({ character }) => {
               onClick={openModal}
             ></img>
           ))}
-          <SpellModal
-            spell={spell}
-            character={character}
-            closeModal={closeModal}
-            isOpen={currentModal === key}
-          />
+          {currentModal === key && (
+            <SpellModal
+              spell={spell}
+              character={character}
+              closeModal={closeModal}
+            />
+          )}
         </div>
       );
     });
