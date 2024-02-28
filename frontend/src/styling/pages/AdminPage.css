@@ -1,7 +1,7 @@
 .admin-create {
   height: 2rlh;
   width: 8rlh;
-  margin-left: 1rem;
+  margin: 1rem;
   border-radius: 0.5rem;
   background-color: #52e352;
   font: small-caps bold 32px/1 sans-serif;
@@ -22,8 +22,9 @@
 .catalogue-item > span {
   color: rgb(255, 255, 255);
   border-radius: 0.5rem;
+  border-color: black;
   border-style: solid;
-  border-width: 0.1rem;
+  border-width: 0.15rem;
   background-color: rgb(80, 83, 87);
   padding: 0.5rem;
   margin: 1rem;
@@ -31,4 +32,23 @@
 
 .catalogue-item > span:hover {
   background-color: rgb(104, 108, 112);
+}
+
+.sub-section {
+  margin: 1rem;
+  background-color: rgb(184, 187, 189);
+}
+
+.sub-item {
+  padding: 1rem;
+}
+
+.sub-item > span {
+  color: rgb(0, 0, 0);
+  border-radius: 0.5rem;
+  border-style: solid;
+  border-width: 0.1rem;
+  background-color: rgb(255, 255, 255);
+  padding: 0.4rem;
+  margin-right: 1rem;
 }

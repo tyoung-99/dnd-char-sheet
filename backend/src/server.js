@@ -11,7 +11,14 @@ import {
 import { getImg, removeImg } from "./handleImg.js";
 import { getAlignments } from "./handleAlignments.js";
 import { getWeaponProfs, getArmorProfs } from "./handleOtherProfs.js";
-import { getRaces, deleteRace } from "./handleRaces.js";
+import {
+  getRaces,
+  getSubracesFromParent,
+  getAllRacialFeatures,
+  deleteRace,
+  deleteSubrace,
+  deleteRacialFeature,
+} from "./handleRaces.js";
 
 const app = express();
 app.use(express.json());
@@ -37,12 +44,49 @@ app.get("/api/races", async (req, res) => {
   }
 });
 
+app.get("/api/subraces/:raceId", async (req, res) => {
+  const { raceId } = req.params;
+  const subracesList = await getSubracesFromParent(db, raceId);
+
+  if (subracesList) {
+    res.json(subracesList);
+  } else {
+    res.sendStatus(404);
+  }
+});
+
+app.get("/api/racialFeatures", async (req, res) => {
+  const racialFeatures = await getAllRacialFeatures(db);
+
+  if (racialFeatures) {
+    res.json(racialFeatures);
+  } else {
+    res.sendStatus(404);
+  }
+});
+
 app.delete("/api/races/:id/delete", async (req, res) => {
   const { id } = req.params;
 
-  deleteRace(db, ObjectId.createFromHexString(id));
+  deleteRace(db, id);
   const racesList = await getRaces(db);
   res.json(racesList);
+});
+
+app.delete("/api/subraces/:id/delete", async (req, res) => {
+  const { id } = req.params;
+
+  deleteSubrace(db, id);
+  const racesList = await getSubracesFromParent(db);
+  res.json(racesList);
+});
+
+app.delete("/api/racialFeatures/:id/delete", async (req, res) => {
+  const { id } = req.params;
+
+  deleteRacialFeature(db, id);
+  // const racialFeatures = await getAllRacialFeatures(db);
+  res.send("Nothing"); // may change later idk
 });
 
 app.get("/api/characters", async (req, res) => {
