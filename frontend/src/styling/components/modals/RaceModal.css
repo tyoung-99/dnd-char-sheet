@@ -38,3 +38,39 @@
 .race-modal-container .selected-feature h1 {
   margin: 0;
 }
+
+.race-modal-container .selected-feature .ability-scores {
+  list-style-type: none;
+  padding: 0;
+  columns: 2;
+  max-width: 20rem;
+}
+.race-modal-container .selected-feature .ability-scores li {
+  display: flex;
+  margin-bottom: 0.5rem;
+}
+.race-modal-container .selected-feature .ability-scores li span {
+  flex: 1;
+  font-size: 1.25rem;
+}
+
+.race-modal-container
+  .selected-feature
+  .ability-scores
+  li
+  span:has(> .button-holder) {
+  display: flex;
+  align-items: center;
+}
+.race-modal-container .selected-feature .ability-scores li span .button-holder {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0.25rem;
+}
+.race-modal-container .selected-feature .ability-scores li span button {
+  height: 1rem;
+  width: 1rem;
+  font-size: 1rem;
+  padding: 0;
+  line-height: 0;
+}

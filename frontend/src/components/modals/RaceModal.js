@@ -114,9 +114,21 @@ const RaceModal = ({ character, closeModal }) => {
 
       for (const effect of feature.effects) {
         let newChoice;
+        const choices = effect.changes.choices;
         switch (effect.category) {
           case "Language":
-            newChoice = new Array(effect.changes.choices);
+            newChoice = new Array(choices);
+            break;
+          case "AbilityScore":
+            newChoice = [
+              { ability: "STR", amount: 0 },
+              { ability: "DEX", amount: 0 },
+              { ability: "CON", amount: 0 },
+              { ability: "INT", amount: 0 },
+              { ability: "WIS", amount: 0 },
+              { ability: "CHA", amount: 0 },
+            ];
+
             break;
           default:
         }
@@ -131,6 +143,10 @@ const RaceModal = ({ character, closeModal }) => {
   };
 
   const getFeatureChoiceInputs = (featureId, category, choices) => {
+    if (!featureChoices[featureId] || !featureChoices[featureId][category]) {
+      return null;
+    }
+
     let optionsDisplay;
     switch (category) {
       case "Language":
@@ -158,10 +174,28 @@ const RaceModal = ({ character, closeModal }) => {
           </>
         );
         break;
-      default:
+      case "AbilityScore":
         optionsDisplay = (
-          <p key={category}>Error. Feature category not recognized.</p>
+          <>
+            <h2>Points Available: {choices.pointsAvailable}</h2>
+            <ul className="ability-scores">
+              {featureChoices[featureId][category].map((ability) => (
+                <li key={ability.ability}>
+                  <span>{ability.ability}</span>
+                  <span>
+                    {ability.amount}
+                    <div className="button-holder">
+                      <button>+</button>
+                      <button>-</button>
+                    </div>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </>
         );
+        break;
+      default:
     }
     return optionsDisplay;
   };
@@ -222,6 +256,7 @@ const RaceModal = ({ character, closeModal }) => {
           );
           setRaceId(event.target.value);
           setSubraceId("");
+          setSelectedFeature(["race", 0]);
           await updateSubraceOptions(event.target.value);
         }}
       >
@@ -259,6 +294,7 @@ const RaceModal = ({ character, closeModal }) => {
               event.target.value
             );
             setSubraceId(event.target.value);
+            setSelectedFeature(["race", 0]);
           }}
           disabled={!raceId}
         >
@@ -284,7 +320,7 @@ const RaceModal = ({ character, closeModal }) => {
   }
 
   let selectedFeatureSection = null;
-  if (currentRace || currentSubrace) {
+  if (featureChoices && (currentRace || currentSubrace)) {
     selectedFeatureSection = !selectedFeatureData ? (
       <p>This race has no features</p>
     ) : (
