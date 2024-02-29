@@ -80,17 +80,17 @@ class Character {
     this.saveCharacter();
   }
 
-  setRace(newRace, newSubrace) {
+  setRace(newRace, newSubrace, newRaceChoices) {
     this.ref_raceName = newRace.name;
     this.race.raceId = newRace.id;
     this.race.raceSourceId = newRace.src;
-    this.setSubrace(newSubrace);
-  }
 
-  setSubrace(newSubrace) {
     this.ref_subraceName = newSubrace.name;
     this.race.subraceId = newSubrace.id;
     this.race.subraceSourceId = newSubrace.src;
+
+    this.race.featureChoices = newRaceChoices;
+
     this.saveCharacter();
   }
 
