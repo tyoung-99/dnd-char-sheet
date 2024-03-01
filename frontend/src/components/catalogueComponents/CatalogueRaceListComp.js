@@ -8,14 +8,15 @@ const CatalogueListComp = ({
   subDelete,
   selectedRace,
   setSelectedRace,
-  selectedModal,
-  setSelectedModal,
+  currentModal,
+  setcurrentModal,
+  closeModal,
 }) => {
   const [subraces, setSubraces] = useState({});
 
   useEffect(() => {
     const loadSubraces = async (raceId) => {
-      const response = await axios.get(`/api/subraces/${raceId}`);
+      const response = await axios.get(`/api/races/${raceId}/subraces`);
       setSubraces((prevState) => ({
         ...prevState,
         [raceId]: response.data,
@@ -33,10 +34,12 @@ const CatalogueListComp = ({
     <>
       {itemList.map((item, i) => (
         <div key={item.name} className="catalogue-item">
-          <span onClick={() => setSelectedModal(item._id)}>{item.name}</span>
+          <span onClick={() => setcurrentModal(item._id)}>{item.name}</span>
           <button onClick={() => setSelectedRace(item.name)}>expand</button>
           <button onClick={() => handleDelete(item._id)}>Delete</button>
-          {selectedModal === item._id && <EditRaceModal race={item.name} />}
+          {currentModal === item._id && (
+            <EditRaceModal race={item} closeModal={closeModal} />
+          )}
           {/* Render subrace if they exist*/}
           {subraces[item._id] && selectedRace === item.name && (
             <div className="sub-section">

@@ -7,7 +7,7 @@ const AdminRacesTab = () => {
   const [raceList, setRaceList] = useState([]);
   const [racialFeatures, setRaceFeatures] = useState([]);
   const [selectedRace, setSelectedRace] = useState("");
-  const [selectedModal, setSelectedModal] = useState("");
+  const [currentModal, setcurrentModal] = useState("");
 
   useEffect(() => {
     const loadRaces = async () => {
@@ -49,6 +49,10 @@ const AdminRacesTab = () => {
     }
   };
 
+  const closeModal = () => {
+    setcurrentModal("");
+  };
+
   // const
   return (
     <>
@@ -63,8 +67,9 @@ const AdminRacesTab = () => {
           subDelete={deleteSubRace}
           selectedRace={selectedRace}
           setSelectedRace={setSelectedRace}
-          selectedModal={selectedModal}
-          setSelectedModal={setSelectedModal}
+          currentModal={currentModal}
+          setcurrentModal={setcurrentModal}
+          closeModal={closeModal}
         />
       </div>
       <div className="row-flex">

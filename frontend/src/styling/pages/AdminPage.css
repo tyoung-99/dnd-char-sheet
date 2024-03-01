@@ -52,3 +52,31 @@
   padding: 0.4rem;
   margin-right: 1rem;
 }
+
+.name-box {
+  margin: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 2rem;
+  font-family: inherit;
+  text-align: center;
+}
+
+.scrollable-list {
+  height: 10rem; /* Adjust height as needed */
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+
+.search-bar {
+  margin-bottom: 10px;
+}
+
+.feature-list-item {
+  padding: 5px;
+  border-bottom: 1px solid #ccc;
+}

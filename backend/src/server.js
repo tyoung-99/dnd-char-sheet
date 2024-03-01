@@ -38,62 +38,6 @@ const storage = multer.diskStorage({
 });
 const imgUpload = multer({ storage: storage });
 
-// Races, subraces
-app.get("/api/races", async (req, res) => {
-  const racesList = await getRaces(db);
-
-  if (racesList) {
-    res.json(racesList);
-  } else {
-    res.sendStatus(404);
-  }
-});
-
-app.get("/api/subraces/:raceId", async (req, res) => {
-  const { raceId } = req.params;
-  const subracesList = await getSubracesFromParent(db, raceId);
-
-  if (subracesList) {
-    res.json(subracesList);
-  } else {
-    res.sendStatus(404);
-  }
-});
-
-app.get("/api/racialFeatures", async (req, res) => {
-  const racialFeatures = await getAllRacialFeatures(db);
-
-  if (racialFeatures) {
-    res.json(racialFeatures);
-  } else {
-    res.sendStatus(404);
-  }
-});
-
-app.delete("/api/races/:id/delete", async (req, res) => {
-  const { id } = req.params;
-
-  deleteRace(db, id);
-  const racesList = await getRaces(db);
-  res.json(racesList);
-});
-
-app.delete("/api/subraces/:id/delete", async (req, res) => {
-  const { id } = req.params;
-
-  deleteSubrace(db, id);
-  const racesList = await getSubracesFromParent(db);
-  res.json(racesList);
-});
-
-app.delete("/api/racialFeatures/:id/delete", async (req, res) => {
-  const { id } = req.params;
-
-  deleteRacialFeature(db, id);
-  // const racialFeatures = await getAllRacialFeatures(db);
-  res.send("Nothing"); // may change later idk
-});
-
 app.get("/api/characters", async (req, res) => {
   const charList = await getCharacters(db);
 
@@ -182,6 +126,9 @@ app.get("/api/subraces/:subraceId", async (req, res) => {
   const { subraceId } = req.params;
   res.send(await getOneSubrace(db, subraceId));
 });
+app.get("/api/racialFeatures", async (req, res) => {
+  res.json(await getAllRacialFeatures(db));
+});
 app.get("/api/racialFeatures/multiple/:featureIds", async (req, res) => {
   let { featureIds } = req.params;
   featureIds = featureIds.split(",");
@@ -190,6 +137,24 @@ app.get("/api/racialFeatures/multiple/:featureIds", async (req, res) => {
 app.get("/api/racialFeatures/one/:featureId", async (req, res) => {
   const { featureId } = req.params;
   res.send(await getOneRacialFeature(db, featureId));
+});
+app.delete("/api/races/:raceId/delete", async (req, res) => {
+  const { raceId } = req.params;
+  deleteRace(db, raceId);
+  res.json(await getRaces(db));
+});
+
+app.delete("/api/subraces/:raceId/delete", async (req, res) => {
+  const { raceId } = req.params;
+  deleteSubrace(db, raceId);
+  res.json(await getSubracesFromParent(db));
+});
+
+app.delete("/api/racialFeatures/:id/delete", async (req, res) => {
+  const { id } = req.params;
+  deleteRacialFeature(db, id);
+  // const racialFeatures = await getAllRacialFeatures(db);
+  res.send("Nothing"); // may change later idk
 });
 
 const PORT = process.env.PORT || 8000;
