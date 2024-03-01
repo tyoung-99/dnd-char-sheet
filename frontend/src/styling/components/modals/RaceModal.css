@@ -3,7 +3,8 @@
 }
 
 .race-modal-container p,
-.race-modal-container input {
+.race-modal-container input,
+.race-modal-container label {
   display: block;
 }
 
@@ -73,4 +74,19 @@
   font-size: 1rem;
   padding: 0;
   line-height: 0;
+}
+.race-modal-container .selected-feature .ability-scores li span button.hidden {
+  visibility: hidden;
+}
+
+.race-footer .tce-checkboxes ul {
+  list-style-type: none;
+  padding: 0;
+  text-align: left;
+}
+.race-footer .tce-checkboxes ul li input[type="checkbox"] {
+  display: inline-flex;
+}
+.race-footer .tce-checkboxes ul li label {
+  display: inline-flex;
 }

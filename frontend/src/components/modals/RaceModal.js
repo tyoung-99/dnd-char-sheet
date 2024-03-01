@@ -3,6 +3,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import GenericModal from "./GenericModal";
+import RaceFeatureAbilityScoreComp from "./sub-components/RaceFeatureAbilityScoreComp";
+import RaceFeatureLanguageComp from "./sub-components/RaceFeatureLanguageComp";
+import RaceFeatureSkillProfComp from "./sub-components/RaceFeatureSkillProfComp";
+import RaceFeatureFeatComp from "./sub-components/RaceFeatureFeatComp";
 import "../../styling/components/modals/RaceModal.css";
 
 const RaceModal = ({ character, closeModal }) => {
@@ -16,6 +20,10 @@ const RaceModal = ({ character, closeModal }) => {
   const [subraceId, setSubraceId] = useState();
   const [featureChoices, setFeatureChoices] = useState();
   const [selectedFeature, setSelectedFeature] = useState(["race", 0]);
+
+  // const [tceRules, setTCERules] = useState(
+  //   character.race.tceRules || { asi: false, lang: false, prof: false }
+  // );
 
   const currentRace =
     raceId && raceId !== ""
@@ -73,7 +81,7 @@ const RaceModal = ({ character, closeModal }) => {
       }
       setSubraceId(character.race.subraceId || "");
 
-      setFeatureChoices(character.race.featureChoices || {});
+      setFeatureChoices(structuredClone(character.race.featureChoices) || {});
     };
     loadData();
   }, [character.race, updateSubraceOptions]);
@@ -116,9 +124,6 @@ const RaceModal = ({ character, closeModal }) => {
         let newChoice;
         const choices = effect.changes.choices;
         switch (effect.category) {
-          case "Language":
-            newChoice = new Array(choices);
-            break;
           case "AbilityScore":
             newChoice = [
               { ability: "STR", amount: 0 },
@@ -128,7 +133,13 @@ const RaceModal = ({ character, closeModal }) => {
               { ability: "WIS", amount: 0 },
               { ability: "CHA", amount: 0 },
             ];
-
+            break;
+          case "Language":
+            newChoice = new Array(choices);
+            break;
+          case "SkillProficiency":
+          case "Feat":
+            newChoice = new Array(choices[0]).fill("");
             break;
           default:
         }
@@ -147,57 +158,51 @@ const RaceModal = ({ character, closeModal }) => {
       return null;
     }
 
-    let optionsDisplay;
     switch (category) {
-      case "Language":
-        let inputs = [];
-        for (let i = 0; i < choices; i++) {
-          inputs.push(
-            <input
-              key={i}
-              id={`Language ${i}`}
-              name={`Language ${i}`}
-              type="text"
-              value={featureChoices[featureId][category][i]}
-              onChange={(event) => {
-                const newChoices = { ...featureChoices };
-                newChoices[featureId][category][i] = event.target.value;
-                setFeatureChoices(newChoices);
-              }}
-            ></input>
-          );
-        }
-        optionsDisplay = (
-          <>
-            <label>Extra language{inputs.length > 1 ? "s" : ""}:</label>
-            {inputs}
-          </>
-        );
-        break;
       case "AbilityScore":
-        optionsDisplay = (
-          <>
-            <h2>Points Available: {choices.pointsAvailable}</h2>
-            <ul className="ability-scores">
-              {featureChoices[featureId][category].map((ability) => (
-                <li key={ability.ability}>
-                  <span>{ability.ability}</span>
-                  <span>
-                    {ability.amount}
-                    <div className="button-holder">
-                      <button>+</button>
-                      <button>-</button>
-                    </div>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </>
+        return (
+          <RaceFeatureAbilityScoreComp
+            featureId={featureId}
+            category={category}
+            choices={choices}
+            featureChoices={featureChoices}
+            setFeatureChoices={setFeatureChoices}
+          />
         );
-        break;
+      case "Language":
+        return (
+          <RaceFeatureLanguageComp
+            featureId={featureId}
+            category={category}
+            choices={choices}
+            featureChoices={featureChoices}
+            setFeatureChoices={setFeatureChoices}
+          />
+        );
+      case "SkillProficiency":
+        return (
+          <RaceFeatureSkillProfComp
+            featureId={featureId}
+            category={category}
+            choices={choices}
+            featureChoices={featureChoices}
+            setFeatureChoices={setFeatureChoices}
+            existingProfs={character.getSkills()}
+          />
+        );
+      case "Feat":
+        return (
+          <RaceFeatureFeatComp
+            featureId={featureId}
+            category={category}
+            choices={choices}
+            featureChoices={featureChoices}
+            setFeatureChoices={setFeatureChoices}
+          />
+        );
       default:
+        return null;
     }
-    return optionsDisplay;
   };
 
   const header = null;
@@ -384,6 +389,50 @@ const RaceModal = ({ character, closeModal }) => {
     savedSubrace.name = "[Select race]";
   }
 
+  // const tceCheckboxes = (
+  //   <div className="tce-checkboxes">
+  //     <h2>TCE Optional Rules</h2>
+  //     <ul>
+  //       <li>
+  //         <label>
+  //           <input
+  //             type="checkbox"
+  //             id="tce-asi"
+  //             name="tce-asi"
+  //             value={tceRules.asi}
+  //             onClick={() => setTCERules({ ...tceRules, asi: !tceRules.asi })}
+  //           ></input>
+  //           Ability Score Increases
+  //         </label>
+  //       </li>
+  //       <li>
+  //         <label>
+  //           <input
+  //             type="checkbox"
+  //             id="tce-language"
+  //             name="tce-language"
+  //             value={tceRules.lang}
+  //             onClick={() => setTCERules({ ...tceRules, lang: !tceRules.lang })}
+  //           ></input>
+  //           Languages
+  //         </label>
+  //       </li>
+  //       <li>
+  //         <label>
+  //           <input
+  //             type="checkbox"
+  //             id="tce-prof"
+  //             name="tce-prof"
+  //             value={tceRules.prof}
+  //             onClick={() => setTCERules({ ...tceRules, prof: !tceRules.prof })}
+  //           ></input>
+  //           Proficiencies
+  //         </label>
+  //       </li>
+  //     </ul>
+  //   </div>
+  // );
+
   const footer = (
     <>
       <button onClick={closeModal}>Cancel</button>
@@ -398,7 +447,7 @@ const RaceModal = ({ character, closeModal }) => {
     </>
   );
 
-  console.log(featureChoices);
+  if (featureChoices) console.log(JSON.parse(JSON.stringify(featureChoices)));
 
   return (
     <GenericModal
