@@ -23,6 +23,7 @@ import {
   deleteRace,
   deleteSubrace,
   deleteRacialFeature,
+  updateRace,
 } from "./handleRaces.js";
 
 const app = express();
@@ -147,7 +148,7 @@ app.delete("/api/races/:raceId/delete", async (req, res) => {
 app.delete("/api/subraces/:raceId/delete", async (req, res) => {
   const { raceId } = req.params;
   deleteSubrace(db, raceId);
-  res.json(await getSubracesFromParent(db));
+  res.json(await getSubracesFromParent(db)); // this will cause an issue because it needs two arguments
 });
 
 app.delete("/api/racialFeatures/:id/delete", async (req, res) => {
@@ -155,6 +156,12 @@ app.delete("/api/racialFeatures/:id/delete", async (req, res) => {
   deleteRacialFeature(db, id);
   // const racialFeatures = await getAllRacialFeatures(db);
   res.send("Nothing"); // may change later idk
+});
+
+app.put("/api/races/:raceId/update", async (req, res) => {
+  const { raceId } = req.params;
+  const { name, source, features } = req.body;
+  updateRace(db, raceId, name, source, features);
 });
 
 const PORT = process.env.PORT || 8000;

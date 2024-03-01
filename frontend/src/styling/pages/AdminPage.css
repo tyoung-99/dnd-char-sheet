@@ -55,7 +55,7 @@
 
 .name-box {
   margin: 0.5rem 1rem;
-  display: flex;
+  width: 35rem;
   align-items: center;
   justify-content: center;
   font-style: normal;
@@ -79,4 +79,35 @@
 .feature-list-item {
   padding: 5px;
   border-bottom: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.feature-list-item:hover {
+  background: lightgray;
+}
+
+.source-drop {
+  justify-content: flex-end;
+}
+
+.added-feature {
+  margin-right: 0.5rem;
+}
+
+.delete-button {
+  background: #c0392b;
+  color: white;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  border: 1px solid black;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  display: inline-block;
+  padding: 0.1rem;
+  margin: 0.1rem;
+}
+
+.delete-button:hover {
+  transform: scale(1.02);
+  background: #c41e0c;
 }

@@ -62,52 +62,70 @@ const EditRaceModal = ({ race, closeModal }) => {
     ]);
   };
 
+  const saveRace = async () => {
+    const newFeatures = addedRacialFeatures.map((feature) => feature.id);
+    const newData = {
+      name: name,
+      source: currentSource,
+      features: newFeatures,
+    };
+    race.name = name;
+    race.source = currentSource;
+    race.features = newFeatures;
+    await axios.put(`/api/races/${race._id}/update`, newData);
+  };
+
   const header = null;
   const body = (
     <>
+      <div className="row-flex source-drop">
+        <label htmlFor="sources">Source:</label>
+        <select
+          name="sources"
+          onChange={(event) => setCurrentSource(event.currentTarget.value)}
+          value={currentSource}
+        >
+          {sources.map((source) => (
+            <option key={source._id} value={source._id}>
+              {source.abbr}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="row-flex">
         <div
-          className="col-1_2 name-box"
+          className="col-1 name-box"
           contentEditable="true"
           onBlur={(event) => setName(event.currentTarget.textContent)}
           suppressContentEditableWarning={true}
         >
           {name}
         </div>
-        <div className="col-1_2">
-          <label htmlFor="sources">Source:</label>
-          <select
-            name="sources"
-            onChange={(event) => setCurrentSource(event.currentTarget.value)}
-            value={currentSource}
-          >
-            {sources.map((source) => (
-              <option key={source._id} value={source._id}>
-                {source.abbr}
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
       <div className="row-flex">
         <div className="col-1_2">
           {addedRacialFeatures &&
             addedRacialFeatures.map((feature) => (
-              <div
-                key={feature.id}
-                onClick={() => removeFeature(feature.id, feature.name)}
-              >
-                {feature.name}
+              <div key={feature.id}>
+                <span className="added-feature">{feature.name}</span>
+                <span
+                  className="delete-button"
+                  onClick={() => removeFeature(feature.id, feature.name)}
+                >
+                  Delete
+                </span>
               </div>
             ))}
         </div>
         <div className="col-1_2 ">
-          <input
-            type="text"
-            className="search-bar"
-            placeholder="Search..."
-            onChange={(e) => setSearchInput(e.currentTarget.value)}
-          ></input>
+          <div className="row-flex">
+            <input
+              type="text"
+              className="search-bar"
+              placeholder="Search..."
+              onChange={(e) => setSearchInput(e.currentTarget.value)}
+            ></input>
+          </div>
           <div className="scrollable-list">
             {racialFeatures &&
               racialFeatures
@@ -134,7 +152,7 @@ const EditRaceModal = ({ race, closeModal }) => {
       <button onClick={closeModal}>Cancel</button>
       <button
         onClick={() => {
-          console.log(name, currentSource);
+          saveRace();
           closeModal();
         }}
       >

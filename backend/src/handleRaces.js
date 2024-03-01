@@ -69,3 +69,12 @@ export const deleteRacialFeature = async (db, id) => {
     _id: ObjectId.createFromHexString(id),
   });
 };
+
+export const updateRace = async (db, id, name, source, features) => {
+  db.collection("races").updateOne(
+    { _id: ObjectId.createFromHexString(id) },
+    {
+      $set: { name: name, source: source, features: features },
+    }
+  );
+};
