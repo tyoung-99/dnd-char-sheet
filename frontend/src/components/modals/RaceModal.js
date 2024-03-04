@@ -207,12 +207,28 @@ const RaceModal = ({ character, closeModal }) => {
 
   const header = null;
 
+  let curatedRaceFeaturesList;
+  if (currentRace) {
+    curatedRaceFeaturesList = structuredClone(currentRace.features);
+    if (currentSubrace) {
+      currentSubrace.features.forEach((feature) => {
+        feature.replaces.forEach((replaceId) => {
+          const index = curatedRaceFeaturesList.findIndex(
+            (checkFeature) => checkFeature._id === replaceId
+          );
+          if (index >= 0) {
+            curatedRaceFeaturesList.splice(index, 1);
+          }
+        });
+      });
+    }
+  }
   const raceFeatures = (
     <>
       {!currentRace ? (
         <p className="feature-name placeholder">Select a race</p>
-      ) : currentRace.features.length === 0 ? null : (
-        currentRace.features.map((feature, i) => (
+      ) : curatedRaceFeaturesList.length === 0 ? null : (
+        curatedRaceFeaturesList.map((feature, i) => (
           <p
             key={i}
             className="feature-name"
@@ -319,7 +335,7 @@ const RaceModal = ({ character, closeModal }) => {
 
   let selectedFeatureData = null;
   if (currentRace && selectedFeature[0] === "race") {
-    selectedFeatureData = currentRace.features[selectedFeature[1]];
+    selectedFeatureData = curatedRaceFeaturesList[selectedFeature[1]];
   } else if (currentSubrace && selectedFeature[0] === "subrace") {
     selectedFeatureData = currentSubrace.features[selectedFeature[1]];
   }
