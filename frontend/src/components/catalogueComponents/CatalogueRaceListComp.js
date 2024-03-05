@@ -35,7 +35,15 @@ const CatalogueListComp = ({
       {itemList.map((item, i) => (
         <div key={item.name} className="catalogue-item">
           <span onClick={() => setcurrentModal(item._id)}>{item.name}</span>
-          <button onClick={() => setSelectedRace(item.name)}>expand</button>
+          <button
+            onClick={() => {
+              setSelectedRace((prevName) =>
+                prevName === item.name ? "" : item.name
+              );
+            }}
+          >
+            expand
+          </button>
           <button onClick={() => handleDelete(item._id)}>Delete</button>
           {currentModal === item._id && (
             <EditRaceModal race={item} closeModal={closeModal} />
@@ -45,10 +53,13 @@ const CatalogueListComp = ({
             <div className="sub-section">
               {subraces[item._id].map((subrace, index) => (
                 <div key={index} className="sub-item">
-                  <span>{subrace.name}</span>
-                  <button onClick={() => subDelete(subraces._id)}>
-                    Delete
-                  </button>
+                  <span onClick={() => setcurrentModal(subrace._id)}>
+                    {subrace.name}
+                  </span>
+                  <button onClick={() => subDelete(subrace._id)}>Delete</button>
+                  {currentModal === subrace._id && (
+                    <EditRaceModal race={subrace} closeModal={closeModal} />
+                  )}
                 </div>
               ))}
             </div>

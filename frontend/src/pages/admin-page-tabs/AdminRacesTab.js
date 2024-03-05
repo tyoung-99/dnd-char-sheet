@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import CatalogueRaceListComp from "../../components/catalogueComponents/CatalogueRaceListComp";
 import CatalogueRacialFeaturesComp from "../../components/catalogueComponents/CatalogueRacialFeaturesComp";
+import EditRaceModal from "../../components/modals/EditRaceModal";
 
 const AdminRacesTab = () => {
   const [raceList, setRaceList] = useState([]);
@@ -22,6 +23,11 @@ const AdminRacesTab = () => {
   if (!raceList) {
     return <div>Loading...</div>;
   }
+
+  const addRace = async (newData) => {
+    const response = await axios.post(`/api/races/insert`, newData);
+    setRaceList(response.data);
+  };
 
   const deleteRace = async (id) => {
     try {
@@ -58,7 +64,20 @@ const AdminRacesTab = () => {
     <>
       <div className="row-flex">
         <h1>Races</h1>
-        <button className="admin-create">+</button>
+        <button
+          className="admin-create"
+          onClick={() => setcurrentModal("createRace")}
+        >
+          +
+        </button>
+        {currentModal === "createRace" && (
+          <EditRaceModal
+            race={{}}
+            closeModal={closeModal}
+            createNew={true}
+            addRace={addRace}
+          />
+        )}
       </div>
       <div className="row-flex wrap">
         <CatalogueRaceListComp

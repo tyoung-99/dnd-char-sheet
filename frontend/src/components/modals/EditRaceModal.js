@@ -2,9 +2,11 @@ import GenericModal from "./GenericModal";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-const EditRaceModal = ({ race, closeModal }) => {
-  const [name, setName] = useState(race.name);
-  const [currentSource, setCurrentSource] = useState(race.source);
+const EditRaceModal = ({ race, closeModal, createNew, addRace }) => {
+  const [name, setName] = useState(race.name ? race.name : "New Race");
+  const [currentSource, setCurrentSource] = useState(
+    race.source ? race.source : "Pick a src"
+  );
   const [sources, setSources] = useState([]);
   const [racialFeatures, setRacialFeatures] = useState([]);
   const [addedRacialFeatures, setAddedRacialFeatures] = useState();
@@ -16,11 +18,15 @@ const EditRaceModal = ({ race, closeModal }) => {
       setSources(response.data);
       response = await axios.get("/api/racialFeatures");
       // create an object with ids and names for the added features
-      const newRacialFeatures = race.features.map((feature) => ({
-        id: feature,
-        name: response.data.find((compFeature) => compFeature._id === feature)
-          .name,
-      }));
+      // works with empty list for creating new race
+      const newRacialFeatures = race.features
+        ? race.features.map((feature) => ({
+            id: feature,
+            name: response.data.find(
+              (compFeature) => compFeature._id === feature
+            ).name,
+          }))
+        : [];
       setAddedRacialFeatures(newRacialFeatures);
       // remove the added features from the feature list
       setRacialFeatures(
@@ -72,7 +78,9 @@ const EditRaceModal = ({ race, closeModal }) => {
     race.name = name;
     race.source = currentSource;
     race.features = newFeatures;
-    await axios.put(`/api/races/${race._id}/update`, newData);
+    createNew
+      ? addRace(newData)
+      : await axios.put(`/api/races/${race._id}/update`, newData);
   };
 
   const header = null;
@@ -85,6 +93,9 @@ const EditRaceModal = ({ race, closeModal }) => {
           onChange={(event) => setCurrentSource(event.currentTarget.value)}
           value={currentSource}
         >
+          <option key={"default"} value={"Pick a src"} disabled>
+            Pick a src
+          </option>
           {sources.map((source) => (
             <option key={source._id} value={source._id}>
               {source.abbr}
@@ -104,6 +115,7 @@ const EditRaceModal = ({ race, closeModal }) => {
       </div>
       <div className="row-flex">
         <div className="col-1_2">
+          <h2>Race Features</h2>
           {addedRacialFeatures &&
             addedRacialFeatures.map((feature) => (
               <div key={feature.id}>

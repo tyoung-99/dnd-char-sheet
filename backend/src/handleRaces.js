@@ -78,3 +78,11 @@ export const updateRace = async (db, id, name, source, features) => {
     }
   );
 };
+
+export const insertRace = async (db, name, source, features) => {
+  db.collection("races").insertOne({
+    name: name,
+    source: source,
+    features: features,
+  });
+};

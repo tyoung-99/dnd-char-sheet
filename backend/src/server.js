@@ -24,6 +24,7 @@ import {
   deleteSubrace,
   deleteRacialFeature,
   updateRace,
+  insertRace,
 } from "./handleRaces.js";
 
 const app = express();
@@ -162,6 +163,12 @@ app.put("/api/races/:raceId/update", async (req, res) => {
   const { raceId } = req.params;
   const { name, source, features } = req.body;
   updateRace(db, raceId, name, source, features);
+});
+
+app.post("/api/races/insert", async (req, res) => {
+  const { name, source, features } = req.body;
+  insertRace(db, name, source, features);
+  res.json(await getRaces(db));
 });
 
 const PORT = process.env.PORT || 8000;
