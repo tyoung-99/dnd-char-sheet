@@ -29,7 +29,12 @@ const CharacterStatsComp = ({ character }) => {
       ) : (
         <span className="not-proficient"></span>
       )}{" "}
-      {(skill.mod >= 0 ? "+" : "") + skill.mod} {skill.name} ({skill.ability})
+      {(skill.mod.flat >= 0 ? "+" : "") + skill.mod.flat}{" "}
+      {skill.mod.dice.reduce(
+        (fullString, die) => fullString + ` + ${die.number}d${die.sides}`,
+        ""
+      )}{" "}
+      {skill.name} ({skill.ability})
       {skill.error ? (
         <img
           src={process.env.PUBLIC_URL + "/icons/danger.png"}

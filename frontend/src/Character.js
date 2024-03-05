@@ -162,57 +162,145 @@ class Character {
   }
 
   getSkills() {
-    let skills = [];
-    this.abilities.forEach((ability) => {
-      ability.skillProfs.forEach((skill) => {
-        const newSkill = {
-          name: skill.name,
-          prof: 0,
-          mod: this.getAbilityMod(ability.name),
-          ability: ability.name,
-        };
+    const skills = [
+      {
+        name: "Athletics",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "STR",
+      },
+      {
+        name: "Acrobatics",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "DEX",
+      },
+      {
+        name: "Sleight of Hand",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "DEX",
+      },
+      {
+        name: "Stealth",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "DEX",
+      },
+      {
+        name: "Arcana",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "INT",
+      },
+      {
+        name: "History",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "INT",
+      },
+      {
+        name: "Investigation",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "INT",
+      },
+      {
+        name: "Nature",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "INT",
+      },
+      {
+        name: "Religion",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "INT",
+      },
+      {
+        name: "Animal Handling",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "WIS",
+      },
+      {
+        name: "Insight",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "WIS",
+      },
+      {
+        name: "Medicine",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "WIS",
+      },
+      {
+        name: "Perception",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "WIS",
+      },
+      {
+        name: "Survival",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "WIS",
+      },
+      {
+        name: "Deception",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "CHA",
+      },
+      {
+        name: "Intimidation",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "CHA",
+      },
+      {
+        name: "Performance",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "CHA",
+      },
+      {
+        name: "Persuasion",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "CHA",
+      },
+    ];
 
-        if (skill.expSrc && !skill.profSrc) {
-          newSkill.error = `Ineligible for expertise in ${skill.name}`;
-        } else {
-          newSkill.prof = skill.proficiency;
-          newSkill.mod += skill.proficiency * this.getProfBonus();
-        }
-
-        skills.push(newSkill);
-      });
+    let category = "SkillProficiency";
+    this.#getSkillsHelper(category, (newProf) => {
+      skills.find((checkSkill) => checkSkill.name === newProf).prof = 1; // Mark prof as 1, expertise as 2, so prof bonus can be multiplied by prof val
     });
 
-    const category = "Skill";
-    this.#getEffects(category).forEach((bonus) => {
-      const effect = bonus.effects.find(
-        (checkEffect) => checkEffect.category === category
+    category = "SkillExpertise";
+    this.#getSkillsHelper(category, (newExp) => {
+      const affectedSkill = skills.find(
+        (checkSkill) => checkSkill.name === newExp
       );
+      if (affectedSkill.prof >= 1) affectedSkill.prof = 2;
+      else {
+        affectedSkill.error = `Ineligible for ${affectedSkill.name} expertise`;
+      }
+    });
 
-      Object.keys(effect.changes.flat).forEach((skillName) => {
-        skills.find((checkSkill) => checkSkill.name === skillName).mod +=
-          effect.changes.flat[skillName];
-      });
+    category = "SkillModifier";
+    this.#getSkillsHelper(category, (newMod) => {
+      const affectedSkill = skills.find(
+        (checkSkill) => checkSkill.name === newMod.skillName
+      );
+      affectedSkill.mod += newMod.flat;
+      this.#addDiceToArr(affectedSkill.mod.dice, newMod.dice);
+    });
 
-      effect.changes.proficiency.forEach((skillName) => {
-        const skill = skills.find(
-          (checkSkill) => checkSkill.name === skillName
-        );
-        skill.prof += 1;
-        skill.mod += this.getProfBonus();
-      });
-
-      effect.changes.expertise.forEach((skillName) => {
-        const skill = skills.find(
-          (checkSkill) => checkSkill.name === skillName
-        );
-        if (skill.prof !== 1) {
-          skill.error = `Ineligible for expertise in ${skill.name}`;
-          return;
-        }
-        skill.prof += 1;
-        skill.mod += this.getProfBonus();
-      });
+    skills.forEach((skill) => {
+      skill.mod.flat +=
+        this.getAbilityMod(skill.ability) + this.getProfBonus() * skill.prof;
     });
 
     skills.sort((first, second) =>
@@ -220,6 +308,15 @@ class Character {
     );
 
     return skills;
+  }
+
+  #getSkillsHelper(category, callback) {
+    this.#getEffects(category).forEach((effectsList) => {
+      const effect = effectsList.effects.find(
+        (checkEffect) => checkEffect.category === category
+      );
+      effect.changes.forEach(callback);
+    });
   }
 
   getSkillByName(skill) {
@@ -689,19 +786,6 @@ class Character {
     });
 
     return damage;
-  }
-
-  #addDiceToArr(diceArr, newDice) {
-    newDice.forEach((die) => {
-      const index = diceArr.findIndex(
-        (checkDie) => checkDie.sides === die.sides
-      );
-      if (index < 0) {
-        diceArr.push({ number: die.number, sides: die.sides });
-      } else {
-        diceArr[index].number += die.number;
-      }
-    });
   }
 
   getItems() {
@@ -1229,6 +1313,19 @@ class Character {
     return this.#getFeatureEffects(category)
       .concat(this.#getBuffEffects(category))
       .concat(this.#getItemEffects(category));
+  }
+
+  #addDiceToArr(diceArr, newDice) {
+    newDice.forEach((die) => {
+      const index = diceArr.findIndex(
+        (checkDie) => checkDie.sides === die.sides
+      );
+      if (index < 0) {
+        diceArr.push({ number: die.number, sides: die.sides });
+      } else {
+        diceArr[index].number += die.number;
+      }
+    });
   }
 }
 
