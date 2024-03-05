@@ -36,14 +36,11 @@ const CharacterPage = () => {
   useEffect(() => {
     const loadData = async () => {
       let response = await axios.get(`/api/characters/${characterID}`);
-      const newChar = Object.assign(
-        await Character.create(
-          setShowingSavedMessage,
-          response.data.race.raceId,
-          response.data.race.subraceId
-        ),
-        response.data
+      const newChar = await Character.create(
+        response.data,
+        setShowingSavedMessage
       );
+
       setCharacter(newChar);
       refreshAvatarImg(newChar);
 

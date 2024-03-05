@@ -4,8 +4,10 @@ import axios from "axios";
 import Timer from "./Timer";
 
 class Character {
-  static async create(setShowingSavedMessage, raceId, subraceId) {
-    // Reverse order of groups b/c when inserting into list of profs, order gets reversed again
+  static async create(newCharData, setShowingSavedMessage) {
+    // Get this reference data when char created to avoid calls to backend during operation
+
+    // Reverse order of prof groups b/c when inserting into list of profs, order gets reversed again
     const weaponProfGroups = (
       await axios.get("/api/proficiencies/weapons")
     ).data.reverse();
@@ -13,38 +15,52 @@ class Character {
       await axios.get("/api/proficiencies/armor")
     ).data.reverse();
 
-    const raceName = raceId
-      ? (await axios.get(`/api/races/${raceId}`)).data.name
+    const race = newCharData.race.raceId
+      ? (await axios.get(`/api/races/${newCharData.race.raceId}`)).data
       : null;
+    await Character.#raceReplaceIdsWithData(race);
 
-    const subraceName = subraceId
-      ? (await axios.get(`/api/subraces/${subraceId}`)).data.displayName
-      : !raceId
-      ? "[Select Race]"
-      : `${raceName} [Select Subrace]`;
+    const subrace = newCharData.race.subraceId
+      ? (await axios.get(`/api/subraces/${newCharData.race.subraceId}`)).data
+      : null;
+    await Character.#raceReplaceIdsWithData(subrace);
 
     return new Character(
+      newCharData,
       setShowingSavedMessage,
       weaponProfGroups,
       armorProfGroups,
-      raceName,
-      subraceName
+      race,
+      subrace
     );
   }
 
+  static async #raceReplaceIdsWithData(race) {
+    race.source = (await axios.get(`/api/sources/${race.source}`)).data;
+
+    if (race.features.length > 0) {
+      race.features = (
+        await axios.get(`/api/racialFeatures/multiple/${race.features}`)
+      ).data;
+    }
+  }
+
   constructor(
+    newCharData,
     setShowingSavedMessage,
     ref_weaponProfGroups,
     ref_armorProfGroups,
-    ref_raceName,
-    ref_subraceName
+    ref_race,
+    ref_subrace
   ) {
+    Object.assign(this, newCharData);
+
     this.queueSave = Timer(this.saveCharacter, 5000);
     this.setShowingSavedMessage = setShowingSavedMessage;
     this.ref_weaponProfGroups = ref_weaponProfGroups;
     this.ref_armorProfGroups = ref_armorProfGroups;
-    this.ref_raceName = ref_raceName;
-    this.ref_subraceName = ref_subraceName;
+    this.ref_race = ref_race;
+    this.ref_subrace = ref_subrace;
   }
 
   async saveCharacter() {
@@ -80,16 +96,20 @@ class Character {
     this.saveCharacter();
   }
 
-  setRace(newRace, newSubrace, newRaceChoices) {
-    this.ref_raceName = newRace.name;
+  async setRace(newRace, newSubrace, newRaceChoices) {
     this.race.raceId = newRace.id;
-    this.race.raceSourceId = newRace.src;
-
-    this.ref_subraceName = newSubrace.name;
     this.race.subraceId = newSubrace.id;
-    this.race.subraceSourceId = newSubrace.src;
-
     this.race.featureChoices = newRaceChoices;
+
+    this.ref_race = newRace.id
+      ? (await axios.get(`/api/races/${newRace.id}`)).data
+      : null;
+    await Character.#raceReplaceIdsWithData(this.ref_race);
+
+    this.ref_subrace = newSubrace.id
+      ? (await axios.get(`/api/subraces/${newSubrace.id}`)).data
+      : null;
+    await Character.#raceReplaceIdsWithData(this.ref_subrace);
 
     this.saveCharacter();
   }
@@ -114,7 +134,10 @@ class Character {
           elem.effects.reduce(
             (subtotal, effect) =>
               effect.category === category
-                ? subtotal + effect.changes[ability] || 0
+                ? subtotal +
+                    effect.changes.find(
+                      (checkAbility) => checkAbility.ability === ability
+                    ).amount || 0
                 : subtotal,
             0
           ),
@@ -764,7 +787,46 @@ class Character {
   }
 
   #getFeatureEffects(category) {
-    return this.features.filter(
+    let features = [];
+
+    if (this.ref_race) {
+      let raceFeatures = structuredClone(this.ref_race.features);
+
+      if (this.ref_subrace) {
+        this.ref_subrace.features.forEach((feature) => {
+          feature.replaces.forEach((replaceId) => {
+            const index = raceFeatures.findIndex(
+              (checkFeature) => checkFeature._id === replaceId
+            );
+            if (index >= 0) {
+              raceFeatures.splice(index, 1);
+            }
+          });
+        });
+
+        raceFeatures = raceFeatures.concat(
+          structuredClone(this.ref_subrace.features)
+        );
+      }
+
+      raceFeatures.forEach((feature) => {
+        feature.effects.forEach((effect) => {
+          if (effect.changes.choices) {
+            effect.changes = this.#combineEffectChoices(
+              effect.category,
+              effect.changes.required,
+              this.race.featureChoices[feature._id][effect.category]
+            );
+          } else {
+            effect.changes = effect.changes.required;
+          }
+        });
+      });
+
+      features = features.concat(raceFeatures);
+    }
+
+    return features.filter(
       (feature) =>
         feature.effects &&
         feature.effects.some((effect) => effect.category === category)
@@ -1133,6 +1195,34 @@ class Character {
         buff.effects &&
         buff.effects.some((effect) => effect.category === category)
     );
+  }
+
+  #combineEffectChoices(category, required, choicesMade) {
+    let combined = structuredClone(required);
+
+    if (!combined) {
+      combined = structuredClone(choicesMade);
+    } else {
+      switch (category) {
+        case "AbilityScore":
+          combined.forEach((ability) => {
+            ability.amount += choicesMade.find(
+              (checkAbility) => (checkAbility.ability = ability.ability)
+            ).amount;
+          });
+          break;
+
+        case "Language":
+        case "SkillProficiency":
+        case "Feat":
+          combined = combined.concat(structuredClone(choicesMade));
+          break;
+
+        default:
+      }
+    }
+
+    return combined;
   }
 
   #getEffects(category) {

@@ -453,8 +453,8 @@ const RaceModal = ({ character, closeModal }) => {
     <>
       <button onClick={closeModal}>Cancel</button>
       <button
-        onClick={() => {
-          character.setRace(savedRace, savedSubrace, featureChoices);
+        onClick={async () => {
+          await character.setRace(savedRace, savedSubrace, featureChoices);
           closeModal();
         }}
       >
