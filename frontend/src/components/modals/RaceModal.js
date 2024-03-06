@@ -19,6 +19,7 @@ const RaceModal = ({ character, closeModal }) => {
   const [raceId, setRaceId] = useState();
   const [subraceId, setSubraceId] = useState();
   const [featureChoices, setFeatureChoices] = useState();
+  const [originalFeatureChoices, setOriginalFeatureChoices] = useState();
   const [selectedFeature, setSelectedFeature] = useState(["race", 0]);
 
   // const [tceRules, setTCERules] = useState(
@@ -82,6 +83,9 @@ const RaceModal = ({ character, closeModal }) => {
       setSubraceId(character.race.subraceId || "");
 
       setFeatureChoices(structuredClone(character.race.featureChoices) || {});
+      setOriginalFeatureChoices(
+        structuredClone(character.race.featureChoices) || {}
+      );
     };
     loadData();
   }, [character.race, updateSubraceOptions]);
@@ -187,6 +191,7 @@ const RaceModal = ({ character, closeModal }) => {
             choices={choices}
             featureChoices={featureChoices}
             setFeatureChoices={setFeatureChoices}
+            originalFeatureChoices={originalFeatureChoices}
             existingProfs={character.getSkills()}
           />
         );
@@ -463,7 +468,7 @@ const RaceModal = ({ character, closeModal }) => {
     </>
   );
 
-  if (featureChoices) console.log(JSON.parse(JSON.stringify(featureChoices)));
+  // if (featureChoices) console.log(JSON.parse(JSON.stringify(featureChoices)));
 
   return (
     <GenericModal

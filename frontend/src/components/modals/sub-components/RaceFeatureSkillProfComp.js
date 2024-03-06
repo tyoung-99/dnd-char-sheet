@@ -6,6 +6,7 @@ const RaceFeatureSkillProfComp = ({
   choices,
   featureChoices,
   setFeatureChoices,
+  originalFeatureChoices,
   existingProfs,
 }) => {
   const SKILL_LIST = [
@@ -31,7 +32,11 @@ const RaceFeatureSkillProfComp = ({
 
   const checkIfUnproficient = (skill) => {
     return existingProfs.find(
-      (checkSkill) => checkSkill.name === skill && checkSkill.prof === 0
+      (checkSkill) =>
+        checkSkill.name === skill &&
+        (checkSkill.prof === 0 ||
+          originalFeatureChoices[featureId][category].includes(skill))
+      // Considers skill profs previously selected for this feature as unproficient to allow them to be displayed in dropdown if deselected
     );
   };
 
