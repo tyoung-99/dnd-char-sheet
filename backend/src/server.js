@@ -20,7 +20,7 @@ import {
   getRacialFeaturesFromList,
   getOneRacialFeature,
 } from "./handleRaces.js";
-import { getFeats, getOneFeat } from "./handleFeats.js";
+import { getFeats, getFeatsFromList, getOneFeat } from "./handleFeats.js";
 
 const app = express();
 app.use(express.json());
@@ -136,7 +136,12 @@ app.get("/api/racialFeatures/one/:featureId", async (req, res) => {
 app.get("/api/feats", async (req, res) => {
   res.send(await getFeats(db));
 });
-app.get("/api/feats/:featId", async (req, res) => {
+app.get("/api/feats/multiple/:featIds", async (req, res) => {
+  let { featIds } = req.params;
+  featIds = featIds.split(",");
+  res.send(await getFeatsFromList(db, featIds));
+});
+app.get("/api/feats/one/:featId", async (req, res) => {
   const { featId } = req.params;
   res.send(await getOneFeat(db, featId));
 });

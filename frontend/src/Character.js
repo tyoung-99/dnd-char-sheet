@@ -7,23 +7,22 @@ class Character {
   static async create(newCharData, setShowingSavedMessage) {
     // Get this reference data when char created to avoid calls to backend during operation
 
-    // Reverse order of prof groups b/c when inserting into list of profs, order gets reversed again
-    const weaponProfGroups = (
-      await axios.get("/api/proficiencies/weapons")
-    ).data.reverse();
-    const armorProfGroups = (
-      await axios.get("/api/proficiencies/armor")
-    ).data.reverse();
+    const weaponProfGroups = (await axios.get("/api/proficiencies/weapons"))
+      .data;
+    const armorProfGroups = (await axios.get("/api/proficiencies/armor")).data;
 
     const race = newCharData.race.raceId
       ? (await axios.get(`/api/races/${newCharData.race.raceId}`)).data
       : null;
-    await Character.#raceReplaceIdsWithData(race);
+    await Character.#raceReplaceIdsWithData(race, newCharData.featureChoices);
 
     const subrace = newCharData.race.subraceId
       ? (await axios.get(`/api/subraces/${newCharData.race.subraceId}`)).data
       : null;
-    await Character.#raceReplaceIdsWithData(subrace);
+    await Character.#raceReplaceIdsWithData(
+      subrace,
+      newCharData.featureChoices
+    );
 
     return new Character(
       newCharData,
@@ -35,7 +34,7 @@ class Character {
     );
   }
 
-  static async #raceReplaceIdsWithData(race) {
+  static async #raceReplaceIdsWithData(race, featureChoices) {
     race.source = (await axios.get(`/api/sources/${race.source}`)).data;
 
     if (race.features.length > 0) {
@@ -43,6 +42,84 @@ class Character {
         await axios.get(`/api/racialFeatures/multiple/${race.features}`)
       ).data;
     }
+
+    // Combining required/chosen effects of racial features/nested feats here simplifies using that data later
+    for (const feature of race.features) {
+      if (!feature.effects) continue;
+
+      for (const effect of feature.effects) {
+        if (
+          featureChoices.race[feature._id] &&
+          featureChoices.race[feature._id][effect.category]
+        ) {
+          effect.changes = Character.#combineEffectChoices(
+            effect.category,
+            effect.changes.required,
+            featureChoices.race[feature._id][effect.category]
+          );
+        } else {
+          effect.changes = effect.changes.required;
+        }
+      }
+
+      const featIndex = feature.effects.findIndex(
+        (effect) => effect.category === "Feat"
+      );
+
+      if (featIndex < 0) continue;
+
+      feature.effects[featIndex].changes = (
+        await axios.get(
+          `/api/feats/multiple/${feature.effects[featIndex].changes}`
+        )
+      ).data;
+
+      for (const feat of feature.effects[featIndex].changes) {
+        for (const featEffect of feat.effects) {
+          if (
+            featureChoices.feat[feat._id] &&
+            featureChoices.feat[feat._id][featEffect.category]
+          ) {
+            featEffect.changes = Character.#combineEffectChoices(
+              featEffect.category,
+              featEffect.changes.required,
+              featureChoices.feat[feat._id][featEffect.category]
+            );
+          } else {
+            featEffect.changes = featEffect.changes.required;
+          }
+        }
+      }
+    }
+  }
+
+  static #combineEffectChoices(category, required, choicesMade) {
+    let combined = structuredClone(required);
+
+    if (!combined) {
+      combined = structuredClone(choicesMade);
+    } else {
+      switch (category) {
+        case "AbilityScore":
+          combined.forEach((ability) => {
+            ability.amount += choicesMade.find(
+              (checkAbility) => (checkAbility.ability = ability.ability)
+            ).amount;
+          });
+          break;
+
+        case "Language":
+        case "SkillProficiency":
+        case "SkillExpertise":
+        case "Feat":
+          combined = combined.concat(structuredClone(choicesMade));
+          break;
+
+        default:
+      }
+    }
+
+    return combined;
   }
 
   constructor(
@@ -99,17 +176,20 @@ class Character {
   async setRace(newRace, newSubrace, newRaceChoices) {
     this.race.raceId = newRace.id;
     this.race.subraceId = newSubrace.id;
-    this.race.featureChoices = newRaceChoices;
+    this.featureChoices.race = newRaceChoices;
 
     this.ref_race = newRace.id
       ? (await axios.get(`/api/races/${newRace.id}`)).data
       : null;
-    await Character.#raceReplaceIdsWithData(this.ref_race);
+    await Character.#raceReplaceIdsWithData(this.ref_race, this.featureChoices);
 
     this.ref_subrace = newSubrace.id
       ? (await axios.get(`/api/subraces/${newSubrace.id}`)).data
       : null;
-    await Character.#raceReplaceIdsWithData(this.ref_subrace);
+    await Character.#raceReplaceIdsWithData(
+      this.ref_subrace,
+      this.featureChoices
+    );
 
     this.saveCharacter();
   }
@@ -123,26 +203,30 @@ class Character {
   }
 
   getAbilityScore(ability) {
-    const category = "AbilityScore";
-    const bonuses = this.#getEffects(category);
-
-    return (
-      this.abilities.find((stat) => stat.name === ability).score +
+    const combineBonuses = (bonuses) =>
       bonuses.reduce(
         (total, elem) =>
           total +
-          elem.effects.reduce(
-            (subtotal, effect) =>
-              effect.category === category
-                ? subtotal +
-                    effect.changes.find(
-                      (checkAbility) => checkAbility.ability === ability
-                    ).amount || 0
-                : subtotal,
-            0
-          ),
+          elem.effects.reduce((subtotal, effect) => {
+            if (effect.category === category) {
+              const abilityBonus = effect.changes.find(
+                (checkAbility) => checkAbility.ability === ability
+              );
+              subtotal += abilityBonus ? abilityBonus.amount : 0;
+            } else if (effect.category === "Feat") {
+              subtotal += combineBonuses(effect.changes);
+            }
+            return subtotal;
+          }, 0),
+
         0
-      )
+      );
+
+    const category = "AbilityScore";
+
+    return (
+      this.abilities.find((stat) => stat.name === ability).score +
+      combineBonuses(this.#getEffects(category))
     );
   }
 
@@ -311,43 +395,49 @@ class Character {
   }
 
   #getSkillsHelper(category, callback) {
-    this.#getEffects(category).forEach((effectsList) => {
-      const effect = effectsList.effects.find(
-        (checkEffect) => checkEffect.category === category
-      );
-      effect.changes.forEach(callback);
-    });
+    const combineBonuses = (bonuses) => {
+      bonuses.forEach((effectsList) => {
+        let effect = effectsList.effects.find(
+          (checkEffect) => checkEffect.category === category
+        );
+        if (effect.changes) effect.changes.forEach(callback);
+
+        effect = effectsList.effects.find(
+          (checkEffect) => checkEffect.category === "Feat"
+        );
+        if (effect) combineBonuses(effect.changes);
+      });
+    };
+
+    combineBonuses(this.#getEffects(category));
   }
 
   getSkillByName(skill) {
-    const ability = this.abilities.find((ability) =>
-      ability.skillProfs.some((checkSkill) => checkSkill.name === skill)
-    );
-    return (
-      this.getAbilityMod(ability.name) +
-      ability.skillProfs.find((checkSkill) => checkSkill.name === skill)
-        .proficiency *
-        this.getProfBonus()
-    );
+    return this.getSkills().find((checkSkill) => checkSkill.name === skill);
   }
 
   getPassivePerception() {
-    const category = "PassivePerception";
-    return (
-      10 +
-      this.getSkillByName("Perception") +
-      this.#getEffects(category).reduce(
+    const combineBonuses = (bonuses) =>
+      bonuses.reduce(
         (total, elem) =>
           total +
-          elem.effects.reduce(
-            (subtotal, effect) =>
-              effect.category === category
-                ? subtotal + effect.changes.bonus
-                : subtotal,
-            0
-          ),
+          elem.effects.reduce((subtotal, effect) => {
+            if (effect.category === category) {
+              subtotal += effect.changes.bonus;
+            } else if (effect.category === "Feat") {
+              subtotal += combineBonuses(effect.changes);
+            }
+            return subtotal;
+          }, 0),
         0
-      )
+      );
+
+    const category = "PassivePerception";
+
+    return (
+      10 +
+      this.getSkillByName("Perception").mod.flat +
+      combineBonuses(this.#getEffects(category))
     );
   }
 
@@ -365,7 +455,7 @@ class Character {
       current.mod += this.getProfBonus();
     });
 
-    const bonuses = this.#getSaveOtherBonuses();
+    const bonuses = this.#getSaveModBonuses();
     Object.keys(bonuses).forEach((ability) => {
       saves.find((checkSave) => checkSave.name === ability).mod +=
         bonuses[ability];
@@ -375,52 +465,56 @@ class Character {
   }
 
   #getSaveProfBonuses() {
-    const baseClass = this.classes.find(
-      (checkClass) => checkClass.startingClass
-    ).className;
+    // TODO: Update w/ getEffects() after putting save prof feature in (don't forget to check feats)
+
+    // const baseClass = this.classes.find(
+    //   (checkClass) => checkClass.startingClass
+    // ).className;
     const saveProfs = [];
 
-    if (["Barbarian", "Fighter", "Monk", "Ranger"].includes(baseClass)) {
-      saveProfs.push("STR");
-    }
-    if (["Bard", "Monk", "Ranger", "Rogue"].includes(baseClass)) {
-      saveProfs.push("DEX");
-    }
-    if (["Artificer", "Barbarian", "Fighter", "Sorcerer"].includes(baseClass)) {
-      saveProfs.push("CON");
-    }
-    if (["Artificer", "Druid", "Rogue", "Wizard"].includes(baseClass)) {
-      saveProfs.push("INT");
-    }
-    if (
-      ["Cleric", "Druid", "Paladin", "Warlock", "Wizard"].includes(baseClass)
-    ) {
-      saveProfs.push("WIS");
-    }
-    if (
-      ["Bard", "Cleric", "Paladin", "Sorcerer", "Warlock"].includes(baseClass)
-    ) {
-      saveProfs.push("CHA");
-    }
+    // if (["Barbarian", "Fighter", "Monk", "Ranger"].includes(baseClass)) {
+    //   saveProfs.push("STR");
+    // }
+    // if (["Bard", "Monk", "Ranger", "Rogue"].includes(baseClass)) {
+    //   saveProfs.push("DEX");
+    // }
+    // if (["Artificer", "Barbarian", "Fighter", "Sorcerer"].includes(baseClass)) {
+    //   saveProfs.push("CON");
+    // }
+    // if (["Artificer", "Druid", "Rogue", "Wizard"].includes(baseClass)) {
+    //   saveProfs.push("INT");
+    // }
+    // if (
+    //   ["Cleric", "Druid", "Paladin", "Warlock", "Wizard"].includes(baseClass)
+    // ) {
+    //   saveProfs.push("WIS");
+    // }
+    // if (
+    //   ["Bard", "Cleric", "Paladin", "Sorcerer", "Warlock"].includes(baseClass)
+    // ) {
+    //   saveProfs.push("CHA");
+    // }
 
-    const category = "SavingThrow";
-    this.#getEffects(category).forEach((bonus) => {
-      const effect = bonus.effects.find(
-        (checkEffect) => checkEffect.category === category
-      );
-      if (effect.changes.prof) {
-        effect.changes.prof.forEach((ability) => {
-          if (!saveProfs.includes(ability)) saveProfs.push(ability);
-        });
-      }
-    });
+    // const category = "SavingThrowProficiency";
+    // this.#getEffects(category).forEach((bonus) => {
+    //   const effect = bonus.effects.find(
+    //     (checkEffect) => checkEffect.category === category
+    //   );
+    //   if (effect.changes.prof) {
+    //     effect.changes.prof.forEach((ability) => {
+    //       if (!saveProfs.includes(ability)) saveProfs.push(ability);
+    //     });
+    //   }
+    // });
 
     return saveProfs;
   }
 
-  #getSaveOtherBonuses() {
-    const category = "SavingThrow";
-    const bonuses = this.#getEffects(category);
+  #getSaveModBonuses() {
+    // TODO: Update w/ getEffects() after putting save mod feature in  (don't forget to check feats)
+
+    // const category = "SavingThrowModifier";
+    // const bonuses = this.#getEffects(category);
     const bonusesParsed = {
       STR: 0,
       DEX: 0,
@@ -430,65 +524,88 @@ class Character {
       CHA: 0,
     };
 
-    bonuses.forEach((bonus) => {
-      const effect = bonus.effects.find(
-        (checkEffect) => checkEffect.category === category
-      );
-      if (effect.changes.flat) {
-        Object.keys(effect.changes.flat).forEach((ability) => {
-          bonusesParsed[ability] += effect.changes.flat[ability];
-        });
-      }
-    });
+    // bonuses.forEach((bonus) => {
+    //   const effect = bonus.effects.find(
+    //     (checkEffect) => checkEffect.category === category
+    //   );
+    //   if (effect.changes.flat) {
+    //     Object.keys(effect.changes.flat).forEach((ability) => {
+    //       bonusesParsed[ability] += effect.changes.flat[ability];
+    //     });
+    //   }
+    // });
 
     return bonusesParsed;
   }
 
   getWeaponProfs() {
-    let cleanProfs = [
-      ...new Set([...this.weaponProfs].map((prof) => prof.name)),
-    ];
+    return this.#filterProfGroups(
+      this.#getWeaponProfsUnfiltered(),
+      this.ref_weaponProfGroups
+    );
+  }
 
-    this.ref_weaponProfGroups.forEach((group) => {
-      if (group.profs.every((prof) => cleanProfs.includes(prof))) {
-        cleanProfs.unshift(group.name);
-        cleanProfs = cleanProfs.filter((prof) => !group.profs.includes(prof));
-      }
-    });
-    return cleanProfs;
+  #getWeaponProfsUnfiltered() {
+    let profsList = [];
+
+    // TODO: Update w/ getEffects() after putting weapon prof feature in  (don't forget to check feats)
+
+    profsList = [...new Set(profsList)];
+    return profsList;
   }
 
   getArmorProfs() {
-    let cleanProfs = [
-      ...new Set([...this.armorProfs].map((prof) => prof.name)),
-    ];
-    this.ref_armorProfGroups.forEach((group) => {
-      if (group.profs.every((prof) => cleanProfs.includes(prof))) {
-        cleanProfs = cleanProfs.filter((prof) => !group.profs.includes(prof));
-        cleanProfs.unshift(group.name);
+    return this.#filterProfGroups(
+      this.#getArmorProfsUnfiltered(),
+      this.ref_armorProfGroups
+    );
+  }
+
+  #getArmorProfsUnfiltered() {
+    let profsList = [];
+
+    // TODO: Update w/ getEffects() after putting armor prof feature in  (don't forget to check feats)
+
+    profsList = [...new Set(profsList)];
+    return profsList;
+  }
+
+  #filterProfGroups(profsList, groups) {
+    groups.forEach((group) => {
+      if (group.profs.every((prof) => profsList.includes(prof))) {
+        profsList = profsList.filter((prof) => !group.profs.includes(prof));
+        profsList.push(group.name);
       }
     });
-    return cleanProfs;
+    return profsList;
   }
 
   getToolProfs() {
-    return [...new Set([...this.toolProfs].map((prof) => prof.name))];
+    let profsList = [];
+
+    // TODO: Update w/ getEffects() after putting tool prof feature in  (don't forget to check feats)
+
+    return [...new Set(profsList)];
   }
 
   getLanguages() {
     let languages = [];
-    const category = "Languages";
-    const langEffects = this.#getEffects(category);
+    const category = "Language";
 
-    langEffects.forEach((langEffect) => {
-      const effect = langEffect.effects.find(
-        (checkEffect) => checkEffect.category === category
-      );
+    const combineBonuses = (bonuses) =>
+      bonuses.forEach((langEffect) => {
+        let effect = langEffect.effects.find(
+          (checkEffect) => checkEffect.category === category
+        );
+        languages = languages.concat(effect.changes);
 
-      languages = languages
-        .concat(effect.changes.required)
-        .concat(effect.changes.choices);
-    });
+        effect = langEffect.effects.find(
+          (checkEffect) => checkEffect.category === "Feat"
+        );
+        if (effect) combineBonuses(effect.changes);
+      });
+
+    combineBonuses(this.#getEffects(category));
 
     return [...new Set(languages)];
   }
@@ -496,17 +613,20 @@ class Character {
   isProficientWithItem(item) {
     return item.profRequired.some(
       (prof) =>
-        this.weaponProfs.includes(prof) ||
-        this.armorProfs.includes(prof) ||
-        this.toolProfs.includes(prof)
+        this.#getWeaponProfsUnfiltered().includes(prof) ||
+        this.#getArmorProfsUnfiltered().includes(prof) ||
+        this.getToolProfs().includes(prof)
     );
   }
 
   getInitiative() {
+    // TODO: Update w/ getEffects() after putting init feature in  (don't forget to check feats)
     return this.getAbilityMod("DEX");
   }
 
   getArmorClass() {
+    // TODO: Update w/ getEffects() after putting AC feature in  (don't forget to check feats)
+
     // Compare every currently legal AC calculation, select highest
     let replacements = [],
       bonuses = [];
@@ -610,19 +730,26 @@ class Character {
 
   getSpeeds() {
     const category = "Speed";
-    const bonuses = this.#getEffects(category);
     const modifiers = { walk: 0, swim: 0, fly: 0 };
     const multipliers = { walk: 1, swim: 1, fly: 1 };
 
-    bonuses.forEach((bonus) => {
-      const effect = bonus.effects.find(
-        (checkEffect) => checkEffect.category === category
-      );
-      Object.keys(effect.changes).forEach((speedType) => {
-        modifiers[speedType] += effect.changes[speedType].modifier || 0;
-        multipliers[speedType] *= effect.changes[speedType].multiplier || 1;
+    const combineBonuses = (bonuses) =>
+      bonuses.forEach((bonus) => {
+        let effect = bonus.effects.find(
+          (checkEffect) => checkEffect.category === category
+        );
+        Object.keys(effect.changes).forEach((speedType) => {
+          modifiers[speedType] += effect.changes[speedType].modifier || 0;
+          multipliers[speedType] *= effect.changes[speedType].multiplier || 1;
+        });
+
+        effect = bonus.effects.find(
+          (checkEffect) => checkEffect.category === "Feat"
+        );
+        if (effect) combineBonuses(effect.changes);
       });
-    });
+
+    combineBonuses(this.#getEffects(category));
 
     /* RAW doesn't address order of operations, using modifiers before multipliers 
     b/c it's consistent w/ how damage resistance is handled, and it makes modifiers 
@@ -653,23 +780,23 @@ class Character {
   }
 
   #getHitPointsHelper(category, categoryName) {
-    const bonuses = this.#getEffects(categoryName);
-
-    return (
-      category.base +
+    const combineBonuses = (bonuses) =>
       bonuses.reduce(
         (total, elem) =>
           total +
-          elem.effects.reduce(
-            (subtotal, effect) =>
-              effect.category === categoryName
-                ? subtotal + effect.changes.bonus
-                : subtotal,
-            0
-          ),
+          elem.effects.reduce((subtotal, effect) => {
+            if (effect.category === categoryName) {
+              subtotal += effect.changes.bonus;
+            } else if (effect.category === "Feat") {
+              subtotal += combineBonuses(effect.changes);
+            }
+            return subtotal;
+          }, 0),
+
         0
-      )
-    );
+      );
+
+    return category.base + combineBonuses(this.#getEffects(categoryName));
   }
 
   getCurrentHitDice() {
@@ -684,6 +811,8 @@ class Character {
   }
 
   getTotalHitDice() {
+    // TODO: Update w/ getEffects() after putting hit dice feature in (are there any?) (don't forget to check feats)
+
     let total = [];
     this.classes.forEach((charClass) => {
       let index = total.findIndex((die) => die.sides === charClass.hitDie);
@@ -704,6 +833,8 @@ class Character {
   }
 
   #getAttackMod(item) {
+    // TODO: Update w/ getEffects() after putting attack mod features in (don't forget to check feats)
+
     const strMod = this.getAbilityMod("STR");
     const dexMod = this.getAbilityMod("DEX");
     const abilityMod =
@@ -743,6 +874,8 @@ class Character {
   }
 
   #getAttackDamage(item) {
+    // TODO: Update w/ getEffects() after putting attack damage features in (don't forget to check feats)
+
     const strMod = this.getAbilityMod("STR");
     const dexMod = this.getAbilityMod("DEX");
     const abilityMod =
@@ -828,49 +961,36 @@ class Character {
     return this.equipment.filter((item) => item.type === "Treasure");
   }
 
-  getFeature(featureName) {
-    return this.features.find((feature) => feature.name === featureName);
-  }
-
-  getFeatures({
-    fromClass,
-    fromRace,
-    fromSubrace,
-    fromBackground,
-    fromFeat,
-  } = {}) {
+  getFeatures(
+    { fromClass, fromRace, fromBackground } = {
+      fromClass: true,
+      fromRace: true,
+      fromBackground: true,
+    }
+  ) {
     let features = [];
 
     if (fromClass) {
-      features = features.concat(
-        this.features.filter((feature) => feature.class)
-      );
+      features = features.concat(this.#getClassFeatures());
     }
     if (fromRace) {
-      features = features.concat(
-        this.features.filter((feature) => feature.race)
-      );
-    }
-    if (fromSubrace) {
-      features = features.concat(
-        this.features.filter((feature) => feature.subrace)
-      );
+      features = features.concat(this.#getRaceFeatures());
     }
     if (fromBackground) {
-      features = features.concat(
-        this.features.filter((feature) => feature.background)
-      );
-    }
-    if (fromFeat) {
-      features = features.concat(
-        this.features.filter((feature) => feature.feat)
-      );
+      features = features.concat(this.#getBackgroundFeatures());
     }
 
     return features;
   }
 
-  #getFeatureEffects(category) {
+  #getClassFeatures() {
+    // TODO: Update w/ getEffects() after putting class features in (don't forget to check feats)
+
+    let features = [];
+    return features;
+  }
+
+  #getRaceFeatures() {
     let features = [];
 
     if (this.ref_race) {
@@ -893,28 +1013,55 @@ class Character {
         );
       }
 
-      raceFeatures.forEach((feature) => {
-        feature.effects.forEach((effect) => {
-          if (effect.changes.choices) {
-            effect.changes = this.#combineEffectChoices(
-              effect.category,
-              effect.changes.required,
-              this.race.featureChoices[feature._id][effect.category]
-            );
-          } else {
-            effect.changes = effect.changes.required;
-          }
-        });
-      });
+      // raceFeatures.forEach((feature) => {
+      //   feature.effects.forEach((effect) => {
+      //     if (effect.changes.choices) {
+      //       effect.changes = this.#combineEffectChoices(
+      //         effect.category,
+      //         effect.changes.required,
+      //         this.featureChoices.race[feature._id][effect.category]
+      //       );
+      //     } else {
+      //       effect.changes = effect.changes.required;
+      //     }
+      //   });
+      // });
 
       features = features.concat(raceFeatures);
     }
 
-    return features.filter(
-      (feature) =>
-        feature.effects &&
-        feature.effects.some((effect) => effect.category === category)
-    );
+    return features;
+  }
+
+  #getBackgroundFeatures() {
+    // TODO: Update w/ getEffects() after putting background features in (don't forget to check feats)
+
+    let features = [];
+    return features;
+  }
+
+  #getFeatureEffects(category) {
+    const temp = this.getFeatures().filter((feature) => {
+      if (!feature.effects) return false;
+
+      const hasMatchingCategory = feature.effects.some(
+        (effect) => effect.category === category
+      );
+
+      let hasMatchingFeat = false;
+      const featIndex = feature.effects.findIndex(
+        (effect) => effect.category === "Feat"
+      );
+      if (featIndex >= 0) {
+        hasMatchingFeat = feature.effects[featIndex].changes.some((feat) =>
+          feat.effects.some((effect) => effect.category === category)
+        );
+      }
+
+      return hasMatchingCategory || hasMatchingFeat;
+    });
+
+    return temp;
   }
 
   getSpellcastingAbility(source) {
@@ -941,6 +1088,8 @@ class Character {
   }
 
   #spellBonusHelper(source, category) {
+    // TODO: Update w/ getEffects() after putting spell bonus features in (don't forget to check feats)
+
     return this.#getEffects(category).reduce(
       (total, elem) =>
         total +
@@ -956,6 +1105,8 @@ class Character {
   }
 
   getTotalSpellSlots() {
+    // TODO: Update w/ getEffects() after putting spell slot features in (don't forget to check feats)
+
     let [spellcastingLevel, pactLevel] = this.#createSpellcastingLevelArr();
 
     spellcastingLevel = Object.keys(spellcastingLevel).reduce(
@@ -1279,34 +1430,6 @@ class Character {
         buff.effects &&
         buff.effects.some((effect) => effect.category === category)
     );
-  }
-
-  #combineEffectChoices(category, required, choicesMade) {
-    let combined = structuredClone(required);
-
-    if (!combined) {
-      combined = structuredClone(choicesMade);
-    } else {
-      switch (category) {
-        case "AbilityScore":
-          combined.forEach((ability) => {
-            ability.amount += choicesMade.find(
-              (checkAbility) => (checkAbility.ability = ability.ability)
-            ).amount;
-          });
-          break;
-
-        case "Language":
-        case "SkillProficiency":
-        case "Feat":
-          combined = combined.concat(structuredClone(choicesMade));
-          break;
-
-        default:
-      }
-    }
-
-    return combined;
   }
 
   #getEffects(category) {

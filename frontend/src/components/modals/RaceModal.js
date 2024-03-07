@@ -82,13 +82,13 @@ const RaceModal = ({ character, closeModal }) => {
       }
       setSubraceId(character.race.subraceId || "");
 
-      setFeatureChoices(structuredClone(character.race.featureChoices) || {});
+      setFeatureChoices(structuredClone(character.featureChoices.race) || {});
       setOriginalFeatureChoices(
-        structuredClone(character.race.featureChoices) || {}
+        structuredClone(character.featureChoices.race) || {}
       );
     };
     loadData();
-  }, [character.race, updateSubraceOptions]);
+  }, [character.race, character.featureChoices, updateSubraceOptions]);
 
   const updateFeatureChoices = (oldChoices, typeChanged, oldId, newId) => {
     let newChoices = { ...oldChoices };

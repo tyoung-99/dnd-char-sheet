@@ -6,6 +6,17 @@ export const getFeats = async (db) => {
   return feats;
 };
 
+export const getFeatsFromList = async (db, featIdList) => {
+  const collection = db.collection("feats");
+  featIdList = featIdList.map((id) => ObjectId.createFromHexString(id));
+  const feats = await collection
+    .find({
+      _id: { $in: featIdList },
+    })
+    .toArray();
+  return feats;
+};
+
 export const getOneFeat = async (db, featId) => {
   const feat = await db
     .collection("feats")
