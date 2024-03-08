@@ -15,10 +15,10 @@ const RaceFeatureLanguageComp = ({
         id={`Language ${i}`}
         name={`Language ${i}`}
         type="text"
-        value={featureChoices[featureId][category][i]}
+        value={featureChoices.race[featureId][category][i]}
         onChange={(event) => {
           const newChoices = { ...featureChoices };
-          newChoices[featureId][category][i] = event.target.value;
+          newChoices.race[featureId][category][i] = event.target.value;
           setFeatureChoices(newChoices);
         }}
       ></input>

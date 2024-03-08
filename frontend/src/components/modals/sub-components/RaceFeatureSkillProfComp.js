@@ -35,7 +35,7 @@ const RaceFeatureSkillProfComp = ({
       (checkSkill) =>
         checkSkill.name === skill &&
         (checkSkill.prof === 0 ||
-          originalFeatureChoices[featureId][category].includes(skill))
+          originalFeatureChoices.race[featureId][category].includes(skill))
       // Considers skill profs previously selected for this feature as unproficient to allow them to be displayed in dropdown if deselected
     );
   };
@@ -52,10 +52,10 @@ const RaceFeatureSkillProfComp = ({
         key={i}
         id={`SkillProf ${i}`}
         name={`SkillProf ${i}`}
-        value={featureChoices[featureId][category][i]}
+        value={featureChoices.race[featureId][category][i]}
         onChange={(event) => {
           const newChoices = { ...featureChoices };
-          newChoices[featureId][category][i] = event.target.value;
+          newChoices.race[featureId][category][i] = event.target.value;
           setFeatureChoices(newChoices);
         }}
       >
@@ -65,8 +65,8 @@ const RaceFeatureSkillProfComp = ({
         {options.map((skill) => {
           // Prevent duplicate selections to avoid need for error checking
           if (
-            featureChoices[featureId][category].includes(skill) &&
-            featureChoices[featureId][category][i] !== skill
+            featureChoices.race[featureId][category].includes(skill) &&
+            featureChoices.race[featureId][category][i] !== skill
           ) {
             return null;
           }

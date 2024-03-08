@@ -82,10 +82,8 @@ const RaceModal = ({ character, closeModal }) => {
       }
       setSubraceId(character.race.subraceId || "");
 
-      setFeatureChoices(structuredClone(character.featureChoices.race) || {});
-      setOriginalFeatureChoices(
-        structuredClone(character.featureChoices.race) || {}
-      );
+      setFeatureChoices(structuredClone(character.featureChoices));
+      setOriginalFeatureChoices(structuredClone(character.featureChoices));
     };
     loadData();
   }, [character.race, character.featureChoices, updateSubraceOptions]);
@@ -95,7 +93,7 @@ const RaceModal = ({ character, closeModal }) => {
     let raceOrSubraceOptions;
 
     if (typeChanged === "race") {
-      newChoices = {};
+      newChoices.race = {};
       raceOrSubraceOptions = raceOptions;
     } else {
       raceOrSubraceOptions = subraceOptions;
@@ -103,9 +101,9 @@ const RaceModal = ({ character, closeModal }) => {
         const toRemove = raceOrSubraceOptions
           .find((checkRace) => checkRace._id === oldId)
           .features.map((feature) => feature._id);
-        for (const featureId of Object.keys(newChoices)) {
+        for (const featureId of Object.keys(newChoices.race)) {
           if (toRemove.includes(featureId)) {
-            delete newChoices[featureId];
+            delete newChoices.race[featureId];
           }
         }
       }
@@ -151,14 +149,17 @@ const RaceModal = ({ character, closeModal }) => {
         addEffects[effect.category] = newChoice;
       }
 
-      newChoices[feature._id] = addEffects;
+      newChoices.race[feature._id] = addEffects;
     }
 
     setFeatureChoices(newChoices);
   };
 
   const getFeatureChoiceInputs = (featureId, category, choices) => {
-    if (!featureChoices[featureId] || !featureChoices[featureId][category]) {
+    if (
+      !featureChoices.race[featureId] ||
+      !featureChoices.race[featureId][category]
+    ) {
       return null;
     }
 
@@ -468,7 +469,7 @@ const RaceModal = ({ character, closeModal }) => {
     </>
   );
 
-  // if (featureChoices) console.log(JSON.parse(JSON.stringify(featureChoices)));
+  if (featureChoices) console.log(JSON.parse(JSON.stringify(featureChoices)));
 
   return (
     <GenericModal

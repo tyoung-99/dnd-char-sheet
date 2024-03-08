@@ -68,6 +68,11 @@ class Character {
 
       if (featIndex < 0) continue;
 
+      if (feature.effects[featIndex].changes.join() === "") {
+        feature.effects[featIndex].changes = null;
+        continue;
+      }
+
       feature.effects[featIndex].changes = (
         await axios.get(
           `/api/feats/multiple/${feature.effects[featIndex].changes}`
@@ -173,10 +178,10 @@ class Character {
     this.saveCharacter();
   }
 
-  async setRace(newRace, newSubrace, newRaceChoices) {
+  async setRace(newRace, newSubrace, newFeatureChoices) {
     this.race.raceId = newRace.id;
     this.race.subraceId = newSubrace.id;
-    this.featureChoices.race = newRaceChoices;
+    this.featureChoices = newFeatureChoices;
 
     this.ref_race = newRace.id
       ? (await axios.get(`/api/races/${newRace.id}`)).data
@@ -400,6 +405,7 @@ class Character {
         let effect = effectsList.effects.find(
           (checkEffect) => checkEffect.category === category
         );
+        if (effect.changes.join() === "") return;
         if (effect.changes) effect.changes.forEach(callback);
 
         effect = effectsList.effects.find(
@@ -1053,9 +1059,11 @@ class Character {
         (effect) => effect.category === "Feat"
       );
       if (featIndex >= 0) {
-        hasMatchingFeat = feature.effects[featIndex].changes.some((feat) =>
-          feat.effects.some((effect) => effect.category === category)
-        );
+        hasMatchingFeat =
+          feature.effects[featIndex].changes &&
+          feature.effects[featIndex].changes.some((feat) =>
+            feat.effects.some((effect) => effect.category === category)
+          );
       }
 
       return hasMatchingCategory || hasMatchingFeat;

@@ -26,10 +26,10 @@ const RaceFeatureFeatComp = ({
         key={i}
         id={`Feat ${i}`}
         name={`Feat ${i}`}
-        value={featureChoices[featureId][category][i]}
+        value={featureChoices.race[featureId][category][i]}
         onChange={(event) => {
           const newChoices = { ...featureChoices };
-          newChoices[featureId][category][i] = event.target.value;
+          newChoices.race[featureId][category][i] = event.target.value;
           setFeatureChoices(newChoices);
         }}
       >
@@ -39,8 +39,8 @@ const RaceFeatureFeatComp = ({
         {featList.map((feat) => {
           // Prevent duplicate selections to avoid need for error checking
           if (
-            featureChoices[featureId][category].includes(feat._id) &&
-            featureChoices[featureId][category][i] !== feat._id
+            featureChoices.race[featureId][category].includes(feat._id) &&
+            featureChoices.race[featureId][category][i] !== feat._id
           ) {
             return null;
           }

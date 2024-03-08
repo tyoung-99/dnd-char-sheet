@@ -9,7 +9,7 @@ const RaceFeatureAbilityScoreComp = ({
 }) => {
   const pointsLeft =
     choices.pointsAvailable -
-    featureChoices[featureId][category].reduce(
+    featureChoices.race[featureId][category].reduce(
       (pointsUsed, ability) => pointsUsed + ability.amount,
       0
     );
@@ -18,7 +18,7 @@ const RaceFeatureAbilityScoreComp = ({
     <>
       <label>Points Available: {pointsLeft}</label>
       <ul className="ability-scores">
-        {featureChoices[featureId][category].map((ability, i) => (
+        {featureChoices.race[featureId][category].map((ability, i) => (
           <li key={ability.ability}>
             <span>{ability.ability}</span>
             <span>
@@ -32,7 +32,7 @@ const RaceFeatureAbilityScoreComp = ({
                   }
                   onClick={() => {
                     const newChoices = { ...featureChoices };
-                    newChoices[featureId][category][i].amount =
+                    newChoices.race[featureId][category][i].amount =
                       ability.amount + 1;
                     setFeatureChoices(newChoices);
                   }}
@@ -47,7 +47,7 @@ const RaceFeatureAbilityScoreComp = ({
                   }
                   onClick={() => {
                     const newChoices = { ...featureChoices };
-                    newChoices[featureId][category][i].amount =
+                    newChoices.race[featureId][category][i].amount =
                       ability.amount - 1;
                     setFeatureChoices(newChoices);
                   }}
