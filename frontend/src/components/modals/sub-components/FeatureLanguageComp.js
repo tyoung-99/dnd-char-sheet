@@ -1,6 +1,7 @@
 // Input component for language racial features
 
-const RaceFeatureLanguageComp = ({
+const FeatureLanguageComp = ({
+  featureType,
   featureId,
   category,
   choices,
@@ -15,10 +16,10 @@ const RaceFeatureLanguageComp = ({
         id={`Language ${i}`}
         name={`Language ${i}`}
         type="text"
-        value={featureChoices.race[featureId][category][i]}
+        value={featureChoices[featureType][featureId][category][i]}
         onChange={(event) => {
           const newChoices = { ...featureChoices };
-          newChoices.race[featureId][category][i] = event.target.value;
+          newChoices[featureType][featureId][category][i] = event.target.value;
           setFeatureChoices(newChoices);
         }}
       ></input>
@@ -33,4 +34,4 @@ const RaceFeatureLanguageComp = ({
   );
 };
 
-export default RaceFeatureLanguageComp;
+export default FeatureLanguageComp;

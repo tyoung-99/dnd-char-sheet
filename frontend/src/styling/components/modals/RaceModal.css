@@ -4,6 +4,7 @@
 
 .race-modal-container p,
 .race-modal-container input,
+.race-modal-container select,
 .race-modal-container label {
   display: block;
 }

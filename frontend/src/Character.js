@@ -217,7 +217,12 @@ class Character {
               const abilityBonus = effect.changes.find(
                 (checkAbility) => checkAbility.ability === ability
               );
-              subtotal += abilityBonus ? abilityBonus.amount : 0;
+              subtotal +=
+                abilityBonus &&
+                (!abilityBonus.cap ||
+                  subtotal + abilityBonus.amount <= abilityBonus.cap)
+                  ? abilityBonus.amount
+                  : 0;
             } else if (effect.category === "Feat") {
               subtotal += combineBonuses(effect.changes);
             }
@@ -1426,6 +1431,20 @@ class Character {
     if (comps.s) compsArr.push("S");
     if (comps.m) compsArr.push(`M (${comps.m.text})`);
     return compsArr.join(", ");
+  }
+
+  getFeats() {
+    const category = "Feat";
+    let feats = [];
+
+    this.#getEffects(category).forEach((elem) => {
+      const featEffect = elem.effects.find(
+        (effect) => effect.category === category
+      );
+      feats = feats.concat(featEffect.changes);
+    });
+
+    return feats;
   }
 
   getBuff(buffName) {

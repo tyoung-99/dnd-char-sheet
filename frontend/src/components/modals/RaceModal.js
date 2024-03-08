@@ -3,10 +3,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import GenericModal from "./GenericModal";
-import RaceFeatureAbilityScoreComp from "./sub-components/RaceFeatureAbilityScoreComp";
-import RaceFeatureLanguageComp from "./sub-components/RaceFeatureLanguageComp";
-import RaceFeatureSkillProfComp from "./sub-components/RaceFeatureSkillProfComp";
-import RaceFeatureFeatComp from "./sub-components/RaceFeatureFeatComp";
+import FeatureAbilityScoreComp from "./sub-components/FeatureAbilityScoreComp";
+import FeatureLanguageComp from "./sub-components/FeatureLanguageComp";
+import FeatureSkillProfComp from "./sub-components/FeatureSkillProfComp";
+import FeatureFeatComp from "./sub-components/FeatureFeatComp";
 import "../../styling/components/modals/RaceModal.css";
 
 const RaceModal = ({ character, closeModal }) => {
@@ -88,6 +88,47 @@ const RaceModal = ({ character, closeModal }) => {
     loadData();
   }, [character.race, character.featureChoices, updateSubraceOptions]);
 
+  const addNewEffectChoices = (toAdd, effectChoices) => {
+    for (const feature of toAdd) {
+      if (
+        feature.effects.length === 0 ||
+        !feature.effects.some((checkEffect) => checkEffect.changes.choices)
+      )
+        continue;
+
+      let addEffects = {};
+
+      for (const effect of feature.effects) {
+        let newChoice;
+        const choices = effect.changes.choices;
+        switch (effect.category) {
+          case "AbilityScore":
+            newChoice = [
+              { ability: "STR", amount: 0, cap: effect.changes.choices.cap },
+              { ability: "DEX", amount: 0, cap: effect.changes.choices.cap },
+              { ability: "CON", amount: 0, cap: effect.changes.choices.cap },
+              { ability: "INT", amount: 0, cap: effect.changes.choices.cap },
+              { ability: "WIS", amount: 0, cap: effect.changes.choices.cap },
+              { ability: "CHA", amount: 0, cap: effect.changes.choices.cap },
+            ];
+            break;
+          case "Language":
+            newChoice = new Array(choices);
+            break;
+          case "SkillProficiency":
+          case "Feat":
+            newChoice = new Array(choices[0]).fill("");
+            break;
+          default:
+        }
+
+        addEffects[effect.category] = newChoice;
+      }
+
+      effectChoices[feature._id] = addEffects;
+    }
+  };
+
   const updateFeatureChoices = (oldChoices, typeChanged, oldId, newId) => {
     let newChoices = { ...oldChoices };
     let raceOrSubraceOptions;
@@ -113,52 +154,20 @@ const RaceModal = ({ character, closeModal }) => {
       (checkRace) => checkRace._id === newId
     ).features;
 
-    for (const feature of toAdd) {
-      if (
-        feature.effects.length === 0 ||
-        !feature.effects.some((checkEffect) => checkEffect.changes.choices)
-      )
-        continue;
-
-      let addEffects = {};
-
-      for (const effect of feature.effects) {
-        let newChoice;
-        const choices = effect.changes.choices;
-        switch (effect.category) {
-          case "AbilityScore":
-            newChoice = [
-              { ability: "STR", amount: 0 },
-              { ability: "DEX", amount: 0 },
-              { ability: "CON", amount: 0 },
-              { ability: "INT", amount: 0 },
-              { ability: "WIS", amount: 0 },
-              { ability: "CHA", amount: 0 },
-            ];
-            break;
-          case "Language":
-            newChoice = new Array(choices);
-            break;
-          case "SkillProficiency":
-          case "Feat":
-            newChoice = new Array(choices[0]).fill("");
-            break;
-          default:
-        }
-
-        addEffects[effect.category] = newChoice;
-      }
-
-      newChoices.race[feature._id] = addEffects;
-    }
+    addNewEffectChoices(toAdd, newChoices.race);
 
     setFeatureChoices(newChoices);
   };
 
-  const getFeatureChoiceInputs = (featureId, category, choices) => {
+  const getFeatureChoiceInputs = (
+    featureType,
+    featureId,
+    category,
+    choices
+  ) => {
     if (
-      !featureChoices.race[featureId] ||
-      !featureChoices.race[featureId][category]
+      !featureChoices[featureType][featureId] ||
+      !featureChoices[featureType][featureId][category]
     ) {
       return null;
     }
@@ -166,17 +175,20 @@ const RaceModal = ({ character, closeModal }) => {
     switch (category) {
       case "AbilityScore":
         return (
-          <RaceFeatureAbilityScoreComp
+          <FeatureAbilityScoreComp
+            featureType={featureType}
             featureId={featureId}
             category={category}
             choices={choices}
             featureChoices={featureChoices}
             setFeatureChoices={setFeatureChoices}
+            currentAbilityScores={character.getAbilities()}
           />
         );
       case "Language":
         return (
-          <RaceFeatureLanguageComp
+          <FeatureLanguageComp
+            featureType={featureType}
             featureId={featureId}
             category={category}
             choices={choices}
@@ -186,7 +198,8 @@ const RaceModal = ({ character, closeModal }) => {
         );
       case "SkillProficiency":
         return (
-          <RaceFeatureSkillProfComp
+          <FeatureSkillProfComp
+            featureType={featureType}
             featureId={featureId}
             category={category}
             choices={choices}
@@ -198,12 +211,17 @@ const RaceModal = ({ character, closeModal }) => {
         );
       case "Feat":
         return (
-          <RaceFeatureFeatComp
+          <FeatureFeatComp
+            featureType={featureType}
             featureId={featureId}
             category={category}
             choices={choices}
             featureChoices={featureChoices}
             setFeatureChoices={setFeatureChoices}
+            originalFeatureChoices={originalFeatureChoices}
+            existingFeats={character.getFeats()}
+            addNewEffectChoices={addNewEffectChoices}
+            getFeatureChoiceInputs={getFeatureChoiceInputs}
           />
         );
       default:
@@ -359,6 +377,7 @@ const RaceModal = ({ character, closeModal }) => {
         {selectedFeatureData.effects.map((effect, i) => (
           <div key={i}>
             {getFeatureChoiceInputs(
+              "race",
               selectedFeatureData._id,
               effect.category,
               effect.changes.choices
@@ -469,7 +488,7 @@ const RaceModal = ({ character, closeModal }) => {
     </>
   );
 
-  if (featureChoices) console.log(JSON.parse(JSON.stringify(featureChoices)));
+  // if (featureChoices) console.log(JSON.parse(JSON.stringify(featureChoices)));
 
   return (
     <GenericModal
