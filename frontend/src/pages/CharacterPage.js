@@ -109,6 +109,8 @@ const CharacterPage = () => {
     </div>
   );
 
+  const [armorClassVal, armorClassBreakdown] = character.getArmorClass();
+
   return (
     <div>
       <div className="menu-bar row-flex">
@@ -192,7 +194,7 @@ const CharacterPage = () => {
       </div>
       <div className="combat-header">
         <div>
-          <p>AC: {character.getArmorClass()}</p>
+          <p title={armorClassBreakdown}>AC: {armorClassVal}</p>
           <p>
             Initiative:{" "}
             {(character.getInitiative() >= 0 ? "+" : "") +

@@ -649,29 +649,29 @@ class Character {
         (checkEffect) => checkEffect.category === category
       );
 
+      const name = option.displayName ? option.displayName : option.name;
+
       if (effect.changes.replace) {
-        replacements.push(effect.changes);
+        replacements.push({ ...effect.changes, name: name });
       } else if (effect.changes.bonus) {
-        bonuses.push(effect.changes);
+        bonuses.push({ ...effect.changes, name: name });
       }
     });
 
-    replacements = this.#validateArmorClassReplacements(replacements);
-    bonuses = this.#validateArmorClassBonuses(bonuses);
+    let replacementsBreakdown, bonusesBreakdown;
+    [replacements, replacementsBreakdown] =
+      this.#validateArmorClassReplacements(replacements);
+    [bonuses, bonusesBreakdown] = this.#validateArmorClassBonuses(bonuses);
 
-    if (!this.getEquippedItems().some((item) => item.type === "Armor")) {
-      replacements.push(10 + this.getAbilityMod("DEX"));
-    }
+    bonusesBreakdown.unshift(replacementsBreakdown);
 
-    return (
-      Math.max(...replacements) +
-      bonuses.reduce((total, bonus) => total + bonus, 0)
-    );
+    return [replacements + bonuses, bonusesBreakdown];
   }
 
   #validateArmorClassReplacements(replacements) {
+    const replacementsBreakdown = new Array(replacements.length).fill("");
     const equippedItems = this.getEquippedItems();
-    replacements = replacements.map((option) => {
+    replacements = replacements.map((option, i) => {
       if (
         option.noArmor &&
         equippedItems.some(
@@ -690,28 +690,61 @@ class Character {
         return -1;
       }
 
-      const mods = option.replace.mods.map((mod, i) => {
+      replacementsBreakdown[i] = `${option.replace.base} (${option.name})`;
+
+      const mods = option.replace.mods.map((mod, j) => {
         let val = this.getAbilityMod(mod);
-        if (option.replace.modCaps && val > option.replace.modCaps[i]) {
-          val = option.replace.modCaps[i];
+        if (option.replace.modCaps && val > option.replace.modCaps[j]) {
+          val = option.replace.modCaps[j];
         }
+        replacementsBreakdown[i] += ` + ${val} (${mod})`;
         return val;
       });
 
       return option.replace.base + mods.reduce((total, mod) => total + mod);
     });
-    return replacements;
+
+    if (!equippedItems.some((item) => item.type === "Armor")) {
+      const dexMod = this.getAbilityMod("DEX");
+      replacements.push(10 + dexMod);
+      replacementsBreakdown.push(`10 (Unarmored) + ${dexMod} (DEX)`);
+    }
+
+    // Custom max index finder b/c it does fewer calculations than indexof(max())
+    const findMaxIndex = (arr) => {
+      if (arr.length === 0) {
+        return -1;
+      }
+
+      let max = arr[0];
+      let maxIndex = 0;
+
+      for (let i = 1; i < arr.length; i++) {
+        if (arr[i] > max) {
+          maxIndex = i;
+          max = arr[i];
+        }
+      }
+
+      return maxIndex;
+    };
+
+    const maxIndex = findMaxIndex(replacements);
+
+    return [replacements[maxIndex], replacementsBreakdown[maxIndex]];
   }
 
   #validateArmorClassBonuses(bonuses) {
+    const bonusesBreakdown = new Array(bonuses.length).fill("");
     const equippedItems = this.getEquippedItems();
-    bonuses = bonuses.map((option) => {
+    bonuses = bonuses.map((option, i) => {
       if (
         option.noArmor &&
         equippedItems.some(
           (item) => item.type === "Armor" && !item.subtypes.includes["Shield"]
         )
       ) {
+        bonusesBreakdown[i] = ` + 0 (${option.name})`;
         return 0;
       }
 
@@ -721,22 +754,27 @@ class Character {
           (item) => item.type === "Armor" && item.subtypes.includes["Shield"]
         )
       ) {
+        bonusesBreakdown[i] = ` + 0 (${option.name})`;
         return 0;
       }
 
-      let mods = option.bonus.mods.map((mod, i) => {
+      let mods = option.bonus.mods.map((mod, j) => {
         let val = this.getAbilityMod(mod);
-        if (val > option.replace.modCaps[i]) {
-          val = option.replace.modCaps[i];
+        if (val > option.replace.modCaps[j]) {
+          val = option.replace.modCaps[j];
         }
+        bonusesBreakdown[i] += ` + ${val} (${option.name}: ${mod})`;
         return val;
       });
       mods.push(option.bonus.flat);
+      bonusesBreakdown[i] += ` + ${option.bonus.flat} (${option.name})`;
       mods = mods.reduce((total, mod) => total + mod);
 
       return mods;
     });
-    return bonuses;
+
+    bonuses = bonuses.reduce((total, bonus) => total + bonus, 0);
+    return [bonuses, bonusesBreakdown];
   }
 
   getSpeeds() {
