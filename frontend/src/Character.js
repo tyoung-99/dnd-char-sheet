@@ -632,7 +632,16 @@ class Character {
 
   getInitiative() {
     // TODO: Update w/ getEffects() after putting init feature in  (don't forget to check feats)
-    return this.getAbilityMod("DEX");
+    let breakdown = "";
+    let bonuses = [];
+
+    const dexMod = this.getAbilityMod("DEX");
+    bonuses.unshift(dexMod);
+    breakdown = `${dexMod} (DEX)` + breakdown;
+
+    bonuses = bonuses.reduce((total, bonus) => (total += bonus), 0);
+
+    return [bonuses, breakdown];
   }
 
   getArmorClass() {
@@ -663,13 +672,11 @@ class Character {
       this.#validateArmorClassReplacements(replacements);
     [bonuses, bonusesBreakdown] = this.#validateArmorClassBonuses(bonuses);
 
-    bonusesBreakdown.unshift(replacementsBreakdown);
-
-    return [replacements + bonuses, bonusesBreakdown];
+    return [replacements + bonuses, replacementsBreakdown + bonusesBreakdown];
   }
 
   #validateArmorClassReplacements(replacements) {
-    const replacementsBreakdown = new Array(replacements.length).fill("");
+    const breakdown = new Array(replacements.length).fill("");
     const equippedItems = this.getEquippedItems();
     replacements = replacements.map((option, i) => {
       if (
@@ -690,14 +697,14 @@ class Character {
         return -1;
       }
 
-      replacementsBreakdown[i] = `${option.replace.base} (${option.name})`;
+      breakdown[i] = `${option.replace.base} (${option.name})`;
 
       const mods = option.replace.mods.map((mod, j) => {
         let val = this.getAbilityMod(mod);
         if (option.replace.modCaps && val > option.replace.modCaps[j]) {
           val = option.replace.modCaps[j];
         }
-        if (val !== 0) replacementsBreakdown[i] += ` + ${val} (${mod})`;
+        if (val !== 0) breakdown[i] += ` + ${val} (${mod})`;
         return val;
       });
 
@@ -708,8 +715,8 @@ class Character {
       const dexMod = this.getAbilityMod("DEX");
       replacements.push(10 + dexMod);
       if (dexMod !== 0) {
-        replacementsBreakdown.push(`10 (Unarmored) + ${dexMod} (DEX)`);
-      } else replacementsBreakdown.push(`10 (Unarmored)`);
+        breakdown.push(`10 (Unarmored) + ${dexMod} (DEX)`);
+      } else breakdown.push(`10 (Unarmored)`);
     }
 
     // Custom max index finder b/c it does fewer calculations than indexof(max())
@@ -733,13 +740,13 @@ class Character {
 
     const maxIndex = findMaxIndex(replacements);
 
-    return [replacements[maxIndex], replacementsBreakdown[maxIndex]];
+    return [replacements[maxIndex], breakdown[maxIndex]];
   }
 
   #validateArmorClassBonuses(bonuses) {
-    const bonusesBreakdown = new Array(bonuses.length).fill("");
+    let breakdown = "";
     const equippedItems = this.getEquippedItems();
-    bonuses = bonuses.map((option, i) => {
+    bonuses = bonuses.map((option) => {
       if (
         option.noArmor &&
         equippedItems.some(
@@ -758,19 +765,19 @@ class Character {
         return 0;
       }
 
-      let mods = option.bonus.mods.map((mod, j) => {
+      let mods = option.bonus.mods.map((mod, i) => {
         let val = this.getAbilityMod(mod);
-        if (val > option.bonus.modCaps[j]) {
-          val = option.bonus.modCaps[j];
+        if (val > option.bonus.modCaps[i]) {
+          val = option.bonus.modCaps[i];
         }
         if (val !== 0) {
-          bonusesBreakdown[i] += ` + ${val} (${option.name}: ${mod})`;
+          breakdown += ` + ${val} (${option.name}: ${mod})`;
         }
         return val;
       });
       mods.push(option.bonus.flat);
       if (option.bonus.flat !== 0) {
-        bonusesBreakdown[i] += ` + ${option.bonus.flat} (${option.name})`;
+        breakdown += ` + ${option.bonus.flat} (${option.name})`;
       }
       mods = mods.reduce((total, mod) => total + mod);
 
@@ -778,7 +785,7 @@ class Character {
     });
 
     bonuses = bonuses.reduce((total, bonus) => total + bonus, 0);
-    return [bonuses, bonusesBreakdown];
+    return [bonuses, breakdown];
   }
 
   getSpeeds() {
@@ -853,7 +860,7 @@ class Character {
   }
 
   getCurrentHitDice() {
-    const total = this.getTotalHitDice();
+    const [total] = this.getTotalHitDice();
     const current = this.usedHitDice.map((usedDie) => ({
       number:
         total.find((totalDie) => totalDie.sides === usedDie.sides).number -
@@ -866,8 +873,12 @@ class Character {
   getTotalHitDice() {
     // TODO: Update w/ getEffects() after putting hit dice feature in (are there any?) (don't forget to check feats)
 
+    let breakdown = "";
     let total = [];
     this.classes.forEach((charClass) => {
+      if (breakdown !== "") breakdown += " + ";
+      breakdown += `${charClass.classLevel}d${charClass.hitDie} (${charClass.className})`;
+
       let index = total.findIndex((die) => die.sides === charClass.hitDie);
       if (index === -1) {
         total.push({
@@ -878,7 +889,7 @@ class Character {
         total[index].number += charClass.classLevel;
       }
     });
-    return total;
+    return [total, breakdown];
   }
 
   getAttack(item) {

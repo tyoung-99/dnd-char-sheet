@@ -110,6 +110,8 @@ const CharacterPage = () => {
   );
 
   const [armorClassVal, armorClassBreakdown] = character.getArmorClass();
+  const [initiativeVal, initiativeBreakdown] = character.getInitiative();
+  const [totalHitDice, totalHitDiceBreakdown] = character.getTotalHitDice();
 
   return (
     <div>
@@ -194,11 +196,9 @@ const CharacterPage = () => {
       </div>
       <div className="combat-header">
         <div>
-          <p title={armorClassBreakdown.join("")}>AC: {armorClassVal}</p>
-          <p>
-            Initiative:{" "}
-            {(character.getInitiative() >= 0 ? "+" : "") +
-              character.getInitiative()}
+          <p title={armorClassBreakdown}>AC: {armorClassVal}</p>
+          <p title={initiativeBreakdown}>
+            Initiative: {(initiativeVal >= 0 ? "+" : "") + initiativeVal}
           </p>
         </div>
         <div>
@@ -207,12 +207,9 @@ const CharacterPage = () => {
           <p>Temp HP: {character.hitPoints.temp}</p>
         </div>
         <div>
-          <p>
+          <p title={totalHitDiceBreakdown}>
             Total Hit Dice:{" "}
-            {character
-              .getTotalHitDice()
-              .map((die) => `${die.number}d${die.sides}`)
-              .join(", ")}
+            {totalHitDice.map((die) => `${die.number}d${die.sides}`).join(", ")}
           </p>
           <p>
             Current Hit Dice:{" "}
