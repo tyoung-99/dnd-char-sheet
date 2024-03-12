@@ -178,6 +178,12 @@ class Character {
     this.saveCharacter();
   }
 
+  setDeathSaves(successCount, failCount) {
+    this.deathSaves.successes = successCount;
+    this.deathSaves.failures = failCount;
+    this.saveCharacter();
+  }
+
   async setRace(newRace, newSubrace, newFeatureChoices) {
     this.race.raceId = newRace.id;
     this.race.subraceId = newSubrace.id;

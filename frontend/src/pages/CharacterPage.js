@@ -219,7 +219,7 @@ const CharacterPage = () => {
               .join(", ")}
           </p>
         </div>
-        <DeathSavesComp deathSaves={character.deathSaves} />
+        <DeathSavesComp character={character} />
       </div>
       <ul className="nav">
         <TabNavComp

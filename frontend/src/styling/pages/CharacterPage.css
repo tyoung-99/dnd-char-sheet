@@ -90,20 +90,6 @@
   left: 1rem;
 }
 
-/* Death save section */
-.death-save-marker {
-  height: 0.75rem;
-  width: 0.75rem;
-  background-color: white;
-  border-radius: 50%;
-  border: 1px solid black;
-  display: inline-block;
-  margin-left: 1px;
-}
-.filled {
-  background-color: black;
-}
-
 .saved-message {
   margin: 0px 1em;
 }
