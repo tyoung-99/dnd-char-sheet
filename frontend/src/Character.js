@@ -866,13 +866,13 @@ class Character {
   }
 
   getCurrentHitDice() {
-    const [total] = this.getTotalHitDice();
-    const current = this.usedHitDice.map((usedDie) => ({
-      number:
-        total.find((totalDie) => totalDie.sides === usedDie.sides).number -
-        usedDie.number,
-      sides: usedDie.sides,
-    }));
+    const [current] = this.getTotalHitDice();
+    this.usedHitDice.forEach(
+      (usedDie) =>
+        (current.find(
+          (currentDie) => currentDie.sides === usedDie.sides
+        ).number -= usedDie.number)
+    );
     return current;
   }
 
