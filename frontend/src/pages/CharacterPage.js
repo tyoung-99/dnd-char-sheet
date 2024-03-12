@@ -157,24 +157,13 @@ const CharacterPage = () => {
           ></input>
         </div>
         <div className="avatar-label">
-          {editingCharName ? (
-            <textarea
-              id="char-name"
-              name="char-name"
-              className="char-name"
-              autoFocus
-              defaultValue={character.name}
-              placeholder="Character Name"
-              onBlur={(event) => {
-                character.setName(event.target.value);
-                setEditingCharName(false);
-              }}
-            ></textarea>
-          ) : (
-            <h1 className="char-name" onClick={() => setEditingCharName(true)}>
-              {character.name || "Character Name"}
-            </h1>
-          )}
+          <h1
+            className="char-name"
+            contentEditable
+            onBlur={(event) => character.setName(event.target.innerText)}
+          >
+            {character.name || "Character Name"}
+          </h1>
           <h2 className="player-name">{character.player}</h2>
           <MultiColumnDropdownComp
             buttonText={character.alignment}
