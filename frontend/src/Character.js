@@ -184,6 +184,16 @@ class Character {
     this.saveCharacter();
   }
 
+  spendHitDie(sides) {
+    this.usedHitDice.find((checkDice) => checkDice.sides === sides).number += 1;
+    this.saveCharacter();
+  }
+
+  restoreHitDie(sides) {
+    this.usedHitDice.find((checkDice) => checkDice.sides === sides).number -= 1;
+    this.saveCharacter();
+  }
+
   async setRace(newRace, newSubrace, newFeatureChoices) {
     this.race.raceId = newRace.id;
     this.race.subraceId = newSubrace.id;

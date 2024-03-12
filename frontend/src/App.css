@@ -158,3 +158,11 @@ p:has(> .hover-icon) {
   position: fixed;
   overflow: auto;
 }
+
+.clickable {
+  cursor: pointer;
+}
+
+.hidden {
+  visibility: hidden;
+}

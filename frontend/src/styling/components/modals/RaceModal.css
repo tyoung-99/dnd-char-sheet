@@ -76,9 +76,6 @@
   padding: 0;
   line-height: 0;
 }
-.race-modal-container .selected-feature .ability-scores li span button.hidden {
-  visibility: hidden;
-}
 
 .race-footer .tce-checkboxes ul {
   list-style-type: none;

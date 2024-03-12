@@ -18,6 +18,7 @@ import DeathSavesComp from "../components/DeathSavesComp";
 import XpComp from "../components/XpComp";
 import MultiColumnDropdownComp from "../components/MultiColumnDropdownComp";
 import RaceModal from "../components/modals/RaceModal";
+import CurrentHitDiceModal from "../components/modals/CurrentHitDiceModal";
 
 const CharacterPage = () => {
   const [activeTab, setActiveTab] = useState("main");
@@ -31,7 +32,7 @@ const CharacterPage = () => {
   const [showingSavedMessage, setShowingSavedMessage] = useState(false);
   const fileInput = useRef(null);
 
-  const [editingCharName, setEditingCharName] = useState(false);
+  const [charName, setCharName] = useState("");
 
   useEffect(() => {
     const loadData = async () => {
@@ -42,6 +43,7 @@ const CharacterPage = () => {
       );
 
       setCharacter(newChar);
+      setCharName(newChar.name);
       refreshAvatarImg(newChar);
 
       response = await axios.get("/api/alignments");
@@ -160,9 +162,18 @@ const CharacterPage = () => {
           <h1
             className="char-name"
             contentEditable
-            onBlur={(event) => character.setName(event.target.innerText)}
+            suppressContentEditableWarning
+            onBlur={(event) => {
+              if (event.target.innerText === "") {
+                character.setName("Character Name");
+                setCharName("Character Name");
+              } else {
+                character.setName(event.target.innerText);
+                setCharName(event.target.innerText);
+              }
+            }}
           >
-            {character.name || "Character Name"}
+            {charName}
           </h1>
           <h2 className="player-name">{character.player}</h2>
           <MultiColumnDropdownComp
@@ -200,13 +211,23 @@ const CharacterPage = () => {
             Total Hit Dice:{" "}
             {totalHitDice.map((die) => `${die.number}d${die.sides}`).join(", ")}
           </p>
-          <p>
+          <p
+            className="clickable"
+            data-modal="currentHitDice"
+            onClick={openModal}
+          >
             Current Hit Dice:{" "}
             {character
               .getCurrentHitDice()
               .map((die) => `${die.number}d${die.sides}`)
               .join(", ")}
           </p>
+          {currentModal === "currentHitDice" && (
+            <CurrentHitDiceModal
+              character={character}
+              closeModal={closeModal}
+            />
+          )}
         </div>
         <DeathSavesComp character={character} />
       </div>
