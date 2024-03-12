@@ -1,9 +1,12 @@
-import GenericModal from "./GenericModal";
+import GenericModal from "../GenericModal";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-const EditRaceModal = ({ race, closeModal, createNew, addRace }) => {
-  const [name, setName] = useState(race.name ? race.name : "New Race");
+const EditSubraceModal = ({ race, closeModal, parentRace, addSubrace }) => {
+  const [name, setName] = useState(race.name ? race.name : "New Subrace");
+  const [displayName, setDisplayName] = useState(
+    race.displayName ? race.displayName : "Display Name"
+  );
   const [currentSource, setCurrentSource] = useState(
     race.source ? race.source : "Pick a src"
   );
@@ -68,19 +71,22 @@ const EditRaceModal = ({ race, closeModal, createNew, addRace }) => {
     ]);
   };
 
-  const saveRace = async () => {
+  const saveSubrace = async () => {
     const newFeatures = addedRacialFeatures.map((feature) => feature.id);
     const newData = {
       name: name,
+      displayName: displayName,
       source: currentSource,
+      parentRace: parentRace,
       features: newFeatures,
     };
     race.name = name;
     race.source = currentSource;
     race.features = newFeatures;
-    createNew
-      ? addRace(newData)
-      : await axios.put(`/api/races/${race._id}/update`, newData);
+    race.displayName = displayName;
+    addSubrace
+      ? addSubrace(newData)
+      : await axios.put(`/api/subraces/${race._id}/update`, newData);
   };
 
   const header = null;
@@ -113,6 +119,18 @@ const EditRaceModal = ({ race, closeModal, createNew, addRace }) => {
           {name}
         </div>
       </div>
+      <h2>Display Name:</h2>
+      <div className="row-flex">
+        <div
+          className="display-name-box"
+          contentEditable="true"
+          onBlur={(event) => setDisplayName(event.currentTarget.textContent)}
+          suppressContentEditableWarning={true}
+        >
+          {displayName}
+        </div>
+      </div>
+      <hr></hr>
       <div className="row-flex">
         <div className="col-1_2">
           <h2>Race Features</h2>
@@ -164,7 +182,7 @@ const EditRaceModal = ({ race, closeModal, createNew, addRace }) => {
       <button onClick={closeModal}>Cancel</button>
       <button
         onClick={() => {
-          saveRace();
+          saveSubrace();
           closeModal();
         }}
       >
@@ -182,4 +200,4 @@ const EditRaceModal = ({ race, closeModal, createNew, addRace }) => {
   );
 };
 
-export default EditRaceModal;
+export default EditSubraceModal;

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import CatalogueRaceListComp from "../../components/catalogueComponents/CatalogueRaceListComp";
 import CatalogueRacialFeaturesComp from "../../components/catalogueComponents/CatalogueRacialFeaturesComp";
-import EditRaceModal from "../../components/modals/EditRaceModal";
+import EditRaceModal from "../../components/modals/adminModals/EditRaceModal";
 
 const AdminRacesTab = () => {
   const [raceList, setRaceList] = useState([]);
@@ -31,18 +31,15 @@ const AdminRacesTab = () => {
 
   const deleteRace = async (id) => {
     try {
-      const response = await axios.delete(`/api/races/${id}/delete`);
+      let response = await axios.delete(`/api/races/${id}/delete`);
       setRaceList(response.data);
+      // delete all subraces
+      response = await axios.get(`/api/races/${id}/subraces`);
+      for (const subrace of response.data) {
+        await axios.delete(`/api/subraces/${subrace._id}/delete/`);
+      }
     } catch (error) {
       console.log("Error deleting race, id:", id);
-    }
-  };
-
-  const deleteSubRace = async (id) => {
-    try {
-      await axios.delete(`/api/subraces/${id}/delete`);
-    } catch (error) {
-      console.log("Error deleting subrace, id:", id);
     }
   };
 
@@ -71,19 +68,13 @@ const AdminRacesTab = () => {
           +
         </button>
         {currentModal === "createRace" && (
-          <EditRaceModal
-            race={{}}
-            closeModal={closeModal}
-            createNew={true}
-            addRace={addRace}
-          />
+          <EditRaceModal race={{}} closeModal={closeModal} addRace={addRace} />
         )}
       </div>
       <div className="row-flex wrap">
         <CatalogueRaceListComp
           itemList={raceList}
           handleDelete={deleteRace}
-          subDelete={deleteSubRace}
           selectedRace={selectedRace}
           setSelectedRace={setSelectedRace}
           currentModal={currentModal}

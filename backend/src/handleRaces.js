@@ -55,23 +55,25 @@ export const getRacialFeaturesFromList = async (db, featureIdList) => {
 };
 
 export const deleteRace = async (db, id) => {
-  db.collection("races").deleteOne({ _id: ObjectId.createFromHexString(id) });
+  await db
+    .collection("races")
+    .deleteOne({ _id: ObjectId.createFromHexString(id) });
 };
 
 export const deleteSubrace = async (db, id) => {
-  db.collection("subraces").deleteOne({
+  await db.collection("subraces").deleteOne({
     _id: ObjectId.createFromHexString(id),
   });
 };
 
 export const deleteRacialFeature = async (db, id) => {
-  db.collection("racialFeatures").deleteOne({
+  await db.collection("racialFeatures").deleteOne({
     _id: ObjectId.createFromHexString(id),
   });
 };
 
 export const updateRace = async (db, id, name, source, features) => {
-  db.collection("races").updateOne(
+  await db.collection("races").updateOne(
     { _id: ObjectId.createFromHexString(id) },
     {
       $set: { name: name, source: source, features: features },
@@ -79,9 +81,47 @@ export const updateRace = async (db, id, name, source, features) => {
   );
 };
 
+export const updateSubrace = async (
+  db,
+  id,
+  name,
+  displayName,
+  source,
+  features
+) => {
+  await db.collection("subraces").updateOne(
+    { _id: ObjectId.createFromHexString(id) },
+    {
+      $set: {
+        name: name,
+        displayName: displayName,
+        source: source,
+        features: features,
+      },
+    }
+  );
+};
+
 export const insertRace = async (db, name, source, features) => {
-  db.collection("races").insertOne({
+  await db.collection("races").insertOne({
     name: name,
+    source: source,
+    features: features,
+  });
+};
+
+export const insertSubrace = async (
+  db,
+  name,
+  displayName,
+  parentRace,
+  source,
+  features
+) => {
+  await db.collection("subraces").insertOne({
+    name: name,
+    displayName: displayName,
+    parentRace: parentRace,
     source: source,
     features: features,
   });

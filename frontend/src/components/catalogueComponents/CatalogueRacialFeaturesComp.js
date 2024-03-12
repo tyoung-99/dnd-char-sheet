@@ -1,6 +1,5 @@
-import EditRaceModal from "../modals/EditRaceModal";
 // takes list and returns JSX with delete and edit buttons on every name
-const CatalogueListComp = ({
+const CatalogueRacialFeaturesComp = ({
   itemList,
   handleDelete,
   selectedModal,
@@ -12,11 +11,11 @@ const CatalogueListComp = ({
         <div key={item.name} className="catalogue-item">
           <span onClick={() => setSelectedModal(item._id)}>{item.name}</span>
           <button onClick={() => handleDelete(item._id)}>Delete</button>
-          {selectedModal === item._id && <EditRaceModal race={item.name} />}
+          {/* {selectedModal === item._id && <EditRaceModal race={item.name} />} */}
         </div>
       ))}
     </>
   );
 };
 
-export default CatalogueListComp;
+export default CatalogueRacialFeaturesComp;

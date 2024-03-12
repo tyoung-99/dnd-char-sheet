@@ -24,7 +24,9 @@ import {
   deleteSubrace,
   deleteRacialFeature,
   updateRace,
+  updateSubrace,
   insertRace,
+  insertSubrace,
 } from "./handleRaces.js";
 
 const app = express();
@@ -142,33 +144,47 @@ app.get("/api/racialFeatures/one/:featureId", async (req, res) => {
 });
 app.delete("/api/races/:raceId/delete", async (req, res) => {
   const { raceId } = req.params;
-  deleteRace(db, raceId);
+  await deleteRace(db, raceId);
   res.json(await getRaces(db));
 });
-
-app.delete("/api/subraces/:raceId/delete", async (req, res) => {
+// just deletes subrace
+app.delete("/api/subraces/:raceId/delete/", async (req, res) => {
   const { raceId } = req.params;
-  deleteSubrace(db, raceId);
-  res.json(await getSubracesFromParent(db)); // this will cause an issue because it needs two arguments
+  await deleteSubrace(db, raceId);
+  res.send("Deleted subrace");
 });
-
+// special subrace delete that sends back updated list of subraces
+app.delete("/api/subraces/:raceId/delete/:parentId", async (req, res) => {
+  const { raceId, parentId } = req.params;
+  await deleteSubrace(db, raceId);
+  const response = await getSubracesFromParent(db, parentId);
+  res.json(response);
+});
 app.delete("/api/racialFeatures/:id/delete", async (req, res) => {
   const { id } = req.params;
-  deleteRacialFeature(db, id);
+  await deleteRacialFeature(db, id);
   // const racialFeatures = await getAllRacialFeatures(db);
   res.send("Nothing"); // may change later idk
 });
-
 app.put("/api/races/:raceId/update", async (req, res) => {
   const { raceId } = req.params;
   const { name, source, features } = req.body;
-  updateRace(db, raceId, name, source, features);
+  await updateRace(db, raceId, name, source, features);
 });
-
+app.put("/api/subraces/:raceId/update", async (req, res) => {
+  const { raceId } = req.params;
+  const { name, displayName, source, features } = req.body;
+  await updateSubrace(db, raceId, name, displayName, source, features);
+});
 app.post("/api/races/insert", async (req, res) => {
   const { name, source, features } = req.body;
-  insertRace(db, name, source, features);
+  await insertRace(db, name, source, features);
   res.json(await getRaces(db));
+});
+app.post("/api/subraces/insert", async (req, res) => {
+  const { name, displayName, parentRace, source, features } = req.body;
+  await insertSubrace(db, name, displayName, parentRace, source, features);
+  res.json(await getSubracesFromParent(db, parentRace));
 });
 
 const PORT = process.env.PORT || 8000;

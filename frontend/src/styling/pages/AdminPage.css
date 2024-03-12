@@ -56,13 +56,18 @@
 .name-box {
   margin: 0.5rem 1rem;
   width: 35rem;
-  align-items: center;
-  justify-content: center;
   font-style: normal;
   font-weight: bold;
   font-size: 2rem;
   font-family: inherit;
   text-align: center;
+}
+
+.display-name-box {
+  width: 35rem;
+  font-style: normal;
+  font-size: 1rem;
+  font-family: inherit;
 }
 
 .scrollable-list {
