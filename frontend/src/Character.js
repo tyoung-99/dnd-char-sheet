@@ -697,7 +697,7 @@ class Character {
         if (option.replace.modCaps && val > option.replace.modCaps[j]) {
           val = option.replace.modCaps[j];
         }
-        replacementsBreakdown[i] += ` + ${val} (${mod})`;
+        if (val !== 0) replacementsBreakdown[i] += ` + ${val} (${mod})`;
         return val;
       });
 
@@ -707,7 +707,9 @@ class Character {
     if (!equippedItems.some((item) => item.type === "Armor")) {
       const dexMod = this.getAbilityMod("DEX");
       replacements.push(10 + dexMod);
-      replacementsBreakdown.push(`10 (Unarmored) + ${dexMod} (DEX)`);
+      if (dexMod !== 0) {
+        replacementsBreakdown.push(`10 (Unarmored) + ${dexMod} (DEX)`);
+      } else replacementsBreakdown.push(`10 (Unarmored)`);
     }
 
     // Custom max index finder b/c it does fewer calculations than indexof(max())
@@ -744,7 +746,6 @@ class Character {
           (item) => item.type === "Armor" && !item.subtypes.includes["Shield"]
         )
       ) {
-        bonusesBreakdown[i] = ` + 0 (${option.name})`;
         return 0;
       }
 
@@ -754,20 +755,23 @@ class Character {
           (item) => item.type === "Armor" && item.subtypes.includes["Shield"]
         )
       ) {
-        bonusesBreakdown[i] = ` + 0 (${option.name})`;
         return 0;
       }
 
       let mods = option.bonus.mods.map((mod, j) => {
         let val = this.getAbilityMod(mod);
-        if (val > option.replace.modCaps[j]) {
-          val = option.replace.modCaps[j];
+        if (val > option.bonus.modCaps[j]) {
+          val = option.bonus.modCaps[j];
         }
-        bonusesBreakdown[i] += ` + ${val} (${option.name}: ${mod})`;
+        if (val !== 0) {
+          bonusesBreakdown[i] += ` + ${val} (${option.name}: ${mod})`;
+        }
         return val;
       });
       mods.push(option.bonus.flat);
-      bonusesBreakdown[i] += ` + ${option.bonus.flat} (${option.name})`;
+      if (option.bonus.flat !== 0) {
+        bonusesBreakdown[i] += ` + ${option.bonus.flat} (${option.name})`;
+      }
       mods = mods.reduce((total, mod) => total + mod);
 
       return mods;

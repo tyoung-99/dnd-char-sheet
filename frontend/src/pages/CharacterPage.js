@@ -194,7 +194,7 @@ const CharacterPage = () => {
       </div>
       <div className="combat-header">
         <div>
-          <p title={armorClassBreakdown}>AC: {armorClassVal}</p>
+          <p title={armorClassBreakdown.join("")}>AC: {armorClassVal}</p>
           <p>
             Initiative:{" "}
             {(character.getInitiative() >= 0 ? "+" : "") +
