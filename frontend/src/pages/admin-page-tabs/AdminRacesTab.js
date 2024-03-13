@@ -8,7 +8,7 @@ const AdminRacesTab = () => {
   const [raceList, setRaceList] = useState([]);
   const [racialFeatures, setRaceFeatures] = useState([]);
   const [selectedRace, setSelectedRace] = useState("");
-  const [currentModal, setcurrentModal] = useState("");
+  const [currentModal, setCurrentModal] = useState("");
 
   useEffect(() => {
     const loadRaces = async () => {
@@ -53,7 +53,7 @@ const AdminRacesTab = () => {
   };
 
   const closeModal = () => {
-    setcurrentModal("");
+    setCurrentModal("");
   };
 
   // const
@@ -63,7 +63,7 @@ const AdminRacesTab = () => {
         <h1>Races</h1>
         <button
           className="admin-create"
-          onClick={() => setcurrentModal("createRace")}
+          onClick={() => setCurrentModal("createRace")}
         >
           +
         </button>
@@ -78,7 +78,7 @@ const AdminRacesTab = () => {
           selectedRace={selectedRace}
           setSelectedRace={setSelectedRace}
           currentModal={currentModal}
-          setcurrentModal={setcurrentModal}
+          setcurrentModal={setCurrentModal}
           closeModal={closeModal}
         />
       </div>
@@ -90,6 +90,7 @@ const AdminRacesTab = () => {
         <CatalogueRacialFeaturesComp
           itemList={racialFeatures}
           handleDelete={deleteRaceFeature}
+          selectedModal={setCurrentModal}
         />
       </div>
     </>
