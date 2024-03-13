@@ -184,16 +184,6 @@ class Character {
     this.saveCharacter();
   }
 
-  spendHitDie(sides) {
-    this.usedHitDice.find((checkDice) => checkDice.sides === sides).number += 1;
-    this.saveCharacter();
-  }
-
-  restoreHitDie(sides) {
-    this.usedHitDice.find((checkDice) => checkDice.sides === sides).number -= 1;
-    this.saveCharacter();
-  }
-
   async setRace(newRace, newSubrace, newFeatureChoices) {
     this.race.raceId = newRace.id;
     this.race.subraceId = newSubrace.id;
@@ -212,6 +202,46 @@ class Character {
       this.featureChoices
     );
 
+    this.saveCharacter();
+  }
+
+  spendHitDie(sides) {
+    this.usedHitDice.find((checkDice) => checkDice.sides === sides).number += 1;
+    this.saveCharacter();
+  }
+
+  restoreHitDie(sides) {
+    this.usedHitDice.find((checkDice) => checkDice.sides === sides).number -= 1;
+    this.saveCharacter();
+  }
+
+  dealDamage(amount) {
+    const dmgLeft = amount - this.hitPoints.temp;
+    if (dmgLeft >= 0) {
+      this.hitPoints.temp = 0;
+      this.hitPoints.currentBase -= dmgLeft;
+
+      const [totalCurrent] = this.getCurrentHitPoints();
+      if (totalCurrent < 0) this.hitPoints.currentBase -= totalCurrent;
+    } else {
+      this.hitPoints.temp -= amount;
+    }
+    this.saveCharacter();
+  }
+
+  restoreHitPoints(amount) {
+    this.hitPoints.currentBase += amount;
+    const [totalCurrent] = this.getCurrentHitPoints(),
+      [totalMax] = this.getMaxHitPoints();
+    if (totalCurrent > totalMax) {
+      this.hitPoints.currentBase -= totalCurrent - totalMax;
+    }
+    this.saveCharacter();
+  }
+
+  replaceTempHitPoints(amount) {
+    if (amount < 0) amount = 0;
+    this.hitPoints.temp = amount;
     this.saveCharacter();
   }
 
@@ -720,7 +750,7 @@ class Character {
         if (option.replace.modCaps && val > option.replace.modCaps[j]) {
           val = option.replace.modCaps[j];
         }
-        if (val !== 0) breakdown[i] += ` + ${val} (${mod})`;
+        if (val !== 0) breakdown[i] += this.#breakdownValToStr(val, mod);
         return val;
       });
 
@@ -731,7 +761,9 @@ class Character {
       const dexMod = this.getAbilityMod("DEX");
       replacements.push(10 + dexMod);
       if (dexMod !== 0) {
-        breakdown.push(`10 (Unarmored) + ${dexMod} (DEX)`);
+        breakdown.push(
+          `10 (Unarmored)` + this.#breakdownValToStr(dexMod, "DEX")
+        );
       } else breakdown.push(`10 (Unarmored)`);
     }
 
@@ -787,13 +819,13 @@ class Character {
           val = option.bonus.modCaps[i];
         }
         if (val !== 0) {
-          breakdown += ` + ${val} (${option.name}: ${mod})`;
+          breakdown += this.#breakdownValToStr(val, `${option.name}: ${mod}`);
         }
         return val;
       });
       mods.push(option.bonus.flat);
       if (option.bonus.flat !== 0) {
-        breakdown += ` + ${option.bonus.flat} (${option.name})`;
+        breakdown += this.#breakdownValToStr(option.bonus.flat, option.name);
       }
       mods = mods.reduce((total, mod) => total + mod);
 
@@ -841,38 +873,53 @@ class Character {
   }
 
   getMaxHitPoints() {
-    return (
-      this.#getHitPointsHelper(this.hitPoints.max, "MaxHitPoints") +
+    let [modifiers, breakdown] = this.#getHitPointsHelper("MaxHitPoints");
+
+    const cumulativeConMod =
       this.getAbilityMod("CON") *
-        this.classes.reduce(
-          (total, charClass) => total + charClass.classLevel,
-          0
-        )
-    );
+      this.classes.reduce(
+        (total, charClass) => total + charClass.classLevel,
+        0
+      );
+
+    breakdown =
+      `${this.hitPoints.maxBase} (Base)` +
+      this.#breakdownValToStr(cumulativeConMod, "CON x lvl") +
+      breakdown;
+
+    return [this.hitPoints.maxBase + cumulativeConMod + modifiers, breakdown];
   }
 
   getCurrentHitPoints() {
-    return this.#getHitPointsHelper(this.hitPoints.current, "CurrentHitPoints");
+    let [modifiers, breakdown] = this.#getHitPointsHelper("CurrentHitPoints");
+    breakdown = `${this.hitPoints.currentBase} (Base)` + breakdown;
+    return [this.hitPoints.currentBase + modifiers, breakdown];
   }
 
-  #getHitPointsHelper(category, categoryName) {
+  #getHitPointsHelper(category) {
     const combineBonuses = (bonuses) =>
       bonuses.reduce(
-        (total, elem) =>
-          total +
-          elem.effects.reduce((subtotal, effect) => {
-            if (effect.category === categoryName) {
+        (total, elem) => {
+          const val = elem.effects.reduce((subtotal, effect) => {
+            if (effect.category === category) {
               subtotal += effect.changes.bonus;
             } else if (effect.category === "Feat") {
               subtotal += combineBonuses(effect.changes);
             }
             return subtotal;
-          }, 0),
+          }, 0);
+
+          breakdown += this.#breakdownValToStr(val, elem.name);
+          return total + val;
+        },
 
         0
       );
 
-    return category.base + combineBonuses(this.#getEffects(categoryName));
+    let breakdown = "";
+    const bonuses = combineBonuses(this.#getEffects(category));
+
+    return [bonuses, breakdown];
   }
 
   getCurrentHitDice() {
@@ -1545,6 +1592,16 @@ class Character {
         diceArr[index].number += die.number;
       }
     });
+  }
+
+  #breakdownValToStr(val, label) {
+    let str = val !== 0 ? `${Math.abs(val)} (${label})` : "";
+    if (val > 0) {
+      str = " + " + str;
+    } else if (val < 0) {
+      str = " - " + str;
+    }
+    return str;
   }
 }
 

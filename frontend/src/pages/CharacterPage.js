@@ -19,6 +19,7 @@ import XpComp from "../components/XpComp";
 import MultiColumnDropdownComp from "../components/MultiColumnDropdownComp";
 import RaceModal from "../components/modals/RaceModal";
 import CurrentHitDiceModal from "../components/modals/CurrentHitDiceModal";
+import NumInputComp from "../components/NumInputComp";
 
 const CharacterPage = () => {
   const [activeTab, setActiveTab] = useState("main");
@@ -114,6 +115,9 @@ const CharacterPage = () => {
   const [armorClassVal, armorClassBreakdown] = character.getArmorClass();
   const [initiativeVal, initiativeBreakdown] = character.getInitiative();
   const [totalHitDice, totalHitDiceBreakdown] = character.getTotalHitDice();
+  const [maxHitPoints, maxHitPointsBreakdown] = character.getMaxHitPoints();
+  const [currentHitPoints, currentHitPointsBreakdown] =
+    character.getCurrentHitPoints();
 
   return (
     <div>
@@ -196,18 +200,46 @@ const CharacterPage = () => {
       </div>
       <div className="combat-header">
         <div>
-          <p title={armorClassBreakdown}>AC: {armorClassVal}</p>
-          <p title={initiativeBreakdown}>
+          <p className="clickable" title={armorClassBreakdown}>
+            AC: {armorClassVal}
+          </p>
+          <p className="clickable" title={initiativeBreakdown}>
             Initiative: {(initiativeVal >= 0 ? "+" : "") + initiativeVal}
           </p>
         </div>
-        <div>
-          <p>Max HP: {character.getMaxHitPoints()}</p>
-          <p>Current HP: {character.getCurrentHitPoints()}</p>
-          <p>Temp HP: {character.hitPoints.temp}</p>
+        <div className="row-flex">
+          <div>
+            <p className="clickable" title={maxHitPointsBreakdown}>
+              Max HP: {maxHitPoints}
+            </p>
+            <p className="clickable" title={currentHitPointsBreakdown}>
+              Current HP: {currentHitPoints}
+            </p>
+            <p>Temp HP: {character.hitPoints.temp}</p>
+          </div>
+          <div className="col-flex hp-buttons">
+            <div>
+              <NumInputComp
+                buttonText={"Heal"}
+                callback={(amount) => character.restoreHitPoints(amount)} // Can't pass directly or "this" points to wrong element
+              />
+            </div>
+            <div>
+              <NumInputComp
+                buttonText={"Damage"}
+                callback={(amount) => character.dealDamage(amount)}
+              />
+            </div>
+            <div>
+              <NumInputComp
+                buttonText={"New Temp HP"}
+                callback={(amount) => character.replaceTempHitPoints(amount)}
+              />
+            </div>
+          </div>
         </div>
         <div>
-          <p title={totalHitDiceBreakdown}>
+          <p className="clickable" title={totalHitDiceBreakdown}>
             Total Hit Dice:{" "}
             {totalHitDice.map((die) => `${die.number}d${die.sides}`).join(", ")}
           </p>

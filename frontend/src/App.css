@@ -157,6 +157,7 @@ p:has(> .hover-icon) {
   display: flex;
   position: fixed;
   overflow: auto;
+  z-index: 9998;
 }
 
 .clickable {

@@ -1,4 +1,3 @@
-/* Button menu */
 .menu-bar input {
   border: 1px solid black;
   background: white;
@@ -8,7 +7,6 @@
   background: lightgray;
 }
 
-/* Navigation tabs */
 .nav {
   margin-bottom: 2rem;
   display: flex;
@@ -31,8 +29,6 @@
   color: white;
 }
 
-/* Headers common to all pages */
-/* Character name/other basic info */
 .name-header {
   text-align: center;
   margin-bottom: 1rem;
@@ -62,7 +58,7 @@
 .race {
   cursor: pointer;
 }
-/* XP total/inspiration */
+
 .xp-inspire-header {
   position: absolute;
   top: 1rem;
@@ -71,19 +67,39 @@
   display: inline-block;
 }
 .xp-inspire-header p,
-.xp-inspire-header input,
 .xp-inspire-header img {
   display: inline-block;
   vertical-align: middle;
   margin: 0.25rem;
 }
-/* Combat-related info for easy reference */
+
 .combat-header {
   display: flex;
   justify-content: space-evenly;
   line-height: 50%;
 }
-/* Menu of buttons */
+.combat-header p {
+  line-height: 1rem;
+  height: 1rem;
+  padding: 0.25rem;
+  margin: 0.5rem 0;
+}
+.combat-header .clickable:hover {
+  background-color: lightgray;
+}
+.combat-header .hp-buttons {
+  margin: 0.5rem 0 0.5rem 0.5rem;
+}
+.combat-header .hp-buttons > div {
+  height: 100%;
+  position: relative;
+}
+.combat-header .hp-buttons button {
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+}
+
 .menu-bar {
   position: absolute;
   top: 1rem;

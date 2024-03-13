@@ -1,0 +1,14 @@
+.num-input-popup {
+  border: 1px solid black;
+  background-color: white;
+  position: absolute;
+  right: 0px;
+  display: flex;
+  z-index: 9999;
+}
+.num-input-popup > input {
+  margin: 0.25rem;
+}
+.num-input-popup > input[type="number"] {
+  width: 3rem;
+}
