@@ -8,6 +8,7 @@ import Character from "../Character";
 import TabNavComp from "../components/TabNavComp";
 import InlineClassListComp from "../components/InlineClassListComp";
 import TabContentComp from "../components/TabContentComp";
+import NumInputComp from "../components/NumInputComp";
 import CharacterMainTab from "./page-tabs/CharacterMainTab";
 import CharacterBackgroundTab from "./page-tabs/CharacterBackgroundTab";
 import CharacterFeaturesTab from "./page-tabs/CharacterFeaturesTab";
@@ -19,7 +20,7 @@ import XpComp from "../components/XpComp";
 import MultiColumnDropdownComp from "../components/MultiColumnDropdownComp";
 import RaceModal from "../components/modals/RaceModal";
 import CurrentHitDiceModal from "../components/modals/CurrentHitDiceModal";
-import NumInputComp from "../components/NumInputComp";
+import MaxHitPointsModal from "../components/modals/MaxHitPointsModal";
 
 const CharacterPage = () => {
   const [activeTab, setActiveTab] = useState("main");
@@ -209,9 +210,20 @@ const CharacterPage = () => {
         </div>
         <div className="row-flex">
           <div>
-            <p className="clickable" title={maxHitPointsBreakdown}>
+            <p
+              className="clickable"
+              data-modal="maxHitPoints"
+              onClick={openModal}
+            >
               Max HP: {maxHitPoints}
             </p>
+            {currentModal === "maxHitPoints" && (
+              <MaxHitPointsModal
+                character={character}
+                closeModal={closeModal}
+                breakdown={maxHitPointsBreakdown}
+              />
+            )}
             <p className="clickable" title={currentHitPointsBreakdown}>
               Current HP: {currentHitPoints}
             </p>

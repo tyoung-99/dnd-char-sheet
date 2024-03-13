@@ -245,6 +245,13 @@ class Character {
     this.saveCharacter();
   }
 
+  setMaxHitPointsBase(amount) {
+    const change = amount - this.hitPoints.maxBase;
+    this.hitPoints.maxBase += change;
+    this.hitPoints.currentBase += change;
+    this.saveCharacter();
+  }
+
   getAbilities() {
     return this.abilities.map((ability) => ({
       name: ability.name,
