@@ -186,7 +186,7 @@ const CharacterPage = () => {
             contents={alignmentList}
             onSelect={(newAlignment) => character.setAlignment(newAlignment)}
           ></MultiColumnDropdownComp>
-          <p className="race" data-modal="race" onClick={openModal}>
+          <p className="race clickable" data-modal="race" onClick={openModal}>
             {character.ref_subraceName}
           </p>
           {currentModal === "race" && (

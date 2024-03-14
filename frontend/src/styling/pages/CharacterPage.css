@@ -56,7 +56,8 @@
   margin: 0.5rem;
 }
 .race {
-  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1rem;
 }
 
 .xp-inspire-header {
@@ -82,9 +83,6 @@
   line-height: 1rem;
   padding: 0.25rem;
   margin: 0.5rem 0;
-}
-.combat-header .clickable:hover {
-  background-color: lightgray;
 }
 .combat-header .hp-buttons {
   margin: 0.5rem 0 0.5rem 0.5rem;

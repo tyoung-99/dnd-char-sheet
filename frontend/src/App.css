@@ -163,6 +163,9 @@ p:has(> .hover-icon) {
 .clickable {
   cursor: pointer;
 }
+.clickable:hover {
+  background-color: lightgray;
+}
 
 .hidden {
   visibility: hidden;

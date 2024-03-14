@@ -13,7 +13,10 @@ const MultiColumnDropdownComp = ({ buttonText, contents, onSelect }) => {
         ></div>
       )}
       <div className={`dropdown ${isOpen ? "toggled-open" : ""}`}>
-        <p className={"dropdown-toggle"} onClick={() => setIsOpen(!isOpen)}>
+        <p
+          className={"clickable dropdown-toggle"}
+          onClick={() => setIsOpen(!isOpen)}
+        >
           {buttonText}
         </p>
         {isOpen && (
