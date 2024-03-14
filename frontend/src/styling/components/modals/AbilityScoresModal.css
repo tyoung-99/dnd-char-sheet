@@ -1,0 +1,48 @@
+.ability-scores-modal-container .ability-scores-header h1 {
+  font-size: 1.5rem;
+}
+
+.ability-scores-modal-container .ability-scores-body th,
+.ability-scores-modal-container .ability-scores-body td {
+  border-bottom: 1px solid black;
+  min-width: 2rem;
+  max-width: 5rem;
+  text-align: center;
+}
+.ability-scores-modal-container .ability-scores-body col:nth-child(even) {
+  background-color: rgba(211, 211, 211, 0.3);
+}
+.ability-scores-modal-container .ability-scores-body td {
+  border-bottom: 1px dotted black;
+}
+.ability-scores-modal-container .ability-scores-body tr:last-child td {
+  border-bottom: none;
+}
+
+.ability-scores-modal-container .ability-scores-body td input[type="number"] {
+  width: 3rem;
+}
+
+.ability-scores-modal-container .ability-scores-body .point-buy-options button {
+  cursor: pointer;
+  background-color: white;
+  border: 1px solid black;
+}
+.ability-scores-modal-container
+  .ability-scores-body
+  .point-buy-options
+  button:hover {
+  background-color: lightgray;
+}
+.ability-scores-modal-container
+  .ability-scores-body
+  .point-buy-options
+  button.selected {
+  background-color: black;
+  color: white;
+}
+.ability-scores-modal-container .ability-scores-body .point-buy-options p {
+  display: inline-block;
+  padding: 0.25rem;
+  margin: 0;
+}

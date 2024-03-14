@@ -252,49 +252,87 @@ class Character {
     this.saveCharacter();
   }
 
+  setPointBuy(newPointBuy) {
+    this.abilities.pointBuy = newPointBuy;
+    this.saveCharacter();
+  }
+
+  setAbilityScores(newAbilities) {
+    newAbilities.forEach((ability) => {
+      this.abilities.values.find(
+        (checkAbility) => checkAbility.name === ability.name
+      ).score = ability.breakdown[0].val;
+    });
+    this.saveCharacter();
+  }
+
   getAbilities() {
-    return this.abilities.map((ability) => ({
-      name: ability.name,
-      score: this.getAbilityScore(ability.name),
-      mod: this.getAbilityMod(ability.name),
-    }));
+    return this.abilities.values.map((ability) => {
+      const [score, breakdown] = this.getAbilityScore(ability.name);
+      return {
+        name: ability.name,
+        score: score,
+        mod: this.getAbilityMod(ability.name),
+        breakdown: breakdown,
+      };
+    });
   }
 
   getAbilityScore(ability) {
     const combineBonuses = (bonuses) =>
       bonuses.reduce(
-        (total, elem) =>
-          total +
-          elem.effects.reduce((subtotal, effect) => {
-            if (effect.category === category) {
-              const abilityBonus = effect.changes.find(
-                (checkAbility) => checkAbility.ability === ability
-              );
-              subtotal +=
-                abilityBonus &&
-                (!abilityBonus.cap ||
-                  subtotal + abilityBonus.amount <= abilityBonus.cap)
-                  ? abilityBonus.amount
-                  : 0;
-            } else if (effect.category === "Feat") {
-              subtotal += combineBonuses(effect.changes);
-            }
-            return subtotal;
-          }, 0),
+        (total, elem) => {
+          let val = 0;
+
+          const matchingEffect = elem.effects.find(
+            (checkEffect) => checkEffect.category === category
+          );
+          if (matchingEffect) {
+            const abilityBonus = matchingEffect.changes.find(
+              (checkAbility) => checkAbility.ability === ability
+            );
+            val +=
+              abilityBonus &&
+              (!abilityBonus.cap ||
+                val + abilityBonus.amount <= abilityBonus.cap)
+                ? abilityBonus.amount
+                : 0;
+
+            breakdown.push({
+              val: val,
+              label: elem.name,
+            });
+          }
+
+          const featEffect = elem.effects.find(
+            (checkEffect) => checkEffect.category === "Feat"
+          );
+          if (featEffect) {
+            val += combineBonuses(featEffect.changes);
+          }
+
+          return total + val;
+        },
 
         0
       );
 
     const category = "AbilityScore";
-
-    return (
-      this.abilities.find((stat) => stat.name === ability).score +
-      combineBonuses(this.#getEffects(category))
-    );
+    const score = this.abilities.values.find(
+      (stat) => stat.name === ability
+    ).score;
+    const breakdown = [
+      {
+        val: score,
+        label: "Base",
+      },
+    ];
+    const bonuses = combineBonuses(this.#getEffects(category));
+    return [score + bonuses, breakdown];
   }
 
   getAbilityMod(ability) {
-    return Math.floor((this.getAbilityScore(ability) - 10) / 2);
+    return Math.floor((this.getAbilityScore(ability)[0] - 10) / 2);
   }
 
   getProfBonus() {
@@ -506,7 +544,7 @@ class Character {
   }
 
   getSaves() {
-    const saves = this.abilities.map((ability) => ({
+    const saves = this.abilities.values.map((ability) => ({
       name: ability.name,
       prof: false,
       mod: this.getAbilityMod(ability.name),

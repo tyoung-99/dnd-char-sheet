@@ -1,7 +1,25 @@
 // Character's ability scores, saves, skills, other proficiencies, languages, and speeds
+
+import { useState } from "react";
+import AbilityScoresModal from "./modals/AbilityScoresModal";
 import "../styling/components/CharacterStatsComp.css";
 
 const CharacterStatsComp = ({ character }) => {
+  const [currentModal, setCurrentModal] = useState("");
+
+  const openModal = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const modal = event.target.dataset.modal;
+    if (modal) {
+      setCurrentModal(modal);
+    }
+  };
+
+  const closeModal = () => {
+    setCurrentModal("");
+  };
+
   const abilities = character.getAbilities().map((ability) => (
     <p key={ability.name}>
       {ability.name}: {ability.score} (
@@ -53,7 +71,19 @@ const CharacterStatsComp = ({ character }) => {
       <div className="col-1 row-flex">
         <div className="col-1_2 col-flex">
           <div className="grid-tile">
-            <h1>Ability Scores</h1>
+            <h1
+              className="clickable"
+              data-modal="abilityScores"
+              onClick={openModal}
+            >
+              Ability Scores
+            </h1>
+            {currentModal === "abilityScores" && (
+              <AbilityScoresModal
+                character={character}
+                closeModal={closeModal}
+              />
+            )}
             <div>{abilities}</div>
           </div>
           <div className="grid-tile">
