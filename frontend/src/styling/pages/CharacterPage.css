@@ -132,3 +132,27 @@
 .avatar-container:hover .avatar-edit {
   display: block;
 }
+
+.abilities-table th,
+.abilities-table td {
+  border-bottom: 1px solid black;
+  min-width: 2rem;
+  max-width: 5rem;
+  text-align: center;
+}
+.abilities-table
+  .saving-throws-modal-container
+  .saving-throws-body
+  col:nth-child(even) {
+  background-color: rgba(211, 211, 211, 0.3);
+}
+.abilities-table td {
+  border-bottom: 1px dotted black;
+}
+.abilities-table tr:last-child td {
+  border-bottom: none;
+}
+
+.abilities-table td input[type="number"] {
+  width: 3rem;
+}

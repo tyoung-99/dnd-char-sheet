@@ -106,8 +106,8 @@ const AbilityScoresModal = ({ character, closeModal }) => {
                 </td>
               ) : (
                 <>
-                  <td>+</td>
-                  <td>{entry.val}</td>
+                  <td>{entry.val >= 0 ? "+" : "-"}</td>
+                  <td>{Math.abs(entry.val)}</td>
                 </>
               )}
             </Fragment>
@@ -163,7 +163,7 @@ const AbilityScoresModal = ({ character, closeModal }) => {
 
   const body = (
     <>
-      <table>
+      <table className="abilities-table">
         {tableCols}
         {tableHead}
         {tableBody}
