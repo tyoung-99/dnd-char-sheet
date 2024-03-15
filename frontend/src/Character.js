@@ -300,7 +300,8 @@ class Character {
 
             breakdown.push({
               val: val,
-              label: elem.name,
+              label: elem.displayName || elem.name,
+              obtainedFrom: elem.race || elem.class || elem.background,
             });
           }
 
@@ -1163,46 +1164,31 @@ class Character {
   }
 
   #getRaceFeatures() {
-    let features = [];
+    if (!this.ref_race) return [];
 
-    if (this.ref_race) {
-      let raceFeatures = structuredClone(this.ref_race.features);
+    const raceFeatures = structuredClone(this.ref_race.features);
+    raceFeatures.forEach((feature) => {
+      feature.race = this.ref_race.name;
+    });
 
-      if (this.ref_subrace) {
-        this.ref_subrace.features.forEach((feature) => {
-          feature.replaces.forEach((replaceId) => {
-            const index = raceFeatures.findIndex(
-              (checkFeature) => checkFeature._id === replaceId
-            );
-            if (index >= 0) {
-              raceFeatures.splice(index, 1);
-            }
-          });
-        });
+    if (!this.ref_subrace) return raceFeatures;
 
-        raceFeatures = raceFeatures.concat(
-          structuredClone(this.ref_subrace.features)
+    const subraceFeatures = structuredClone(this.ref_subrace.features);
+
+    subraceFeatures.forEach((feature) => {
+      feature.race = this.ref_subrace.displayName;
+
+      feature.replaces.forEach((replaceId) => {
+        const index = raceFeatures.findIndex(
+          (checkFeature) => checkFeature._id === replaceId
         );
-      }
+        if (index >= 0) {
+          raceFeatures.splice(index, 1);
+        }
+      });
+    });
 
-      // raceFeatures.forEach((feature) => {
-      //   feature.effects.forEach((effect) => {
-      //     if (effect.changes.choices) {
-      //       effect.changes = this.#combineEffectChoices(
-      //         effect.category,
-      //         effect.changes.required,
-      //         this.featureChoices.race[feature._id][effect.category]
-      //       );
-      //     } else {
-      //       effect.changes = effect.changes.required;
-      //     }
-      //   });
-      // });
-
-      features = features.concat(raceFeatures);
-    }
-
-    return features;
+    return raceFeatures.concat(subraceFeatures);
   }
 
   #getBackgroundFeatures() {

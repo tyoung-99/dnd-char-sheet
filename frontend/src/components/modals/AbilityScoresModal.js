@@ -63,7 +63,9 @@ const AbilityScoresModal = ({ character, closeModal }) => {
             ) : (
               <>
                 <th></th>
-                <th>{entry.label}</th>
+                <th title={entry.obtainedFrom && `From: ${entry.obtainedFrom}`}>
+                  {entry.label}
+                </th>
               </>
             )}
           </Fragment>
