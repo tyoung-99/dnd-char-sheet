@@ -30,9 +30,9 @@ const CharacterStatsComp = ({ character }) => {
   const saves = character.getSaves().map((save) => (
     <p key={save.name}>
       {save.prof ? (
-        <span className="proficient"></span>
+        <span className="proficient" title="Proficient"></span>
       ) : (
-        <span className="not-proficient"></span>
+        <span className="not-proficient" title="Unproficient"></span>
       )}{" "}
       {(save.mod >= 0 ? "+" : "") + save.mod} {save.name}
     </p>
@@ -41,11 +41,11 @@ const CharacterStatsComp = ({ character }) => {
   const skills = character.getSkills().map((skill) => (
     <p key={skill.name}>
       {skill.prof === 1 ? (
-        <span className="proficient"></span>
+        <span className="proficient" title="Proficient"></span>
       ) : skill.prof === 2 ? (
-        <span className="expert"></span>
+        <span className="expert" title="Expert"></span>
       ) : (
-        <span className="not-proficient"></span>
+        <span className="not-proficient" title="Unproficient"></span>
       )}{" "}
       {(skill.mod.flat >= 0 ? "+" : "") + skill.mod.flat}{" "}
       {skill.mod.dice.reduce(
