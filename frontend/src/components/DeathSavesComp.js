@@ -13,10 +13,13 @@ const DeathSavesComp = ({ character }) => {
     failures = [];
 
   for (let i = 0; i < 3; ++i) {
+    let key = "success " + i;
     successes.push(
       <input
-        key={"success " + i}
+        key={key}
         type="checkbox"
+        id={key}
+        name={key}
         checked={i < successCount}
         onChange={(event) => {
           let newCount;
@@ -28,10 +31,13 @@ const DeathSavesComp = ({ character }) => {
       ></input>
     );
 
+    key = "failure " + i;
     failures.push(
       <input
-        key={"failure " + i}
+        key={key}
         type="checkbox"
+        id={key}
+        name={key}
         checked={i < failCount}
         onChange={(event) => {
           let newCount;
