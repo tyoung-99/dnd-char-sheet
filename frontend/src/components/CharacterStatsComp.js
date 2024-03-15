@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AbilityScoresModal from "./modals/AbilityScoresModal";
+import SavingThrowsModal from "./modals/SavingThrowsModal";
 import "../styling/components/CharacterStatsComp.css";
 
 const CharacterStatsComp = ({ character }) => {
@@ -87,7 +88,19 @@ const CharacterStatsComp = ({ character }) => {
             <div>{abilities}</div>
           </div>
           <div className="grid-tile">
-            <h1>Saving Throws</h1>
+            <h1
+              className="clickable"
+              data-modal="savingThrows"
+              onClick={openModal}
+            >
+              Saving Throws
+            </h1>
+            {currentModal === "savingThrows" && (
+              <SavingThrowsModal
+                character={character}
+                closeModal={closeModal}
+              />
+            )}
             <div>{saves}</div>
           </div>
           <div className="grid-tile col-end">

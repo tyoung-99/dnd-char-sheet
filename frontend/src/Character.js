@@ -545,72 +545,80 @@ class Character {
   }
 
   getSaves() {
-    const saves = this.abilities.values.map((ability) => ({
-      name: ability.name,
-      prof: false,
-      mod: this.getAbilityMod(ability.name),
-    }));
-
-    const saveProfs = this.#getSaveProfBonuses();
-    saveProfs.forEach((saveName) => {
-      const current = saves.find((checkSave) => checkSave.name === saveName);
-      current.prof = true;
-      current.mod += this.getProfBonus();
+    const saves = this.abilities.values.map((ability) => {
+      const abilityMod = this.getAbilityMod(ability.name);
+      return {
+        name: ability.name,
+        prof: false,
+        mod: abilityMod,
+        profBreakdown: [],
+        bonusBreakdown: [
+          {
+            val: abilityMod,
+            label: "Ability Modifier",
+            obtainedFrom: null,
+          },
+        ],
+      };
     });
 
-    const bonuses = this.#getSaveModBonuses();
+    const [saveProfs, profBreakdown] = this.#getSaveProfBonuses();
+    const profBonus = this.getProfBonus();
+    saveProfs.forEach((ability) => {
+      const current = saves.find((checkSave) => checkSave.name === ability);
+      current.prof = true;
+      current.mod += profBonus;
+    });
+    saves.forEach((save) => {
+      save.profBreakdown = profBreakdown;
+      save.bonusBreakdown = save.bonusBreakdown.concat({
+        val: profBonus * save.prof,
+        label: "Proficiency",
+        obtainedFrom: null,
+      });
+    });
+
+    const [bonuses, bonusBreakdown] = this.#getSaveModBonuses();
     Object.keys(bonuses).forEach((ability) => {
-      saves.find((checkSave) => checkSave.name === ability).mod +=
-        bonuses[ability];
+      const current = saves.find((checkSave) => checkSave.name === ability);
+      current.mod += bonuses[ability];
+      current.bonusBreakdown = current.bonusBreakdown.concat(bonusBreakdown);
     });
 
     return saves;
   }
 
   #getSaveProfBonuses() {
-    // TODO: Update w/ getEffects() after putting save prof feature in (don't forget to check feats)
+    const combineBonuses = (bonuses) => {
+      let saves = [];
+      bonuses.forEach((elem) => {
+        const matchingEffect = elem.effects.find(
+          (checkEffect) => checkEffect.category === category
+        );
+        if (matchingEffect) {
+          saves = saves.concat(matchingEffect.changes);
+          breakdown.push({
+            saves: matchingEffect.changes,
+            label: elem.displayName || elem.name,
+            obtainedFrom: elem.race || elem.class || elem.background,
+          });
+        }
 
-    // const baseClass = this.classes.find(
-    //   (checkClass) => checkClass.startingClass
-    // ).className;
-    const saveProfs = [];
+        const featEffect = elem.effects.find(
+          (checkEffect) => checkEffect.category === "Feat"
+        );
+        if (featEffect) {
+          saves = saves.concat(combineBonuses(featEffect.changes));
+        }
+      });
 
-    // if (["Barbarian", "Fighter", "Monk", "Ranger"].includes(baseClass)) {
-    //   saveProfs.push("STR");
-    // }
-    // if (["Bard", "Monk", "Ranger", "Rogue"].includes(baseClass)) {
-    //   saveProfs.push("DEX");
-    // }
-    // if (["Artificer", "Barbarian", "Fighter", "Sorcerer"].includes(baseClass)) {
-    //   saveProfs.push("CON");
-    // }
-    // if (["Artificer", "Druid", "Rogue", "Wizard"].includes(baseClass)) {
-    //   saveProfs.push("INT");
-    // }
-    // if (
-    //   ["Cleric", "Druid", "Paladin", "Warlock", "Wizard"].includes(baseClass)
-    // ) {
-    //   saveProfs.push("WIS");
-    // }
-    // if (
-    //   ["Bard", "Cleric", "Paladin", "Sorcerer", "Warlock"].includes(baseClass)
-    // ) {
-    //   saveProfs.push("CHA");
-    // }
+      return [...new Set(saves)];
+    };
 
-    // const category = "SavingThrowProficiency";
-    // this.#getEffects(category).forEach((bonus) => {
-    //   const effect = bonus.effects.find(
-    //     (checkEffect) => checkEffect.category === category
-    //   );
-    //   if (effect.changes.prof) {
-    //     effect.changes.prof.forEach((ability) => {
-    //       if (!saveProfs.includes(ability)) saveProfs.push(ability);
-    //     });
-    //   }
-    // });
-
-    return saveProfs;
+    const category = "SaveProficiency";
+    const breakdown = [];
+    const bonuses = combineBonuses(this.#getEffects(category));
+    return [bonuses, breakdown];
   }
 
   #getSaveModBonuses() {
@@ -638,7 +646,7 @@ class Character {
     //   }
     // });
 
-    return bonusesParsed;
+    return [bonusesParsed, []];
   }
 
   getWeaponProfs() {
