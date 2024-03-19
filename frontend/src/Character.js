@@ -906,6 +906,8 @@ class Character {
     const category = "Speed";
     const modifiers = { walk: 0, swim: 0, fly: 0 };
     const multipliers = { walk: 1, swim: 1, fly: 1 };
+    const modifiersBreakdown = { walk: [], swim: [], fly: [] };
+    const multipliersBreakdown = { walk: [], swim: [], fly: [] };
 
     const combineBonuses = (bonuses) =>
       bonuses.forEach((bonus) => {
@@ -913,8 +915,25 @@ class Character {
           (checkEffect) => checkEffect.category === category
         );
         Object.keys(effect.changes).forEach((speedType) => {
-          modifiers[speedType] += effect.changes[speedType].modifier || 0;
-          multipliers[speedType] *= effect.changes[speedType].multiplier || 1;
+          const mod = effect.changes[speedType].modifier;
+          const mult = effect.changes[speedType].multiplier;
+
+          if (mod !== 0) {
+            modifiers[speedType] += mod;
+            modifiersBreakdown[speedType].push({
+              val: mod,
+              label: bonus.displayName || bonus.name,
+              obtainedFrom: bonus.race || bonus.class || bonus.background,
+            });
+          }
+          if (mult !== 1) {
+            multipliers[speedType] *= mult;
+            multipliersBreakdown[speedType].push({
+              val: mult,
+              label: bonus.displayName || bonus.name,
+              obtainedFrom: bonus.race || bonus.class || bonus.background,
+            });
+          }
         });
 
         effect = bonus.effects.find(
@@ -935,7 +954,10 @@ class Character {
       modifiers[speedType] *= multipliers[speedType];
     });
 
-    return modifiers;
+    return [
+      modifiers,
+      { modifiers: modifiersBreakdown, multipliers: multipliersBreakdown },
+    ];
   }
 
   getMaxHitPoints() {

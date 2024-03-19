@@ -6,8 +6,6 @@ import "../../styling/components/modals/GenericBreakdownModal.css";
 const GenericBreakdownModal = ({ title, closeModal, breakdown, total }) => {
   const header = <h1>{title}</h1>;
 
-  console.log(breakdown);
-
   const body = (
     <p>
       {breakdown.reduce((fullText, current, i) => {

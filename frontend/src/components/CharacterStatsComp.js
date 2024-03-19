@@ -4,6 +4,7 @@ import { useState } from "react";
 import AbilityScoresModal from "./modals/AbilityScoresModal";
 import SavingThrowsModal from "./modals/SavingThrowsModal";
 import GenericBreakdownModal from "./modals/GenericBreakdownModal";
+import SpeedModal from "./modals/SpeedModal";
 import "../styling/components/CharacterStatsComp.css";
 
 const CharacterStatsComp = ({ character }) => {
@@ -66,7 +67,7 @@ const CharacterStatsComp = ({ character }) => {
     </p>
   ));
 
-  const speeds = character.getSpeeds();
+  const [speeds, speedsBreakdown] = character.getSpeeds();
   const [passivePerception, passivePerceptionBreakdown] =
     character.getPassivePerception();
 
@@ -143,6 +144,13 @@ const CharacterStatsComp = ({ character }) => {
             <h1 className="clickable" data-modal="speed" onClick={openModal}>
               Speed
             </h1>
+            {currentModal === "speed" && (
+              <SpeedModal
+                closeModal={closeModal}
+                breakdown={speedsBreakdown}
+                total={speeds}
+              />
+            )}
             <div className="row-flex">
               <p className="col-1_3">Walk {speeds.walk} ft</p>
               <p className="col-1_3">Swim {speeds.swim} ft</p>

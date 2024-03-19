@@ -5,7 +5,6 @@ import GenericModal from "./GenericModal";
 import "../../styling/components/modals/MaxHitPointsModal.css";
 
 const MaxHitPointsModal = ({ character, closeModal, breakdown, total }) => {
-  console.log(JSON.parse(JSON.stringify(breakdown)));
   const [base, setBase] = useState(breakdown[0].val);
   const [runningTotal, setRunningTotal] = useState(total);
   breakdown = breakdown.slice(1);
