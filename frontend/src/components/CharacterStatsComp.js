@@ -3,6 +3,7 @@
 import { useState } from "react";
 import AbilityScoresModal from "./modals/AbilityScoresModal";
 import SavingThrowsModal from "./modals/SavingThrowsModal";
+import GenericBreakdownModal from "./modals/GenericBreakdownModal";
 import "../styling/components/CharacterStatsComp.css";
 
 const CharacterStatsComp = ({ character }) => {
@@ -124,23 +125,24 @@ const CharacterStatsComp = ({ character }) => {
           <div className="grid-tile">
             <h1
               className="clickable"
-              title={passivePerceptionBreakdown.reduce(
-                (fullText, current, i) => {
-                  if (i !== 0) {
-                    if (current.val >= 0) fullText += " + ";
-                    else fullText += " - ";
-                  }
-                  fullText += `${Math.abs(current.val)} (${current.label})`;
-                  return fullText;
-                },
-                ""
-              )}
+              data-modal="passivePerception"
+              onClick={openModal}
             >
               Passive Perception: {passivePerception}
             </h1>
+            {currentModal === "passivePerception" && (
+              <GenericBreakdownModal
+                title={"Passive Perception"}
+                closeModal={closeModal}
+                breakdown={passivePerceptionBreakdown}
+                total={passivePerception}
+              />
+            )}
           </div>
           <div className="grid-tile">
-            <h1>Speed</h1>
+            <h1 className="clickable" data-modal="speed" onClick={openModal}>
+              Speed
+            </h1>
             <div className="row-flex">
               <p className="col-1_3">Walk {speeds.walk} ft</p>
               <p className="col-1_3">Swim {speeds.swim} ft</p>

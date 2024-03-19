@@ -19,6 +19,7 @@ import DeathSavesComp from "../components/DeathSavesComp";
 import XpComp from "../components/XpComp";
 import MultiColumnDropdownComp from "../components/MultiColumnDropdownComp";
 import RaceModal from "../components/modals/RaceModal";
+import GenericBreakdownModal from "../components/modals/GenericBreakdownModal";
 import CurrentHitDiceModal from "../components/modals/CurrentHitDiceModal";
 import MaxHitPointsModal from "../components/modals/MaxHitPointsModal";
 
@@ -115,10 +116,14 @@ const CharacterPage = () => {
 
   const [armorClassVal, armorClassBreakdown] = character.getArmorClass();
   const [initiativeVal, initiativeBreakdown] = character.getInitiative();
-  const [totalHitDice, totalHitDiceBreakdown] = character.getTotalHitDice();
+  let [totalHitDice, totalHitDiceBreakdown] = character.getTotalHitDice();
   const [maxHitPoints, maxHitPointsBreakdown] = character.getMaxHitPoints();
   const [currentHitPoints, currentHitPointsBreakdown] =
     character.getCurrentHitPoints();
+
+  totalHitDice = totalHitDice
+    .map((die) => `${die.number}d${die.sides}`)
+    .join(", ");
 
   return (
     <div>
@@ -201,12 +206,28 @@ const CharacterPage = () => {
       </div>
       <div className="combat-header">
         <div>
-          <p className="clickable" title={armorClassBreakdown}>
+          <p className="clickable" data-modal="armorClass" onClick={openModal}>
             AC: {armorClassVal}
           </p>
-          <p className="clickable" title={initiativeBreakdown}>
+          {currentModal === "armorClass" && (
+            <GenericBreakdownModal
+              title={"Armor Class"}
+              closeModal={closeModal}
+              breakdown={armorClassBreakdown}
+              total={armorClassVal}
+            />
+          )}
+          <p className="clickable" data-modal="initiative" onClick={openModal}>
             Initiative: {(initiativeVal >= 0 ? "+" : "") + initiativeVal}
           </p>
+          {currentModal === "initiative" && (
+            <GenericBreakdownModal
+              title={"Initiative"}
+              closeModal={closeModal}
+              breakdown={initiativeBreakdown}
+              total={initiativeVal}
+            />
+          )}
         </div>
         <div className="row-flex">
           <div>
@@ -222,11 +243,24 @@ const CharacterPage = () => {
                 character={character}
                 closeModal={closeModal}
                 breakdown={maxHitPointsBreakdown}
+                total={maxHitPoints}
               />
             )}
-            <p className="clickable" title={currentHitPointsBreakdown}>
+            <p
+              className="clickable"
+              data-modal="currentHitPoints"
+              onClick={openModal}
+            >
               Current HP: {currentHitPoints}
             </p>
+            {currentModal === "currentHitPoints" && (
+              <GenericBreakdownModal
+                title={"Current Hit Points"}
+                closeModal={closeModal}
+                breakdown={currentHitPointsBreakdown}
+                total={currentHitPoints}
+              />
+            )}
             <p>Temp HP: {character.hitPoints.temp}</p>
           </div>
           <div className="col-flex hp-buttons">
@@ -251,10 +285,21 @@ const CharacterPage = () => {
           </div>
         </div>
         <div>
-          <p className="clickable" title={totalHitDiceBreakdown}>
-            Total Hit Dice:{" "}
-            {totalHitDice.map((die) => `${die.number}d${die.sides}`).join(", ")}
+          <p
+            className="clickable"
+            data-modal="totalHitDice"
+            onClick={openModal}
+          >
+            Total Hit Dice: {totalHitDice}
           </p>
+          {currentModal === "totalHitDice" && (
+            <GenericBreakdownModal
+              title={"Total Hit Dice"}
+              closeModal={closeModal}
+              breakdown={totalHitDiceBreakdown}
+              total={totalHitDice}
+            />
+          )}
           <p
             className="clickable"
             data-modal="currentHitDice"

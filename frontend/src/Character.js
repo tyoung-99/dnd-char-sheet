@@ -742,12 +742,12 @@ class Character {
 
   getInitiative() {
     // TODO: Update w/ getEffects() after putting init feature in  (don't forget to check feats)
-    let breakdown = "";
+    let breakdown = [];
     let bonuses = [];
 
     const dexMod = this.getAbilityMod("DEX");
     bonuses.unshift(dexMod);
-    breakdown = `${dexMod} (DEX)` + breakdown;
+    breakdown.unshift({ val: dexMod, label: "DEX" });
 
     bonuses = bonuses.reduce((total, bonus) => (total += bonus), 0);
 
@@ -782,11 +782,14 @@ class Character {
       this.#validateArmorClassReplacements(replacements);
     [bonuses, bonusesBreakdown] = this.#validateArmorClassBonuses(bonuses);
 
-    return [replacements + bonuses, replacementsBreakdown + bonusesBreakdown];
+    return [
+      replacements + bonuses,
+      replacementsBreakdown.concat(bonusesBreakdown),
+    ];
   }
 
   #validateArmorClassReplacements(replacements) {
-    const breakdown = new Array(replacements.length).fill("");
+    const breakdown = new Array(replacements.length).fill([]);
     const equippedItems = this.getEquippedItems();
     replacements = replacements.map((option, i) => {
       if (
@@ -807,14 +810,14 @@ class Character {
         return -1;
       }
 
-      breakdown[i] = `${option.replace.base} (${option.name})`;
+      breakdown[i].push({ val: option.replace.base, label: option.name });
 
       const mods = option.replace.mods.map((mod, j) => {
         let val = this.getAbilityMod(mod);
         if (option.replace.modCaps && val > option.replace.modCaps[j]) {
           val = option.replace.modCaps[j];
         }
-        if (val !== 0) breakdown[i] += this.#breakdownValToStr(val, mod);
+        if (val !== 0) breakdown[i].push({ val: val, label: mod });
         return val;
       });
 
@@ -824,11 +827,10 @@ class Character {
     if (!equippedItems.some((item) => item.type === "Armor")) {
       const dexMod = this.getAbilityMod("DEX");
       replacements.push(10 + dexMod);
+      breakdown.push([{ val: 10, label: "Unarmored" }]);
       if (dexMod !== 0) {
-        breakdown.push(
-          `10 (Unarmored)` + this.#breakdownValToStr(dexMod, "DEX")
-        );
-      } else breakdown.push(`10 (Unarmored)`);
+        breakdown[breakdown.length - 1].push({ val: dexMod, label: "DEX" });
+      }
     }
 
     // Custom max index finder b/c it does fewer calculations than indexof(max())
@@ -856,7 +858,7 @@ class Character {
   }
 
   #validateArmorClassBonuses(bonuses) {
-    let breakdown = "";
+    let breakdown = [];
     const equippedItems = this.getEquippedItems();
     bonuses = bonuses.map((option) => {
       if (
@@ -883,13 +885,13 @@ class Character {
           val = option.bonus.modCaps[i];
         }
         if (val !== 0) {
-          breakdown += this.#breakdownValToStr(val, `${option.name}: ${mod}`);
+          breakdown.push({ val: val, label: `${option.name}: ${mod}` });
         }
         return val;
       });
       mods.push(option.bonus.flat);
       if (option.bonus.flat !== 0) {
-        breakdown += this.#breakdownValToStr(option.bonus.flat, option.name);
+        breakdown.push({ val: option.bonus.flat, label: option.name });
       }
       mods = mods.reduce((total, mod) => total + mod);
 
@@ -946,17 +948,15 @@ class Character {
         0
       );
 
-    breakdown =
-      `${this.hitPoints.maxBase} (Base)` +
-      this.#breakdownValToStr(cumulativeConMod, "CON x lvl") +
-      breakdown;
+    breakdown.unshift({ val: cumulativeConMod, label: "CON x lvl" });
+    breakdown.unshift({ val: this.hitPoints.maxBase, label: "Base" });
 
     return [this.hitPoints.maxBase + cumulativeConMod + modifiers, breakdown];
   }
 
   getCurrentHitPoints() {
     let [modifiers, breakdown] = this.#getHitPointsHelper("CurrentHitPoints");
-    breakdown = `${this.hitPoints.currentBase} (Base)` + breakdown;
+    breakdown.unshift({ val: this.hitPoints.currentBase, label: "Base" });
     return [this.hitPoints.currentBase + modifiers, breakdown];
   }
 
@@ -973,14 +973,14 @@ class Character {
             return subtotal;
           }, 0);
 
-          breakdown += this.#breakdownValToStr(val, elem.name);
+          breakdown.push({ val: val, label: elem.name });
           return total + val;
         },
 
         0
       );
 
-    let breakdown = "";
+    let breakdown = [];
     const bonuses = combineBonuses(this.#getEffects(category));
 
     return [bonuses, breakdown];
@@ -1000,11 +1000,13 @@ class Character {
   getTotalHitDice() {
     // TODO: Update w/ getEffects() after putting hit dice feature in (are there any?) (don't forget to check feats)
 
-    let breakdown = "";
+    let breakdown = [];
     let total = [];
     this.classes.forEach((charClass) => {
-      if (breakdown !== "") breakdown += " + ";
-      breakdown += `${charClass.classLevel}d${charClass.hitDie} (${charClass.className})`;
+      breakdown.push({
+        die: { number: charClass.classLevel, sides: charClass.hitDie },
+        label: charClass.className,
+      });
 
       let index = total.findIndex((die) => die.sides === charClass.hitDie);
       if (index === -1) {
@@ -1641,16 +1643,6 @@ class Character {
         diceArr[index].number += die.number;
       }
     });
-  }
-
-  #breakdownValToStr(val, label) {
-    let str = val !== 0 ? `${Math.abs(val)} (${label})` : "";
-    if (val > 0) {
-      str = " + " + str;
-    } else if (val < 0) {
-      str = " - " + str;
-    }
-    return str;
   }
 }
 
