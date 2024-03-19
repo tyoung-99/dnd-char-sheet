@@ -99,6 +99,9 @@ const AbilityScoresModal = ({ character, closeModal }) => {
                           newAbilities[i].breakdown[j].val;
                         newAbilities[i].breakdown[j].val += change;
                         newAbilities[i].score += change;
+                        newAbilities[i].mod = Math.floor(
+                          (newAbilities[i].score - 10) / 2
+                        );
                         return newAbilities;
                       })
                     }
