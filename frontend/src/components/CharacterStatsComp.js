@@ -66,6 +66,8 @@ const CharacterStatsComp = ({ character }) => {
   ));
 
   const speeds = character.getSpeeds();
+  const [passivePerception, passivePerceptionBreakdown] =
+    character.getPassivePerception();
 
   return (
     <>
@@ -120,7 +122,22 @@ const CharacterStatsComp = ({ character }) => {
             <h1>Proficiency Bonus: +{character.getProfBonus()}</h1>
           </div>
           <div className="grid-tile">
-            <h1>Passive Perception: {character.getPassivePerception()}</h1>
+            <h1
+              className="clickable"
+              title={passivePerceptionBreakdown.reduce(
+                (fullText, current, i) => {
+                  if (i !== 0) {
+                    if (current.val >= 0) fullText += " + ";
+                    else fullText += " - ";
+                  }
+                  fullText += `${Math.abs(current.val)} (${current.label})`;
+                  return fullText;
+                },
+                ""
+              )}
+            >
+              Passive Perception: {passivePerception}
+            </h1>
           </div>
           <div className="grid-tile">
             <h1>Speed</h1>

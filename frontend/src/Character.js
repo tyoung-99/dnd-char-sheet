@@ -527,6 +527,7 @@ class Character {
           elem.effects.reduce((subtotal, effect) => {
             if (effect.category === category) {
               subtotal += effect.changes.bonus;
+              breakdown.push({ val: effect.changes.bonus, label: elem.name });
             } else if (effect.category === "Feat") {
               subtotal += combineBonuses(effect.changes);
             }
@@ -536,12 +537,21 @@ class Character {
       );
 
     const category = "PassivePerception";
+    const perceptionMod = this.getSkillByName("Perception").mod.flat;
+    const breakdown = [
+      {
+        val: 10,
+        label: "Base",
+      },
+      {
+        val: perceptionMod,
+        label: "Perception",
+      },
+    ];
+    const passivePerception =
+      10 + perceptionMod + combineBonuses(this.#getEffects(category));
 
-    return (
-      10 +
-      this.getSkillByName("Perception").mod.flat +
-      combineBonuses(this.#getEffects(category))
-    );
+    return [passivePerception, breakdown];
   }
 
   getSaves() {
