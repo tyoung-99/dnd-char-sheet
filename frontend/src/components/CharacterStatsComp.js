@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import AbilityScoresModal from "./modals/AbilityScoresModal";
-import SavingThrowsModal from "./modals/SavingThrowsModal";
+import SkillsSavingThrowsModal from "./modals/SkillsSavingThrowsModal";
 import GenericBreakdownModal from "./modals/GenericBreakdownModal";
 import SpeedModal from "./modals/SpeedModal";
 import "../styling/components/CharacterStatsComp.css";
@@ -37,7 +37,7 @@ const CharacterStatsComp = ({ character }) => {
       ) : (
         <span className="not-proficient" title="Unproficient"></span>
       )}{" "}
-      {(save.mod >= 0 ? "+" : "") + save.mod} {save.name}
+      {(save.mod.flat >= 0 ? "+" : "") + save.mod.flat} {save.name}
     </p>
   ));
 
@@ -100,9 +100,10 @@ const CharacterStatsComp = ({ character }) => {
               Saving Throws
             </h1>
             {currentModal === "savingThrows" && (
-              <SavingThrowsModal
+              <SkillsSavingThrowsModal
                 character={character}
                 closeModal={closeModal}
+                isSkills={false}
               />
             )}
             <div>{saves}</div>
@@ -158,7 +159,20 @@ const CharacterStatsComp = ({ character }) => {
             </div>
           </div>
           <div className="grid-tile col-end">
-            <h1>Skills</h1>
+            <h1
+              className="clickable"
+              data-modal="skillProficiencies"
+              onClick={openModal}
+            >
+              Skills
+            </h1>
+            {currentModal === "skillProficiencies" && (
+              <SkillsSavingThrowsModal
+                character={character}
+                closeModal={closeModal}
+                isSkills={true}
+              />
+            )}
             <div>{skills}</div>
           </div>
         </div>

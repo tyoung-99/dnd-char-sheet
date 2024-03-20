@@ -140,10 +140,7 @@
   max-width: 5rem;
   text-align: center;
 }
-.abilities-table
-  .saving-throws-modal-container
-  .saving-throws-body
-  col:nth-child(even) {
+.abilities-table col:nth-child(even) {
   background-color: rgba(211, 211, 211, 0.3);
 }
 .abilities-table td {
@@ -152,7 +149,6 @@
 .abilities-table tr:last-child td {
   border-bottom: none;
 }
-
 .abilities-table td input[type="number"] {
   width: 3rem;
 }

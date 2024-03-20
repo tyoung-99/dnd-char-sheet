@@ -349,144 +349,128 @@ class Character {
 
   getSkills() {
     const skills = [
-      {
-        name: "Athletics",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "STR",
-      },
-      {
-        name: "Acrobatics",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "DEX",
-      },
-      {
-        name: "Sleight of Hand",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "DEX",
-      },
-      {
-        name: "Stealth",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "DEX",
-      },
-      {
-        name: "Arcana",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "INT",
-      },
-      {
-        name: "History",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "INT",
-      },
-      {
-        name: "Investigation",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "INT",
-      },
-      {
-        name: "Nature",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "INT",
-      },
-      {
-        name: "Religion",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "INT",
-      },
-      {
-        name: "Animal Handling",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "WIS",
-      },
-      {
-        name: "Insight",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "WIS",
-      },
-      {
-        name: "Medicine",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "WIS",
-      },
-      {
-        name: "Perception",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "WIS",
-      },
-      {
-        name: "Survival",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "WIS",
-      },
-      {
-        name: "Deception",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "CHA",
-      },
-      {
-        name: "Intimidation",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "CHA",
-      },
-      {
-        name: "Performance",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "CHA",
-      },
-      {
-        name: "Persuasion",
-        prof: 0,
-        mod: { flat: 0, dice: [] },
-        ability: "CHA",
-      },
+      { name: "Athletics", ability: "STR" },
+      { name: "Acrobatics", ability: "DEX" },
+      { name: "Sleight of Hand", ability: "DEX" },
+      { name: "Stealth", ability: "DEX" },
+      { name: "Arcana", ability: "INT" },
+      { name: "History", ability: "INT" },
+      { name: "Investigation", ability: "INT" },
+      { name: "Nature", ability: "INT" },
+      { name: "Religion", ability: "INT" },
+      { name: "Animal Handling", ability: "WIS" },
+      { name: "Insight", ability: "WIS" },
+      { name: "Medicine", ability: "WIS" },
+      { name: "Perception", ability: "WIS" },
+      { name: "Survival", ability: "WIS" },
+      { name: "Deception", ability: "CHA" },
+      { name: "Intimidation", ability: "CHA" },
+      { name: "Performance", ability: "CHA" },
+      { name: "Persuasion", ability: "CHA" },
     ];
+    skills.forEach((skill) => {
+      skill.prof = 0;
+      skill.mod = { flat: 0, dice: [] };
+      skill.profBreakdown = [];
+      skill.bonusBreakdown = [];
+    });
 
     let category = "SkillProficiency";
-    this.#getSkillsHelper(category, (newProf) => {
-      skills.find((checkSkill) => checkSkill.name === newProf).prof = 1; // Mark prof as 1, expertise as 2, so prof bonus can be multiplied by prof val
-    });
+    this.#getSkillsHelper(
+      category,
+
+      (label, obtainedFrom) => {
+        skills.forEach((skill) => {
+          skill.profBreakdown.push({
+            prof: 0,
+            label: label,
+            obtainedFrom: obtainedFrom,
+          });
+        });
+      },
+
+      (newProf) => {
+        const affectedSkill = skills.find(
+          (checkSkill) => checkSkill.name === newProf
+        );
+        affectedSkill.prof = 1; // Mark prof as 1, expertise as 2, so prof bonus can be multiplied by prof val
+        affectedSkill.profBreakdown[
+          affectedSkill.profBreakdown.length - 1
+        ].prof = 1;
+      }
+    );
 
     category = "SkillExpertise";
-    this.#getSkillsHelper(category, (newExp) => {
-      const affectedSkill = skills.find(
-        (checkSkill) => checkSkill.name === newExp
-      );
-      if (affectedSkill.prof >= 1) affectedSkill.prof = 2;
-      else {
-        affectedSkill.error = `Ineligible for ${affectedSkill.name} expertise`;
+    this.#getSkillsHelper(
+      category,
+
+      (label, obtainedFrom) => {
+        skills.forEach((skill) => {
+          skill.profBreakdown.push({
+            prof: 0,
+            label: label,
+            obtainedFrom: obtainedFrom,
+          });
+        });
+      },
+
+      (newExp) => {
+        const affectedSkill = skills.find(
+          (checkSkill) => checkSkill.name === newExp
+        );
+        if (affectedSkill.prof >= 1) affectedSkill.prof = 2;
+        else {
+          affectedSkill.error = `Ineligible for ${affectedSkill.name} expertise`;
+        }
+        affectedSkill.profBreakdown[
+          affectedSkill.profBreakdown.length - 1
+        ].prof = 2;
       }
-    });
+    );
 
     category = "SkillModifier";
-    this.#getSkillsHelper(category, (newMod) => {
-      const affectedSkill = skills.find(
-        (checkSkill) => checkSkill.name === newMod.skillName
-      );
-      affectedSkill.mod += newMod.flat;
-      this.#addDiceToArr(affectedSkill.mod.dice, newMod.dice);
-    });
+    this.#getSkillsHelper(
+      category,
+
+      (label, obtainedFrom) => {
+        skills.forEach((skill) => {
+          skill.bonusBreakdown.push({
+            val: { flat: 0, dice: [] },
+            label: label,
+            obtainedFrom: obtainedFrom,
+          });
+        });
+      },
+
+      (newMod) => {
+        const affectedSkill = skills.find(
+          (checkSkill) => checkSkill.name === newMod.skillName
+        );
+        affectedSkill.mod += newMod.flat;
+        this.#addDiceToArr(affectedSkill.mod.dice, newMod.dice);
+
+        const affectedBreakdown =
+          affectedSkill.bonusBreakdown[affectedSkill.bonusBreakdown.length - 1];
+        affectedBreakdown.val.flat = newMod.flat;
+        affectedBreakdown.val.dice = newMod.dice;
+      }
+    );
 
     skills.forEach((skill) => {
-      skill.mod.flat +=
-        this.getAbilityMod(skill.ability) + this.getProfBonus() * skill.prof;
+      const abilityMod = this.getAbilityMod(skill.ability);
+      const profBonus = this.getProfBonus() * skill.prof;
+      skill.mod.flat += abilityMod + profBonus;
+
+      skill.bonusBreakdown.unshift({
+        val: { flat: profBonus, dice: [] },
+        label: "Proficiency",
+        obtainedFrom: null,
+      });
+      skill.bonusBreakdown.unshift({
+        val: { flat: abilityMod, dice: [] },
+        label: "Ability Modifier",
+        obtainedFrom: null,
+      });
     });
 
     skills.sort((first, second) =>
@@ -496,14 +480,20 @@ class Character {
     return skills;
   }
 
-  #getSkillsHelper(category, callback) {
+  #getSkillsHelper(category, initialize, runForEach) {
     const combineBonuses = (bonuses) => {
       bonuses.forEach((effectsList) => {
         let effect = effectsList.effects.find(
           (checkEffect) => checkEffect.category === category
         );
         if (effect.changes.join() === "") return;
-        if (effect.changes) effect.changes.forEach(callback);
+        if (effect.changes) {
+          initialize(
+            effectsList.displayName || effectsList.name,
+            effectsList.race || effectsList.class || effectsList.background
+          );
+          effect.changes.forEach(runForEach);
+        }
 
         effect = effectsList.effects.find(
           (checkEffect) => checkEffect.category === "Feat"
@@ -560,11 +550,11 @@ class Character {
       return {
         name: ability.name,
         prof: false,
-        mod: abilityMod,
+        mod: { flat: abilityMod, dice: [] },
         profBreakdown: [],
         bonusBreakdown: [
           {
-            val: abilityMod,
+            val: { flat: abilityMod, dice: [] },
             label: "Ability Modifier",
             obtainedFrom: null,
           },
@@ -577,12 +567,16 @@ class Character {
     saveProfs.forEach((ability) => {
       const current = saves.find((checkSave) => checkSave.name === ability);
       current.prof = true;
-      current.mod += profBonus;
+      current.mod.flat += profBonus;
     });
     saves.forEach((save) => {
-      save.profBreakdown = profBreakdown;
+      save.profBreakdown = profBreakdown.map((elem) => ({
+        prof: elem.saves.includes(save.name) ? 1 : 0,
+        label: elem.label,
+        obtainedFrom: elem.obtainedFrom,
+      }));
       save.bonusBreakdown = save.bonusBreakdown.concat({
-        val: profBonus * save.prof,
+        val: { flat: profBonus * save.prof, dice: [] },
         label: "Proficiency",
         obtainedFrom: null,
       });
@@ -591,7 +585,7 @@ class Character {
     const [bonuses, bonusBreakdown] = this.#getSaveModBonuses();
     Object.keys(bonuses).forEach((ability) => {
       const current = saves.find((checkSave) => checkSave.name === ability);
-      current.mod += bonuses[ability];
+      current.mod.flat += bonuses[ability];
       current.bonusBreakdown = current.bonusBreakdown.concat(bonusBreakdown);
     });
 

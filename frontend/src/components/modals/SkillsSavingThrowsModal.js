@@ -2,14 +2,15 @@
 
 import { Fragment, useState } from "react";
 import GenericModal from "./GenericModal";
-import "../../styling/components/modals/SavingThrowsModal.css";
+import "../../styling/components/modals/SkillsSavingThrowsModal.css";
 
-const SavingThrowsModal = ({ character, closeModal }) => {
-  const [saves] = useState(character.getSaves());
+const SkillsSavingThrowsModal = ({ character, closeModal, isSkills }) => {
+  const [data] = useState(
+    isSkills ? character.getSkills() : character.getSaves()
+  );
 
   const saveAndClose = () => {
     // TODO: Add functionality for custom bonuses, potentially also add ability to change feature choice bonuses from this window
-    // character.setSavingThrows(saves);
     closeModal();
   };
 
@@ -17,11 +18,12 @@ const SavingThrowsModal = ({ character, closeModal }) => {
 
   const tableCols = (
     <colgroup>
-      {saves[0].profBreakdown.map((entry, i) => (
+      {data[0].profBreakdown.map((_, i) => (
         <col key={i}></col>
       ))}
+      {isSkills ? <col></col> : null}
       <col></col>
-      {saves[0].bonusBreakdown.map((entry, i) => (
+      {data[0].bonusBreakdown.map((_, i) => (
         <Fragment key={i}>
           {i === 0 ? (
             <col></col>
@@ -41,11 +43,17 @@ const SavingThrowsModal = ({ character, closeModal }) => {
   const tableHead = (
     <thead>
       <tr>
-        {saves[0].profBreakdown.map((entry, i) => (
-          <th key={i}>{entry.label}</th>
+        {data[0].profBreakdown.map((entry, i) => (
+          <th
+            key={i}
+            title={entry.obtainedFrom && `From: ${entry.obtainedFrom}`}
+          >
+            {entry.label}
+          </th>
         ))}
+        {isSkills ? <th>Skill</th> : null}
         <th>Ability</th>
-        {saves[0].bonusBreakdown.map((entry, i) => (
+        {data[0].bonusBreakdown.map((entry, i) => (
           <Fragment key={i}>
             {i === 0 ? (
               <th>Ability Modifier</th>
@@ -67,35 +75,49 @@ const SavingThrowsModal = ({ character, closeModal }) => {
 
   const tableBody = (
     <tbody>
-      {saves.map((save, i) => (
-        <tr key={save.name}>
-          {save.profBreakdown.map((entry, j) => (
+      {data.map((skillOrSave, i) => (
+        <tr key={skillOrSave.name}>
+          {skillOrSave.profBreakdown.map((profEntry, j) => (
             <td key={j}>
-              {entry.saves.includes(save.name) ? (
+              {profEntry.prof === 0 ? (
+                <span className="not-proficient" title="Unproficient"></span>
+              ) : profEntry.prof === 1 ? (
                 <span className="proficient" title="Proficient"></span>
               ) : (
-                <span className="not-proficient" title="Unproficient"></span>
+                <span className="expert" title="Expert"></span>
               )}
             </td>
           ))}
-          <td>{save.name}</td>
-          {save.bonusBreakdown.map((entry, j) => (
+          <td>{skillOrSave.name}</td>
+          {isSkills ? <td>{skillOrSave.ability}</td> : null}
+          {skillOrSave.bonusBreakdown.map((bonusEntry, j) => (
             <Fragment key={j}>
               {j === 0 ? (
                 <td>
-                  {entry.val >= 0 ? "+" : ""}
-                  {entry.val}
+                  {bonusEntry.val.flat >= 0 ? "+" : ""}
+                  {bonusEntry.val.flat}
+                  {bonusEntry.val.dice.map(
+                    (die) => ` + ${die.number}d${die.sides}`
+                  )}
                 </td>
               ) : (
                 <>
-                  <td>{entry.val >= 0 ? "+" : "-"}</td>
-                  <td>{Math.abs(entry.val)}</td>
+                  <td>{bonusEntry.val.flat >= 0 ? "+" : "-"}</td>
+                  <td>
+                    {Math.abs(bonusEntry.val.flat)}
+                    {bonusEntry.val.dice.map(
+                      (die) => ` + ${die.number}d${die.sides}`
+                    )}
+                  </td>
                 </>
               )}
             </Fragment>
           ))}
           <td>=</td>
-          <td>{(save.mod >= 0 ? "+" : "") + save.mod}</td>
+          <td>
+            {(skillOrSave.mod.flat >= 0 ? "+" : "") + skillOrSave.mod.flat}
+            {skillOrSave.mod.dice.map((die) => ` + ${die.number}d${die.sides}`)}
+          </td>
         </tr>
       ))}
     </tbody>
@@ -119,9 +141,9 @@ const SavingThrowsModal = ({ character, closeModal }) => {
       header={header}
       body={body}
       footer={footer}
-      category={"saving-throws"}
+      category={"skills-saving-throws"}
     />
   );
 };
 
-export default SavingThrowsModal;
+export default SkillsSavingThrowsModal;
