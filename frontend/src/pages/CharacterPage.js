@@ -63,6 +63,8 @@ const CharacterPage = () => {
     if (modal) {
       setCurrentModal(modal);
     }
+
+    console.log(event.target.dataset.modal);
   };
 
   const closeModal = () => {
@@ -360,7 +362,12 @@ const CharacterPage = () => {
       </ul>
       <div>
         <TabContentComp id={"main"} activeTab={activeTab}>
-          <CharacterMainTab character={character} />
+          <CharacterMainTab
+            character={character}
+            openModal={openModal}
+            closeModal={closeModal}
+            currentModal={currentModal}
+          />
         </TabContentComp>
         <TabContentComp id={"background"} activeTab={activeTab}>
           <CharacterBackgroundTab character={character} />

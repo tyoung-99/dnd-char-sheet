@@ -1,28 +1,17 @@
 // Character's ability scores, saves, skills, other proficiencies, languages, and speeds
 
-import { useState } from "react";
 import AbilityScoresModal from "./modals/AbilityScoresModal";
 import SkillsSavingThrowsModal from "./modals/SkillsSavingThrowsModal";
 import GenericBreakdownModal from "./modals/GenericBreakdownModal";
 import SpeedModal from "./modals/SpeedModal";
 import "../styling/components/CharacterStatsComp.css";
 
-const CharacterStatsComp = ({ character }) => {
-  const [currentModal, setCurrentModal] = useState("");
-
-  const openModal = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    const modal = event.target.dataset.modal;
-    if (modal) {
-      setCurrentModal(modal);
-    }
-  };
-
-  const closeModal = () => {
-    setCurrentModal("");
-  };
-
+const CharacterStatsComp = ({
+  character,
+  openModal,
+  closeModal,
+  currentModal,
+}) => {
   const abilities = character.getAbilities().map((ability) => (
     <p key={ability.name}>
       {ability.name}: {ability.score} (
