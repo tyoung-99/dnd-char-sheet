@@ -1,55 +1,47 @@
 // Character's weapons/attacks, ammo/consumables
+
+import ItemModal from "./modals/ItemModal";
 import "../styling/components/CharacterQuickItemsComp.css";
 
-const CharacterQuickItemsComp = ({ character }) => {
+const CharacterQuickItemsComp = ({
+  character,
+  openModal,
+  closeModal,
+  currentModal,
+}) => {
   const handleWeapons = (weapons) => {
     weapons = weapons.sort((first, second) =>
       first.name > second.name ? 1 : first.name === second.name ? 0 : -1
     );
     weapons = weapons.map((item, i) => {
-      const [attackMod, damage] = character.getAttack(item);
-
-      let attackModStr = `${attackMod.flat >= 0 ? "+" : ""}${attackMod.flat}`;
-      if (attackMod.dice.length > 0) {
-        const attackDice = attackMod.dice.map(
-          (die) => ` + ${die.number}d${die.sides}`
-        );
-        attackModStr = attackModStr.concat(attackDice.join(""));
-      }
+      const [[attackMod], [damage]] = character.getAttack(item);
 
       return (
         <div key={i} className="row-flex">
-          <div className="col-1_3">
+          <div
+            className="col-1_3 clickable"
+            onClick={(e) => openModal(e, `quickWeapon${i}`)}
+          >
             <p className="weapon">{item.name}</p>
             <p className="weapon-properties">
               {item.properties.join(", ") || ""}
             </p>
           </div>
-          <p className="col-1_6">{attackModStr}</p>
-          <p className="col-1_3">
-            {damage.map((group, j) => {
-              let damageMod;
-              if (group.flat > 0) {
-                damageMod = ` + ${group.flat}`;
-              } else if (!group.flat || group.flat === 0) {
-                damageMod = "";
-              } else {
-                damageMod = ` - ${Math.abs(group.flat)}`; // Uses absolute value so there's space between minus and number
-              }
-
-              let groupDice = group.dice.map(
-                (die, k) =>
-                  `${die.number}d${die.sides}${
-                    k === group.dice.length - 1 ? "" : " + "
-                  }`
-              );
-              return `${groupDice}${damageMod} ${group.type}${
-                j === damage.length - 1 ? "" : " + "
-              }`;
-            })}
-          </p>
+          {currentModal === `quickWeapon${i}` && (
+            <ItemModal
+              character={character}
+              closeModal={closeModal}
+              item={item}
+            />
+          )}
+          <p className="col-1_6">+{attackMod}</p>
+          <p className="col-1_3">{damage}</p>
           <p className="col-1_6">
-            {item.damage.activated ? (item.activated ? "Yes" : "No") : "-"}
+            {typeof item.activated === "boolean"
+              ? item.activated
+                ? "Yes"
+                : "No"
+              : "-"}
           </p>
         </div>
       );
@@ -61,11 +53,12 @@ const CharacterQuickItemsComp = ({ character }) => {
   const handleConsumables = (consumables) => {
     let itemizedConsumables = {};
 
+    // 1st subtype takes priority for sorting
     consumables.forEach((item) => {
-      if (!(item.subtype in itemizedConsumables)) {
-        itemizedConsumables[item.subtype] = [];
+      if (!(item.subtypes[0] in itemizedConsumables)) {
+        itemizedConsumables[item.subtypes[0]] = [];
       }
-      itemizedConsumables[item.subtype].push(item);
+      itemizedConsumables[item.subtypes[0]].push(item);
     });
 
     // Alphabetize categories & items w/in categories
@@ -94,7 +87,19 @@ const CharacterQuickItemsComp = ({ character }) => {
 
           return (
             <div key={i} className="row-flex">
-              <p className={`col-1_2${position}`}>{item.name}</p>
+              <p
+                className={`col-1_2${position} clickable`}
+                onClick={(e) => openModal(e, `quickConsumable${subtype}${i}`)}
+              >
+                {item.name}
+              </p>
+              {currentModal === `quickConsumable${subtype}${i}` && (
+                <ItemModal
+                  character={character}
+                  closeModal={closeModal}
+                  item={item}
+                />
+              )}
               <p className={`col-1_2${position}`}>{item.count}</p>
             </div>
           );

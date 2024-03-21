@@ -664,6 +664,7 @@ class Character {
     let profsList = [];
 
     // TODO: Update w/ getEffects() after putting weapon prof feature in  (don't forget to check feats)
+    profsList = this.weaponProfs.map((prof) => prof.name);
 
     profsList = [...new Set(profsList)];
     return profsList;
@@ -680,6 +681,7 @@ class Character {
     let profsList = [];
 
     // TODO: Update w/ getEffects() after putting armor prof feature in  (don't forget to check feats)
+    profsList = this.armorProfs.map((prof) => prof.name);
 
     profsList = [...new Set(profsList)];
     return profsList;
@@ -699,6 +701,7 @@ class Character {
     let profsList = [];
 
     // TODO: Update w/ getEffects() after putting tool prof feature in  (don't forget to check feats)
+    profsList = this.toolProfs.map((prof) => prof.name);
 
     return [...new Set(profsList)];
   }
@@ -1043,15 +1046,38 @@ class Character {
 
   #getAttackMod(item) {
     // TODO: Update w/ getEffects() after putting attack mod features in (don't forget to check feats)
+    const breakdown = [];
 
     const strMod = this.getAbilityMod("STR");
     const dexMod = this.getAbilityMod("DEX");
-    const abilityMod =
+
+    let abilityMod;
+    if (
       item.subtypes.includes("Ranged") ||
       (item.properties.includes("Finesse") && dexMod > strMod)
-        ? dexMod
-        : strMod;
-    const profMod = this.isProficientWithItem(item) ? this.getProfBonus() : 0;
+    ) {
+      abilityMod = dexMod;
+      breakdown.push({ val: { flat: dexMod, dice: [] }, label: "DEX" });
+    } else {
+      abilityMod = strMod;
+      breakdown.push({ val: { flat: strMod, dice: [] }, label: "STR" });
+    }
+
+    let profMod = 0;
+    if (this.isProficientWithItem(item)) {
+      profMod = this.getProfBonus();
+      breakdown.push({
+        val: { flat: profMod, dice: [] },
+        label: "Proficiency",
+      });
+    }
+
+    if (item.attackBonus) {
+      breakdown.push({
+        val: { flat: item.attackBonus, dice: [] },
+        label: "Weapon",
+      });
+    }
 
     const attackMod = {
       flat: abilityMod + profMod + (item.attackBonus || 0),
@@ -1069,8 +1095,14 @@ class Character {
           flatAttackBonus += effect.changes.flat || 0;
 
           if (effect.changes.dice) {
-            this.#addDiceToArr(attackDice, [effect.changes.dice]);
+            this.#addDiceToArr(attackDice, effect.changes.dice);
           }
+
+          breakdown.push({
+            val: { flat: effect.changes.flat, dice: effect.changes.dice },
+            label: bonus.displayName || bonus.name,
+            obtainedFrom: bonus.race || bonus.class || bonus.background,
+          });
         }
       });
     });
@@ -1079,24 +1111,64 @@ class Character {
       (first, second) => second.sides - first.sides
     );
 
-    return attackMod;
+    return [this.#modifiersToString(attackMod), breakdown];
   }
 
   #getAttackDamage(item) {
     // TODO: Update w/ getEffects() after putting attack damage features in (don't forget to check feats)
+    const breakdown = [];
 
     const strMod = this.getAbilityMod("STR");
     const dexMod = this.getAbilityMod("DEX");
-    const abilityMod =
+
+    let abilityMod;
+    if (
       item.subtypes.includes("Ranged") ||
       (item.properties.includes("Finesse") && dexMod > strMod)
-        ? dexMod
-        : strMod;
+    ) {
+      abilityMod = dexMod;
+      breakdown.push({
+        val: { flat: dexMod, dice: [] },
+        label: "DEX",
+        type: item.damage.base[0].type,
+      });
+    } else {
+      abilityMod = strMod;
+      breakdown.push({
+        val: { flat: strMod, dice: [] },
+        label: "STR",
+        type: item.damage.base[0].type,
+      });
+    }
 
     let damage = JSON.parse(JSON.stringify(item.damage.base));
+
+    breakdown.unshift({
+      val: { flat: damage[0].flat, dice: damage[0].dice },
+      label: "Weapon",
+      type: damage[0].type,
+    });
+
+    damage.forEach((passiveDamage, i) => {
+      if (i === 0) return;
+      breakdown.push({
+        val: { flat: passiveDamage.flat, dice: passiveDamage.dice },
+        label: "Weapon",
+        type: passiveDamage.type,
+      });
+    });
+
     damage[0].flat = abilityMod + (damage[0].flat || 0);
+
     if (item.activated) {
       damage = damage.concat(item.damage.activated);
+      item.damage.activated.forEach((activeDamage) => {
+        breakdown.push({
+          val: { flat: activeDamage.flat, dice: activeDamage.dice },
+          label: "Weapon - Activated",
+          type: activeDamage.type,
+        });
+      });
     }
 
     const category = "DamageMod";
@@ -1123,11 +1195,23 @@ class Character {
           if (effect.changes.dice) {
             this.#addDiceToArr(damage[index].dice, effect.changes.dice);
           }
+
+          breakdown.push({
+            val: { flat: effect.changes.flat, dice: effect.changes.dice },
+            label: bonus.displayName || bonus.name,
+            obtainedFrom: bonus.race || bonus.class || bonus.background,
+            type: effect.changes.type,
+          });
         }
       });
     });
 
-    return damage;
+    damage = damage.reduce((totalString, damageType, i) => {
+      if (i > 0) totalString += " + ";
+      return totalString + this.#modifiersToString(damageType);
+    }, "");
+
+    return [damage, breakdown];
   }
 
   getItems() {
@@ -1659,6 +1743,30 @@ class Character {
         diceArr[index].number += die.number;
       }
     });
+  }
+
+  #modifiersToString({ flat, dice, type }) {
+    let modStr = dice.reduce((totalStr, current, i) => {
+      if (i > 0) {
+        totalStr += " + ";
+      }
+      return totalStr + `${current.number}d${current.sides}`;
+    }, "");
+
+    if (flat) {
+      if (flat >= 0) {
+        modStr += " + ";
+      } else {
+        modStr += " - ";
+      }
+      modStr += Math.abs(flat);
+    }
+
+    if (type) {
+      modStr += ` (${type})`;
+    }
+
+    return modStr;
   }
 }
 
