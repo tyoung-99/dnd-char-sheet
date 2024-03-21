@@ -56,15 +56,10 @@ const CharacterPage = () => {
     loadData();
   }, [characterID]);
 
-  const openModal = (event) => {
+  const openModal = (event, modalName) => {
     event.preventDefault();
     event.stopPropagation();
-    const modal = event.target.dataset.modal;
-    if (modal) {
-      setCurrentModal(modal);
-    }
-
-    console.log(event.target.dataset.modal);
+    setCurrentModal(modalName);
   };
 
   const closeModal = () => {
@@ -193,7 +188,7 @@ const CharacterPage = () => {
             contents={alignmentList}
             onSelect={(newAlignment) => character.setAlignment(newAlignment)}
           ></MultiColumnDropdownComp>
-          <p className="race clickable" data-modal="race" onClick={openModal}>
+          <p className="race clickable" onClick={(e) => openModal(e, "race")}>
             {character.ref_subraceName}
           </p>
           {currentModal === "race" && (
@@ -208,7 +203,7 @@ const CharacterPage = () => {
       </div>
       <div className="combat-header">
         <div>
-          <p className="clickable" data-modal="armorClass" onClick={openModal}>
+          <p className="clickable" onClick={(e) => openModal(e, "armorClass")}>
             AC: {armorClassVal}
           </p>
           {currentModal === "armorClass" && (
@@ -219,7 +214,7 @@ const CharacterPage = () => {
               total={armorClassVal}
             />
           )}
-          <p className="clickable" data-modal="initiative" onClick={openModal}>
+          <p className="clickable" onClick={(e) => openModal(e, "initiative")}>
             Initiative: {(initiativeVal >= 0 ? "+" : "") + initiativeVal}
           </p>
           {currentModal === "initiative" && (
@@ -235,8 +230,7 @@ const CharacterPage = () => {
           <div>
             <p
               className="clickable"
-              data-modal="maxHitPoints"
-              onClick={openModal}
+              onClick={(e) => openModal(e, "maxHitPoints")}
             >
               Max HP: {maxHitPoints}
             </p>
@@ -250,8 +244,7 @@ const CharacterPage = () => {
             )}
             <p
               className="clickable"
-              data-modal="currentHitPoints"
-              onClick={openModal}
+              onClick={(e) => openModal(e, "currentHitPoints")}
             >
               Current HP: {currentHitPoints}
             </p>
@@ -289,8 +282,7 @@ const CharacterPage = () => {
         <div>
           <p
             className="clickable"
-            data-modal="totalHitDice"
-            onClick={openModal}
+            onClick={(e) => openModal(e, "totalHitDice")}
           >
             Total Hit Dice: {totalHitDice}
           </p>
@@ -304,8 +296,7 @@ const CharacterPage = () => {
           )}
           <p
             className="clickable"
-            data-modal="currentHitDice"
-            onClick={openModal}
+            onClick={(e) => openModal(e, "currentHitDice")}
           >
             Current Hit Dice:{" "}
             {character

@@ -67,8 +67,7 @@ const CharacterStatsComp = ({
           <div className="grid-tile">
             <h1
               className="clickable"
-              data-modal="abilityScores"
-              onClick={openModal}
+              onClick={(e) => openModal(e, "abilityScores")}
             >
               Ability Scores
             </h1>
@@ -83,8 +82,7 @@ const CharacterStatsComp = ({
           <div className="grid-tile">
             <h1
               className="clickable"
-              data-modal="savingThrows"
-              onClick={openModal}
+              onClick={(e) => openModal(e, "savingThrows")}
             >
               Saving Throws
             </h1>
@@ -116,8 +114,7 @@ const CharacterStatsComp = ({
           <div className="grid-tile">
             <h1
               className="clickable"
-              data-modal="passivePerception"
-              onClick={openModal}
+              onClick={(e) => openModal(e, "passivePerception")}
             >
               Passive Perception: {passivePerception}
             </h1>
@@ -131,7 +128,7 @@ const CharacterStatsComp = ({
             )}
           </div>
           <div className="grid-tile">
-            <h1 className="clickable" data-modal="speed" onClick={openModal}>
+            <h1 className="clickable" onClick={(e) => openModal(e, "speed")}>
               Speed
             </h1>
             {currentModal === "speed" && (
@@ -150,8 +147,7 @@ const CharacterStatsComp = ({
           <div className="grid-tile col-end">
             <h1
               className="clickable"
-              data-modal="skillProficiencies"
-              onClick={openModal}
+              onClick={(e) => openModal(e, "skillProficiencies")}
             >
               Skills
             </h1>
