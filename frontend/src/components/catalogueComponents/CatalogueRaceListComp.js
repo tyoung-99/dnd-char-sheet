@@ -5,12 +5,12 @@ import EditSubraceModal from "../modals/adminModals/EditSubraceModal";
 
 // takes list and returns JSX with delete and edit buttons on every name
 const CatalogueListComp = ({
-  itemList,
+  raceList,
   handleDelete,
   selectedRace,
   setSelectedRace,
   currentModal,
-  setcurrentModal,
+  setCurrentModal,
   closeModal,
 }) => {
   const [subraces, setSubraces] = useState({});
@@ -24,12 +24,12 @@ const CatalogueListComp = ({
       }));
     };
 
-    itemList.forEach((item) => {
+    raceList.forEach((item) => {
       if (!subraces[item._id]) {
         loadSubraces(item._id);
       }
     });
-  }, [itemList, subraces]);
+  }, [raceList, subraces]);
 
   const addSubrace = async (newData) => {
     const response = await axios.post(`/api/subraces/insert`, newData);
@@ -51,9 +51,9 @@ const CatalogueListComp = ({
 
   return (
     <>
-      {itemList.map((race, i) => (
+      {raceList.map((race, i) => (
         <div key={race.name} className="catalogue-item">
-          <span onClick={() => setcurrentModal(race._id)}>{race.name}</span>
+          <span onClick={() => setCurrentModal(race._id)}>{race.name}</span>
           <button
             onClick={() => {
               setSelectedRace((prevName) =>
@@ -83,13 +83,13 @@ const CatalogueListComp = ({
             <div className="sub-section">
               <button
                 className="admin-create"
-                onClick={() => setcurrentModal("createSubrace")}
+                onClick={() => setCurrentModal("createSubrace")}
               >
                 +
               </button>
               {subraces[race._id].map((subrace, index) => (
                 <div key={index} className="sub-item">
-                  <span onClick={() => setcurrentModal(subrace._id)}>
+                  <span onClick={() => setCurrentModal(subrace._id)}>
                     {subrace.name}
                   </span>
                   <button

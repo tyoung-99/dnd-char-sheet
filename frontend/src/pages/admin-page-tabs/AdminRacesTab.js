@@ -73,12 +73,12 @@ const AdminRacesTab = () => {
       </div>
       <div className="row-flex wrap">
         <CatalogueRaceListComp
-          itemList={raceList}
+          raceList={raceList}
           handleDelete={deleteRace}
           selectedRace={selectedRace}
           setSelectedRace={setSelectedRace}
           currentModal={currentModal}
-          setcurrentModal={setCurrentModal}
+          setCurrentModal={setCurrentModal}
           closeModal={closeModal}
         />
       </div>
@@ -88,9 +88,11 @@ const AdminRacesTab = () => {
       </div>
       <div className="row-flex wrap">
         <CatalogueRacialFeaturesComp
-          itemList={racialFeatures}
+          racialFeatures={racialFeatures}
           handleDelete={deleteRaceFeature}
-          selectedModal={setCurrentModal}
+          currentModal={currentModal}
+          setCurrentModal={setCurrentModal}
+          closeModal={closeModal}
         />
       </div>
     </>

@@ -64,7 +64,9 @@
 }
 
 .display-name-box {
-  width: 35rem;
+  padding-top: 1rem;
+  padding-left: 1rem;
+  width: 20rem;
   font-style: normal;
   font-size: 1rem;
   font-family: inherit;
@@ -75,6 +77,11 @@
   overflow-y: auto;
   border: 1px solid #ccc;
   padding: 5px;
+}
+
+.list-with-columns {
+  column-count: 2;
+  column-gap: 1rem;
 }
 
 .search-bar {
@@ -99,6 +106,10 @@
   margin-right: 0.5rem;
 }
 
+.added-feature:hover {
+  text-decoration: line-through;
+}
+
 .delete-button {
   background: #c0392b;
   color: white;
@@ -115,4 +126,8 @@
 .delete-button:hover {
   transform: scale(1.02);
   background: #c41e0c;
+}
+
+.admin-center {
+  justify-content: center;
 }

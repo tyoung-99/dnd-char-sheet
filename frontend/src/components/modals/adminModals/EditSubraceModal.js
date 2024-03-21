@@ -119,8 +119,8 @@ const EditSubraceModal = ({ race, closeModal, parentRace, addSubrace }) => {
           {name}
         </div>
       </div>
-      <h2>Display Name:</h2>
       <div className="row-flex">
+        <h2>Display Name:</h2>
         <div
           className="display-name-box"
           contentEditable="true"

@@ -1,17 +1,26 @@
+import EditRaceFeatureModal from "../modals/adminModals/EditRaceFeatureModal";
 // takes list and returns JSX with delete and edit buttons on every name
 const CatalogueRacialFeaturesComp = ({
-  itemList,
+  racialFeatures,
   handleDelete,
-  selectedModal,
-  setSelectedModal,
+  currentModal,
+  setCurrentModal,
+  closeModal,
 }) => {
   return (
     <>
-      {itemList.map((item, i) => (
-        <div key={item.name} className="catalogue-item">
-          <span onClick={() => setSelectedModal(item._id)}>{item.name}</span>
-          <button onClick={() => handleDelete(item._id)}>Delete</button>
-          {/* {selectedModal === item._id && <EditRaceModal race={item.name} />} */}
+      {racialFeatures.map((racFeat, i) => (
+        <div key={racFeat.name} className="catalogue-item">
+          <span onClick={() => setCurrentModal(racFeat._id)}>
+            {racFeat.name}
+          </span>
+          <button onClick={() => handleDelete(racFeat._id)}>Delete</button>
+          {currentModal === racFeat._id && (
+            <EditRaceFeatureModal
+              racialFeature={racFeat}
+              closeModal={closeModal}
+            />
+          )}
         </div>
       ))}
     </>
