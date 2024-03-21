@@ -370,7 +370,12 @@ const CharacterPage = () => {
           <CharacterBuffsTab character={character} />
         </TabContentComp>
         <TabContentComp id={"equipment"} activeTab={activeTab}>
-          <CharacterEquipmentTab character={character} />
+          <CharacterEquipmentTab
+            character={character}
+            openModal={openModal}
+            closeModal={closeModal}
+            currentModal={currentModal}
+          />
         </TabContentComp>
         <TabContentComp id={"spellcasting"} activeTab={activeTab}>
           <CharacterSpellcastingTab character={character} />

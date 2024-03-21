@@ -35,14 +35,33 @@ const CharacterQuickItemsComp = ({
             />
           )}
           <p className="col-1_6">+{attackMod}</p>
-          <p className="col-1_3">{damage}</p>
-          <p className="col-1_6">
-            {typeof item.activated === "boolean"
-              ? item.activated
-                ? "Yes"
-                : "No"
-              : "-"}
-          </p>
+          <p className="col-1_4">{damage}</p>
+          <span className="col-1_4 toggles">
+            {typeof item.toggles.Activated === "boolean" && (
+              <span>
+                <label htmlFor={"activated"}>Activated: </label>
+                <button
+                  id={"activated"}
+                  name={"activated"}
+                  onClick={() => character.toggleItemActive(item)}
+                >
+                  {item.toggles.Activated ? "Yes" : "No"}
+                </button>
+              </span>
+            )}
+            {typeof item.toggles["Two Handed"] === "boolean" && (
+              <span>
+                <label htmlFor={"twoHanded"}>Two Handed: </label>
+                <button
+                  id={"twoHanded"}
+                  name={"twoHanded"}
+                  onClick={() => character.toggleItemTwoHanded(item)}
+                >
+                  {item.toggles["Two Handed"] ? "Yes" : "No"}
+                </button>
+              </span>
+            )}
+          </span>
         </div>
       );
     });
@@ -112,10 +131,10 @@ const CharacterQuickItemsComp = ({
 
   let weapons = character
     .getItemsByType("Weapon")
-    .filter((item) => item.equipped);
+    .filter((item) => item.toggles.Equipped);
   let consumables = character
     .getItemsByType("Consumable")
-    .filter((item) => item.equipped);
+    .filter((item) => item.toggles.Equipped);
 
   weapons = handleWeapons(weapons);
   consumables = handleConsumables(consumables);
@@ -130,8 +149,8 @@ const CharacterQuickItemsComp = ({
               <div className="row-flex">
                 <h2 className="col-1_3">Name</h2>
                 <h2 className="col-1_6">Attack</h2>
-                <h2 className="col-1_3">Damage</h2>
-                <h2 className="col-1_6">Activated</h2>
+                <h2 className="col-1_4">Damage</h2>
+                <h2 className="col-1_4">Toggles</h2>
               </div>
               {weapons.length === 0 ? (
                 <p>-Equip a weapon to display it here-</p>

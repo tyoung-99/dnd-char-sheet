@@ -1,3 +1,17 @@
 .item-modal-container .item-header h1 {
   font-size: 1.5rem;
 }
+
+.item-modal-container .item-body {
+  display: flex;
+  flex-direction: column;
+}
+.item-modal-container .item-body p,
+.item-modal-container .item-body label,
+.item-modal-container .item-body input,
+.item-modal-container .item-body button {
+  margin: 0.5rem 0;
+}
+.item-modal-container .item-body input[type="number"] {
+  width: 3rem;
+}

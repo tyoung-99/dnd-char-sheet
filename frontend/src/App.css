@@ -24,6 +24,9 @@
 .text-center {
   text-align: center;
 }
+.text-right {
+  text-align: right;
+}
 
 .height-1 {
   height: 1lh;

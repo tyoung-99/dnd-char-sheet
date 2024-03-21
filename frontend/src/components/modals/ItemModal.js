@@ -1,10 +1,19 @@
 // Modal to view/edit item details
 
+import { useState } from "react";
 import GenericModal from "./GenericModal";
 import "../../styling/components/modals/ItemModal.css";
 
 const ItemModal = ({ character, closeModal, item }) => {
   console.log(item);
+
+  const [itemCount, setItemCount] = useState(item.count);
+  const [toggles, setToggles] = useState(structuredClone(item.toggles));
+
+  const saveAndClose = () => {
+    character.updateItem(item, itemCount, toggles);
+    closeModal();
+  };
 
   const combineBreakdown = (breakdown) => {
     return breakdown.map((entry, i) => {
@@ -56,8 +65,53 @@ const ItemModal = ({ character, closeModal, item }) => {
         Type: {item.type}
         {item.subtypes ? ` (${item.subtypes.join(", ")})` : ""}
       </p>
-      <p>Amount: {item.count}</p>
-      <p>Equipped: {item.equipped ? "Yes" : "No"}</p>
+      <span>
+        <label htmlFor="itemCount">Amount: </label>
+        <input
+          type="number"
+          id="itemCount"
+          name="itemCount"
+          value={itemCount}
+          min={0}
+          onChange={(e) => setItemCount(e.target.value)}
+        ></input>
+      </span>
+      {typeof toggles.Equipped === "boolean" && (
+        <span>
+          <label htmlFor={"equipped"}>Equipped: </label>
+          <button
+            id={"equipped"}
+            name={"equipped"}
+            onClick={() =>
+              setToggles((oldToggles) => {
+                const newToggles = { ...oldToggles };
+                newToggles.Equipped = !newToggles.Equipped;
+                return newToggles;
+              })
+            }
+          >
+            {toggles.Equipped ? "Yes" : "No"}
+          </button>
+        </span>
+      )}
+      {typeof toggles.Attuned === "boolean" && (
+        <span>
+          <label htmlFor={"attuned"}>Attuned: </label>
+          <button
+            id={"attuned"}
+            name={"attuned"}
+            onClick={() =>
+              setToggles((oldToggles) => {
+                const newToggles = { ...oldToggles };
+                newToggles.Attuned = !newToggles.Attuned;
+                return newToggles;
+              })
+            }
+          >
+            {toggles.Attuned ? "Yes" : "No"}
+          </button>
+        </span>
+      )}
       {!item.profRequired ? null : (
         <p>Requires proficiency in one of: {item.profRequired.join(", ")}</p>
       )}
@@ -76,8 +130,43 @@ const ItemModal = ({ character, closeModal, item }) => {
           </p>
         </>
       )}
-      {typeof item.activated !== "boolean" ? null : (
-        <p>Activated: {item.activated ? "Yes" : "No"}</p>
+      {typeof toggles["Two Handed"] === "boolean" && (
+        <span>
+          <label htmlFor={"twoHanded"}>Two Handed: </label>
+          <button
+            id={"twoHanded"}
+            name={"twoHanded"}
+            onClick={() => {
+              character.toggleItemTwoHanded(item);
+              setToggles((oldToggles) => {
+                const newToggles = { ...oldToggles };
+                newToggles["Two Handed"] = !newToggles["Two Handed"];
+                return newToggles;
+              });
+            }}
+          >
+            {toggles["Two Handed"] ? "Yes" : "No"}
+          </button>
+        </span>
+      )}
+      {typeof toggles.Activated === "boolean" && (
+        <span>
+          <label htmlFor={"activated"}>Activated: </label>
+          <button
+            id={"activated"}
+            name={"activated"}
+            onClick={() => {
+              character.toggleItemActive(item);
+              setToggles((oldToggles) => {
+                const newToggles = { ...oldToggles };
+                newToggles.Activated = !newToggles.Activated;
+                return newToggles;
+              });
+            }}
+          >
+            {toggles.Activated ? "Yes" : "No"}
+          </button>
+        </span>
       )}
     </>
   );
@@ -86,7 +175,7 @@ const ItemModal = ({ character, closeModal, item }) => {
 
   return (
     <GenericModal
-      closeModal={closeModal}
+      closeModal={saveAndClose}
       header={header}
       body={body}
       footer={footer}

@@ -266,6 +266,22 @@ class Character {
     this.saveCharacter();
   }
 
+  updateItem(item, newCount, newToggles) {
+    item.count = newCount;
+    item.toggles = newToggles;
+    this.saveCharacter();
+  }
+
+  toggleItemActive(item) {
+    item.toggles.Activated = !item.toggles.Activated;
+    this.saveCharacter();
+  }
+
+  toggleItemTwoHanded(item) {
+    item.toggles["Two Handed"] = !item.toggles["Two Handed"];
+    this.saveCharacter();
+  }
+
   getAbilities() {
     return this.abilities.values.map((ability) => {
       const [score, breakdown] = this.getAbilityScore(ability.name);
@@ -1142,6 +1158,14 @@ class Character {
     }
 
     let damage = JSON.parse(JSON.stringify(item.damage.base));
+    if (item.toggles["Two Handed"]) {
+      let newBase = item.properties
+        .find((prop) => prop.includes("Versatile"))
+        .split(/[()]+/)[1]; // Removes parentheses
+      newBase = newBase.split("d");
+      damage[0].dice[0].number = newBase[0];
+      damage[0].dice[0].sides = newBase[1];
+    }
 
     breakdown.unshift({
       val: { flat: damage[0].flat, dice: damage[0].dice },
@@ -1160,7 +1184,7 @@ class Character {
 
     damage[0].flat = abilityMod + (damage[0].flat || 0);
 
-    if (item.activated) {
+    if (item.toggles.Activated) {
       damage = damage.concat(item.damage.activated);
       item.damage.activated.forEach((activeDamage) => {
         breakdown.push({
@@ -1228,7 +1252,9 @@ class Character {
   }
 
   getEquippedItems() {
-    return this.equipment.filter((item) => item.equipped);
+    return this.equipment.filter(
+      (item) => item.toggles && item.toggles.Equipped
+    );
   }
 
   getItemsByType(type) {
@@ -1244,7 +1270,10 @@ class Character {
       return (
         item.effects &&
         item.effects.some(
-          (effect) => effect.category === category && item.equipped
+          (effect) =>
+            effect.category === category &&
+            item.toggles &&
+            item.toggles.Equipped
         )
       );
     });

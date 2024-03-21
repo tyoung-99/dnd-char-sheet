@@ -1,7 +1,15 @@
 // Character's inventory/equipment
+
+import { Fragment } from "react";
+import ItemModal from "../../components/modals/ItemModal";
 import "../../styling/pages/page-tabs/CharacterEquipmentTab.css";
 
-const CharacterEquipmentTab = ({ character }) => {
+const CharacterEquipmentTab = ({
+  character,
+  openModal,
+  closeModal,
+  currentModal,
+}) => {
   let itemizedInventory = character.getItems();
   let treasure = character.getTreasure();
 
@@ -23,10 +31,24 @@ const CharacterEquipmentTab = ({ character }) => {
 
   for (let type in itemizedInventory) {
     itemizedInventory[type] = itemizedInventory[type].map((item, i) => (
-      <div key={i} className="row-flex">
-        <div className="col-1_2">{item.name}</div>
-        <div className="col-1_2 text-center">{item.count}</div>
-      </div>
+      <Fragment key={i}>
+        <div className="row-flex">
+          <div
+            className="col-1_2 clickable"
+            onClick={(e) => openModal(e, `item${type}${i}`)}
+          >
+            {item.name}
+          </div>
+          <div className="col-1_2 text-center">{item.count}</div>
+        </div>
+        {currentModal === `item${type}${i}` && (
+          <ItemModal
+            character={character}
+            closeModal={closeModal}
+            item={item}
+          />
+        )}
+      </Fragment>
     ));
   }
   treasure = treasure.map((item, i) => {
