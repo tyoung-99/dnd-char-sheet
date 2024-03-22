@@ -49,15 +49,15 @@ const CharacterQuickItemsComp = ({
                 </button>
               </span>
             )}
-            {typeof item.toggles["Two Handed"] === "boolean" && (
+            {typeof item.toggles["Two-Handed"] === "boolean" && (
               <span>
-                <label htmlFor={"twoHanded"}>Two Handed: </label>
+                <label htmlFor={"twoHanded"}>Two-Handed: </label>
                 <button
                   id={"twoHanded"}
                   name={"twoHanded"}
                   onClick={() => character.toggleItemTwoHanded(item)}
                 >
-                  {item.toggles["Two Handed"] ? "Yes" : "No"}
+                  {item.toggles["Two-Handed"] ? "Yes" : "No"}
                 </button>
               </span>
             )}

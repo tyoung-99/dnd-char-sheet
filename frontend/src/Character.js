@@ -278,7 +278,7 @@ class Character {
   }
 
   toggleItemTwoHanded(item) {
-    item.toggles["Two Handed"] = !item.toggles["Two Handed"];
+    item.toggles["Two-Handed"] = !item.toggles["Two-Handed"];
     this.saveCharacter();
   }
 
@@ -1158,7 +1158,7 @@ class Character {
     }
 
     let damage = JSON.parse(JSON.stringify(item.damage.base));
-    if (item.toggles["Two Handed"]) {
+    if (item.toggles["Two-Handed"]) {
       let newBase = item.properties
         .find((prop) => prop.includes("Versatile"))
         .split(/[()]+/)[1]; // Removes parentheses
