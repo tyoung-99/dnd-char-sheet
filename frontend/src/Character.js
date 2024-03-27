@@ -145,46 +145,47 @@ class Character {
     this.ref_subrace = ref_subrace;
   }
 
-  async saveCharacter() {
-    const response = await axios.put(`/api/characters/${this.id}/update`, {
-      newChar: this,
+  async saveCharacter(newChar) {
+    const response = await axios.put(`/api/characters/${newChar.id}/update`, {
+      newChar: newChar,
     });
-    if (response.data.success) this.setShowingSavedMessage(true);
+    if (response.data.success) newChar.setShowingSavedMessage(true);
     else window.alert(response.data.reason);
   }
 
   setName(newName) {
     this.name = newName;
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   setAvatar(newFileId) {
     this.avatarId = newFileId;
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   setAlignment(newAlignment) {
     this.alignment = newAlignment;
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   setXp(newXp) {
     this.xp.amount = newXp;
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   setInspiration(newInspiration) {
     this.inspiration = newInspiration;
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   setDeathSaves(successCount, failCount) {
     this.deathSaves.successes = successCount;
     this.deathSaves.failures = failCount;
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   async setRace(newRace, newSubrace, newFeatureChoices) {
+    console.log(newRace);
     this.race.raceId = newRace.id;
     this.race.subraceId = newSubrace.id;
     this.featureChoices = newFeatureChoices;
@@ -202,17 +203,17 @@ class Character {
       this.featureChoices
     );
 
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   spendHitDie(sides) {
     this.usedHitDice.find((checkDice) => checkDice.sides === sides).number += 1;
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   restoreHitDie(sides) {
     this.usedHitDice.find((checkDice) => checkDice.sides === sides).number -= 1;
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   dealDamage(amount) {
@@ -226,7 +227,7 @@ class Character {
     } else {
       this.hitPoints.temp -= amount;
     }
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   restoreHitPoints(amount) {
@@ -236,25 +237,25 @@ class Character {
     if (totalCurrent > totalMax) {
       this.hitPoints.currentBase -= totalCurrent - totalMax;
     }
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   replaceTempHitPoints(amount) {
     if (amount < 0) amount = 0;
     this.hitPoints.temp = amount;
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   setMaxHitPointsBase(amount) {
     const change = amount - this.hitPoints.maxBase;
     this.hitPoints.maxBase += change;
     this.hitPoints.currentBase += change;
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   setPointBuy(newPointBuy) {
     this.abilities.pointBuy = newPointBuy;
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   setAbilityScores(newAbilities) {
@@ -263,23 +264,33 @@ class Character {
         (checkAbility) => checkAbility.name === ability.name
       ).score = ability.breakdown[0].val;
     });
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   updateItem(item, newCount, newToggles) {
     item.count = newCount;
     item.toggles = newToggles;
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   toggleItemActive(item) {
     item.toggles.Activated = !item.toggles.Activated;
-    this.saveCharacter();
+    this.queueSave(this);
   }
 
   toggleItemTwoHanded(item) {
     item.toggles["Two-Handed"] = !item.toggles["Two-Handed"];
-    this.saveCharacter();
+    this.queueSave(this);
+  }
+
+  setBackgroundId(newId) {
+    this.background.id = newId;
+    this.queueSave(this);
+  }
+
+  setBackgroundName(newName) {
+    this.background.displayName = newName;
+    this.queueSave(this);
   }
 
   getAbilities() {

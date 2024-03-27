@@ -3,9 +3,9 @@
 const Timer = (callback, time) => {
   let timer;
 
-  const restartTimer = () => {
+  const restartTimer = (callbackParams) => {
     clearTimeout(timer);
-    timer = setTimeout(callback, time);
+    timer = setTimeout(() => callback(callbackParams), time);
   };
 
   return restartTimer;
