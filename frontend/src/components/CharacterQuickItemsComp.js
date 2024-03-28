@@ -1,6 +1,6 @@
 // Character's weapons/attacks, ammo/consumables
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import ItemModal from "./modals/ItemModal";
 import "../styling/components/CharacterQuickItemsComp.css";
 
@@ -12,7 +12,7 @@ const CharacterQuickItemsComp = ({
   closeModal,
   currentModal,
 }) => {
-  const dataLoaded = useRef(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   const [weapons, setWeapons] = useState();
   const [consumables, setConsumables] = useState();
@@ -155,7 +155,7 @@ const CharacterQuickItemsComp = ({
       .filter((item) => item.toggles.Equipped);
     setConsumables(handleConsumables(consumables));
 
-    dataLoaded.current = true;
+    setDataLoaded(true);
   }, [
     character,
     charChangeFlag,
@@ -165,7 +165,7 @@ const CharacterQuickItemsComp = ({
     openModal,
   ]);
 
-  if (!dataLoaded.current) return;
+  if (!dataLoaded) return;
 
   return (
     <>

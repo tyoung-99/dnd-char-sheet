@@ -1,15 +1,51 @@
 // Character's background details/backstory
 
+import { useState, useEffect, useRef } from "react";
+import EditorConvertToJSON from "../../components/EditorConvertToJSON";
 import axios from "axios";
-import { useState, useEffect } from "react";
 
-const CharacterBackgroundTab = ({ character }) => {
+const CharacterBackgroundTab = ({
+  character,
+  charChangeFlag,
+  setCharChangeFlag,
+}) => {
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  const srcList = useRef();
   const [imgURLs, setImgURLs] = useState([]);
+  const [backgroundOptions, setBackgroundOptions] = useState([]);
+
+  const [background, setBackground] = useState();
+  const [appearance, setAppearance] = useState();
+  const [backstory, setBackstory] = useState();
+
+  console.log(backgroundOptions);
 
   useEffect(() => {
-    const loadImgURLs = async () => {
+    setBackground(character.background);
+    setAppearance(character.appearance);
+    setBackstory(character.backstory);
+    setDataLoaded(true);
+  }, [character, charChangeFlag]);
+
+  const replaceIdsWithData = async (background) => {
+    background.source = srcList.current.find(
+      (source) => source._id === background.source
+    );
+
+    if (background.features.length > 0) {
+      background.features = (
+        await axios.get(
+          `/api/backgroundFeatures/multiple/${background.features}`
+        )
+      ).data;
+    }
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
       const newImgURLs = [];
-      for (const id of character.appearance.pictureIds) {
+      for (const id of appearance.pictureIds) {
         try {
           const imgBlob = await axios.get(`/api/img/char/${id}`, {
             responseType: "blob",
@@ -18,62 +54,141 @@ const CharacterBackgroundTab = ({ character }) => {
         } catch (error) {}
       }
       setImgURLs(newImgURLs);
+
+      srcList.current = (await axios.get(`/api/sources`)).data;
+      const newBackgrounds = (await axios.get(`/api/backgrounds`)).data;
+      for (const background of newBackgrounds) {
+        await replaceIdsWithData(background);
+      }
+      setBackgroundOptions(newBackgrounds);
     };
 
-    loadImgURLs();
-  }, [character.appearance.pictureIds]);
+    if (dataLoaded) loadData();
+  }, [appearance, dataLoaded]);
 
-  const background = (
+  const updateBackground = (newBackground) => {
+    character.setBackground(newBackground);
+    setCharChangeFlag((old) => !old);
+  };
+
+  if (!dataLoaded) return;
+
+  const backgroundDisplay = (
     <>
-      <h1>Background: {character.background.name}</h1>
+      <h1>
+        Background:{" "}
+        <select
+          name="background"
+          id="background"
+          value={background.id || ""}
+          onChange={(event) => {
+            const newBackground = { ...background };
+            newBackground.id = event.target.value;
+            updateBackground(newBackground);
+          }}
+        >
+          <option hidden value={""}>
+            Select Background
+          </option>
+          {backgroundOptions.map((option) => (
+            <option key={option._id} value={option._id}>
+              {option.name}
+            </option>
+          ))}
+        </select>{" "}
+        <input
+          type="text"
+          id="customName"
+          name="customName"
+          value={background.displayName}
+          onChange={(event) => {
+            const newBackground = { ...background };
+            newBackground.displayName = event.target.value;
+            updateBackground(newBackground);
+          }}
+        ></input>
+        <label htmlFor="customName"> (Customized Name)</label>
+      </h1>
       <h2>Personality Traits</h2>
-      {character.background.personalityTraits.map((paragraph, i) => (
-        <p key={i}>{paragraph}</p>
-      ))}
+      <EditorConvertToJSON
+        toolbarHidden
+        wrapperClassName="wysiwyg-textbox-wrapper"
+        editorClassName="wysiwyg-textbox-editor"
+        onChange={(contentJSON) => {
+          const newBackground = { ...background };
+          newBackground.personalityTraits = contentJSON;
+          updateBackground(newBackground);
+        }}
+        defaultTextJSON={background.personalityTraits}
+      />
       <h2>Ideals</h2>
-      {character.background.ideals.map((paragraph, i) => (
-        <p key={i}>{paragraph}</p>
-      ))}
+      <EditorConvertToJSON
+        toolbarHidden
+        wrapperClassName="wysiwyg-textbox-wrapper"
+        editorClassName="wysiwyg-textbox-editor"
+        onChange={(contentJSON) => {
+          const newBackground = { ...background };
+          newBackground.ideals = contentJSON;
+          updateBackground(newBackground);
+        }}
+        defaultTextJSON={background.ideals}
+      />
       <h2>Bonds</h2>
-      {character.background.bonds.map((paragraph, i) => (
-        <p key={i}>{paragraph}</p>
-      ))}
+      <EditorConvertToJSON
+        toolbarHidden
+        wrapperClassName="wysiwyg-textbox-wrapper"
+        editorClassName="wysiwyg-textbox-editor"
+        onChange={(contentJSON) => {
+          const newBackground = { ...background };
+          newBackground.bonds = contentJSON;
+          updateBackground(newBackground);
+        }}
+        defaultTextJSON={background.bonds}
+      />
       <h2>Flaws</h2>
-      {character.background.flaws.map((paragraph, i) => (
-        <p key={i}>{paragraph}</p>
-      ))}
+      <EditorConvertToJSON
+        toolbarHidden
+        wrapperClassName="wysiwyg-textbox-wrapper"
+        editorClassName="wysiwyg-textbox-editor"
+        onChange={(contentJSON) => {
+          const newBackground = { ...background };
+          newBackground.flaws = contentJSON;
+          updateBackground(newBackground);
+        }}
+        defaultTextJSON={background.flaws}
+      />
     </>
   );
 
-  const appearance = (
+  const appearanceDisplay = (
     <>
       <h1>Appearance</h1>
       <div className="row-flex">
         <div className="col-1_3">
           <h2>Age</h2>
-          <p>{character.appearance.age}</p>
+          <p>{appearance.age}</p>
         </div>
         <div className="col-1_3">
           <h2>Height</h2>
-          <p>{character.appearance.height}</p>
+          <p>{appearance.height}</p>
         </div>
         <div className="col-1_3">
           <h2>Weight</h2>
-          <p>{character.appearance.weight}</p>
+          <p>{appearance.weight}</p>
         </div>
       </div>
       <div className="row-flex">
         <div className="col-1_3">
           <h2>Eyes</h2>
-          <p>{character.appearance.eyes}</p>
+          <p>{appearance.eyes}</p>
         </div>
         <div className="col-1_3">
           <h2>Skin</h2>
-          <p>{character.appearance.skin}</p>
+          <p>{appearance.skin}</p>
         </div>
         <div className="col-1_3">
           <h2>Hair</h2>
-          <p>{character.appearance.hair}</p>
+          <p>{appearance.hair}</p>
         </div>
       </div>
       <h2>Description</h2>
@@ -87,7 +202,7 @@ const CharacterBackgroundTab = ({ character }) => {
           ></img>
         ))}
       </div>
-      {character.appearance.desc.map((paragraph, i) => (
+      {appearance.desc.map((paragraph, i) => (
         <p key={i} className="text-block">
           {paragraph}
         </p>
@@ -95,38 +210,10 @@ const CharacterBackgroundTab = ({ character }) => {
     </>
   );
 
-  const allies = (
-    <>
-      <h1>Allies & Organizations</h1>
-      {character.allies.map((ally, i) => (
-        <div key={i} className="clear-floaters">
-          <h2>{ally.name}</h2>
-          {ally.symbols ? (
-            <div className="float-right col-flex">
-              {ally.symbols.map((sym, j) => (
-                <img
-                  key={j}
-                  src={process.env.PUBLIC_URL + `/img/char_pics/${sym}`}
-                  alt={`${ally.name}`}
-                  className="height-8 float-right"
-                ></img>
-              ))}
-            </div>
-          ) : null}
-          {ally.desc.map((paragraph, i) => (
-            <p key={i} className="text-block">
-              {paragraph}
-            </p>
-          ))}
-        </div>
-      ))}
-    </>
-  );
-
-  const backstory = (
+  const backstoryDisplay = (
     <>
       <h1>Backstory</h1>
-      {character.backstory.map((paragraph, i) => (
+      {backstory.map((paragraph, i) => (
         <p key={i} className="text-block">
           {paragraph}
         </p>
@@ -138,12 +225,11 @@ const CharacterBackgroundTab = ({ character }) => {
     <div className="grid-container row-flex">
       <div className="col-flex">
         <div className="row-flex">
-          <div className="col-1_3 grid-tile">{background}</div>
-          <div className="col-1_3 grid-tile">{appearance}</div>
-          <div className="col-1_3 grid-tile">{allies}</div>
+          <div className="col-1_2 grid-tile">{backgroundDisplay}</div>
+          <div className="col-1_2 grid-tile">{appearanceDisplay}</div>
         </div>
         <div className="row-flex">
-          <div className="col-1 grid-tile">{backstory}</div>
+          <div className="col-1 grid-tile">{backstoryDisplay}</div>
         </div>
       </div>
     </div>

@@ -182,3 +182,11 @@ p:has(> .hover-icon) {
   opacity: 0;
   transition: all 250ms linear 2s;
 }
+
+.wysiwyg-textbox-wrapper {
+  border: solid 1px black;
+}
+
+.wysiwyg-textbox-editor {
+  padding: 0 0.1rem;
+}

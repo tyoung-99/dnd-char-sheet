@@ -1,6 +1,6 @@
 // Character's ability scores, saves, skills, other proficiencies, languages, and speeds[0]
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import AbilityScoresModal from "./modals/AbilityScoresModal";
 import SkillsSavingThrowsModal from "./modals/SkillsSavingThrowsModal";
 import GenericBreakdownModal from "./modals/GenericBreakdownModal";
@@ -15,7 +15,7 @@ const CharacterStatsComp = ({
   closeModal,
   currentModal,
 }) => {
-  const dataLoaded = useRef(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   const [abilities, setAbilities] = useState();
   const [saves, setSaves] = useState();
@@ -74,10 +74,10 @@ const CharacterStatsComp = ({
     setSpeeds(character.getSpeeds());
     setPassivePerception(character.getPassivePerception());
 
-    dataLoaded.current = true;
+    setDataLoaded(true);
   }, [character, charChangeFlag]);
 
-  if (!dataLoaded.current) return;
+  if (!dataLoaded) return;
 
   return (
     <>

@@ -297,13 +297,8 @@ class Character {
     this.queueSave();
   }
 
-  setBackgroundId(newId) {
-    this.background.id = newId;
-    this.queueSave();
-  }
-
-  setBackgroundName(newName) {
-    this.background.displayName = newName;
+  setBackground(newBackground) {
+    this.background = newBackground;
     this.queueSave();
   }
 

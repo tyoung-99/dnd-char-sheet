@@ -24,7 +24,7 @@ import CurrentHitDiceModal from "../components/modals/CurrentHitDiceModal";
 import MaxHitPointsModal from "../components/modals/MaxHitPointsModal";
 
 const CharacterPage = () => {
-  const charLoaded = useRef(false);
+  const [charLoaded, setCharLoaded] = useState(false);
   const [charChangeFlag, setCharChangeFlag] = useState(true);
 
   const [activeTab, setActiveTab] = useState("main");
@@ -87,7 +87,7 @@ const CharacterPage = () => {
       .join(", ");
     setTotalHitDice([totalHitDiceVal, totalHitDiceBreakdown]);
 
-    charLoaded.current = true;
+    setCharLoaded(true);
   }, [character, charChangeFlag]);
 
   const openModal = (event, modalName) => {
@@ -128,7 +128,7 @@ const CharacterPage = () => {
     setCharChangeFlag((old) => !old);
   };
 
-  if (!charLoaded.current) {
+  if (!charLoaded) {
     return <div>Loading...</div>;
   }
 
@@ -407,7 +407,11 @@ const CharacterPage = () => {
           />
         </TabContentComp>
         <TabContentComp id={"background"} activeTab={activeTab}>
-          <CharacterBackgroundTab character={character} />
+          <CharacterBackgroundTab
+            character={character}
+            charChangeFlag={charChangeFlag}
+            setCharChangeFlag={setCharChangeFlag}
+          />
         </TabContentComp>
         <TabContentComp id={"features"} activeTab={activeTab}>
           <CharacterFeaturesTab character={character} />
