@@ -242,7 +242,6 @@ class Character {
       this.hitPoints.temp -= amount;
     }
     this.queueSave();
-    return [this.getCurrentHitPoints(), this.hitPoints.temp];
   }
 
   restoreHitPoints(amount) {
@@ -253,7 +252,6 @@ class Character {
       this.hitPoints.currentBase -= totalCurrent - totalMax;
     }
     this.queueSave();
-    return this.getCurrentHitPoints();
   }
 
   replaceTempHitPoints(amount) {

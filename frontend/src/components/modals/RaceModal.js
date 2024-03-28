@@ -9,7 +9,7 @@ import FeatureSkillProfComp from "./sub-components/FeatureSkillProfComp";
 import FeatureFeatComp from "./sub-components/FeatureFeatComp";
 import "../../styling/components/modals/RaceModal.css";
 
-const RaceModal = ({ character, closeModal }) => {
+const RaceModal = ({ character, setCharChangeFlag, closeModal }) => {
   const srcList = useRef();
   const [raceOptions, setRaceOptions] = useState();
   const [raceDropdownOptions, setRaceDropdownOptions] = useState();
@@ -480,6 +480,7 @@ const RaceModal = ({ character, closeModal }) => {
       <button
         onClick={async () => {
           await character.setRace(savedRace, savedSubrace, featureChoices);
+          setCharChangeFlag((old) => !old);
           closeModal();
         }}
       >

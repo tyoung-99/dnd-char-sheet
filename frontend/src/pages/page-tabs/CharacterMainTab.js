@@ -4,6 +4,8 @@ import CharacterQuickItemsComp from "../../components/CharacterQuickItemsComp";
 
 const CharacterMainTab = ({
   character,
+  charChangeFlag,
+  setCharChangeFlag,
   openModal,
   closeModal,
   currentModal,
@@ -13,6 +15,8 @@ const CharacterMainTab = ({
       <div className="col-1_2">
         <CharacterStatsComp
           character={character}
+          charChangeFlag={charChangeFlag}
+          setCharChangeFlag={setCharChangeFlag}
           openModal={openModal}
           closeModal={closeModal}
           currentModal={currentModal}
@@ -21,6 +25,8 @@ const CharacterMainTab = ({
       <div className="col-1_2">
         <CharacterQuickItemsComp
           character={character}
+          charChangeFlag={charChangeFlag}
+          setCharChangeFlag={setCharChangeFlag}
           openModal={openModal}
           closeModal={closeModal}
           currentModal={currentModal}

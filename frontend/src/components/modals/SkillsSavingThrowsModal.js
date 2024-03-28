@@ -4,13 +4,19 @@ import { Fragment, useState } from "react";
 import GenericModal from "./GenericModal";
 import "../../styling/components/modals/SkillsSavingThrowsModal.css";
 
-const SkillsSavingThrowsModal = ({ character, closeModal, isSkills }) => {
+const SkillsSavingThrowsModal = ({
+  character,
+  setCharChangeFlag,
+  closeModal,
+  isSkills,
+}) => {
   const [data] = useState(
     isSkills ? character.getSkills() : character.getSaves()
   );
 
   const saveAndClose = () => {
     // TODO: Add functionality for custom bonuses, potentially also add ability to change feature choice bonuses from this window
+    setCharChangeFlag((old) => !old);
     closeModal();
   };
 

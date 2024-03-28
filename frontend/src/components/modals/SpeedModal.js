@@ -3,7 +3,12 @@
 import GenericModal from "./GenericModal";
 import "../../styling/components/modals/SpeedModal.css";
 
-const SpeedModal = ({ closeModal, breakdown, total }) => {
+const SpeedModal = ({ closeModal, setCharChangeFlag, breakdown, total }) => {
+  const saveAndClose = () => {
+    setCharChangeFlag((old) => !old);
+    closeModal();
+  };
+
   const header = <h1>Speed</h1>;
 
   const formatBreakdown = (speedType) => {
@@ -27,11 +32,11 @@ const SpeedModal = ({ closeModal, breakdown, total }) => {
     return (
       <p>
         {/* Separated brackets necessary to make spans display properly */}
-        {formattedModifiers.length > 0 ? "[" : ""}
+        {formattedModifiers.length > 1 ? "[" : ""}
         {formattedModifiers.length > 0
           ? formattedModifiers
           : "0 (No Base Speed)"}
-        {formattedModifiers.length > 0 ? "]" : ""}
+        {formattedModifiers.length > 1 ? "]" : ""}
         {formattedMultipliers}
         {` = ${total[speedType]} feet`}
       </p>
@@ -53,7 +58,7 @@ const SpeedModal = ({ closeModal, breakdown, total }) => {
 
   return (
     <GenericModal
-      closeModal={closeModal}
+      closeModal={saveAndClose}
       header={header}
       body={body}
       footer={footer}

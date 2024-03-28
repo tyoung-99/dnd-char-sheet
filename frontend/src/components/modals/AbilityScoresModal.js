@@ -4,12 +4,13 @@ import { Fragment, useState } from "react";
 import GenericModal from "./GenericModal";
 import "../../styling/components/modals/AbilityScoresModal.css";
 
-const AbilityScoresModal = ({ character, closeModal }) => {
+const AbilityScoresModal = ({ character, setCharChangeFlag, closeModal }) => {
   const [abilities, setAbilities] = useState(character.getAbilities());
   const POINT_COSTS = { 8: 0, 9: 1, 10: 2, 11: 3, 12: 4, 13: 5, 14: 7, 15: 9 };
 
   const saveAndClose = () => {
     character.setAbilityScores(abilities);
+    setCharChangeFlag((old) => !old);
     closeModal();
   };
 

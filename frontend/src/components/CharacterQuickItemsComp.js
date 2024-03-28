@@ -1,143 +1,171 @@
 // Character's weapons/attacks, ammo/consumables
 
+import { useEffect, useState, useRef } from "react";
 import ItemModal from "./modals/ItemModal";
 import "../styling/components/CharacterQuickItemsComp.css";
 
 const CharacterQuickItemsComp = ({
   character,
+  charChangeFlag,
+  setCharChangeFlag,
   openModal,
   closeModal,
   currentModal,
 }) => {
-  const handleWeapons = (weapons) => {
-    weapons = weapons.sort((first, second) =>
-      first.name > second.name ? 1 : first.name === second.name ? 0 : -1
-    );
-    weapons = weapons.map((item, i) => {
-      const [[attackMod], [damage]] = character.getAttack(item);
+  const dataLoaded = useRef(false);
 
-      return (
-        <div key={i} className="row-flex">
-          <div
-            className="col-1_3 clickable"
-            onClick={(e) => openModal(e, `quickWeapon${i}`)}
-          >
-            <p className="weapon">{item.name}</p>
-            <p className="weapon-properties">
-              {item.properties.join(", ") || ""}
-            </p>
-          </div>
-          {currentModal === `quickWeapon${i}` && (
-            <ItemModal
-              character={character}
-              closeModal={closeModal}
-              item={item}
-            />
-          )}
-          <p className="col-1_6">+{attackMod}</p>
-          <p className="col-1_4">{damage}</p>
-          <span className="col-1_4 toggles">
-            {typeof item.toggles.Activated === "boolean" && (
-              <span>
-                <label htmlFor={"activated"}>Activated: </label>
-                <button
-                  id={"activated"}
-                  name={"activated"}
-                  onClick={() => character.toggleItemActive(item)}
-                >
-                  {item.toggles.Activated ? "Yes" : "No"}
-                </button>
-              </span>
-            )}
-            {typeof item.toggles["Two-Handed"] === "boolean" && (
-              <span>
-                <label htmlFor={"twoHanded"}>Two-Handed: </label>
-                <button
-                  id={"twoHanded"}
-                  name={"twoHanded"}
-                  onClick={() => character.toggleItemTwoHanded(item)}
-                >
-                  {item.toggles["Two-Handed"] ? "Yes" : "No"}
-                </button>
-              </span>
-            )}
-          </span>
-        </div>
+  const [weapons, setWeapons] = useState();
+  const [consumables, setConsumables] = useState();
+
+  useEffect(() => {
+    const handleWeapons = (weapons) => {
+      weapons = weapons.sort((first, second) =>
+        first.name > second.name ? 1 : first.name === second.name ? 0 : -1
       );
-    });
+      weapons = weapons.map((item, i) => {
+        const [[attackMod], [damage]] = character.getAttack(item);
 
-    return weapons;
-  };
-
-  const handleConsumables = (consumables) => {
-    let itemizedConsumables = {};
-
-    // 1st subtype takes priority for sorting
-    consumables.forEach((item) => {
-      if (!(item.subtypes[0] in itemizedConsumables)) {
-        itemizedConsumables[item.subtypes[0]] = [];
-      }
-      itemizedConsumables[item.subtypes[0]].push(item);
-    });
-
-    // Alphabetize categories & items w/in categories
-    itemizedConsumables = Object.keys(itemizedConsumables)
-      .sort()
-      .reduce((sorted, subtype) => {
-        sorted[subtype] = itemizedConsumables[subtype];
-        return sorted;
-      }, {});
-
-    for (let subtype in itemizedConsumables) {
-      itemizedConsumables[subtype] = itemizedConsumables[subtype].sort(
-        (first, second) =>
-          first.name > second.name ? 1 : first.name === second.name ? 0 : -1
-      );
-
-      itemizedConsumables[subtype] = itemizedConsumables[subtype].map(
-        (item, i) => {
-          let position = "";
-          if (i < itemizedConsumables[subtype].length - 1) {
-            position = position.concat(" flush-below");
-          }
-          if (i > 0) {
-            position = position.concat(" flush-above");
-          }
-
-          return (
-            <div key={i} className="row-flex">
-              <p
-                className={`col-1_2${position} clickable`}
-                onClick={(e) => openModal(e, `quickConsumable${subtype}${i}`)}
-              >
-                {item.name}
+        return (
+          <div key={i} className="row-flex">
+            <div
+              className="col-1_3 clickable"
+              onClick={(e) => openModal(e, `quickWeapon${i}`)}
+            >
+              <p className="weapon">{item.name}</p>
+              <p className="weapon-properties">
+                {item.properties.join(", ") || ""}
               </p>
-              {currentModal === `quickConsumable${subtype}${i}` && (
-                <ItemModal
-                  character={character}
-                  closeModal={closeModal}
-                  item={item}
-                />
-              )}
-              <p className={`col-1_2${position}`}>{item.count}</p>
             </div>
-          );
+            {currentModal === `quickWeapon${i}` && (
+              <ItemModal
+                character={character}
+                setCharChangeFlag={setCharChangeFlag}
+                closeModal={closeModal}
+                item={item}
+              />
+            )}
+            <p className="col-1_6">+{attackMod}</p>
+            <p className="col-1_4">{damage}</p>
+            <span className="col-1_4 toggles">
+              {typeof item.toggles.Activated === "boolean" && (
+                <span>
+                  <label htmlFor={"activated"}>Activated: </label>
+                  <button
+                    id={"activated"}
+                    name={"activated"}
+                    onClick={() => {
+                      character.toggleItemActive(item);
+                      setCharChangeFlag((old) => !old);
+                    }}
+                  >
+                    {item.toggles.Activated ? "Yes" : "No"}
+                  </button>
+                </span>
+              )}
+              {typeof item.toggles["Two-Handed"] === "boolean" && (
+                <span>
+                  <label htmlFor={"twoHanded"}>Two-Handed: </label>
+                  <button
+                    id={"twoHanded"}
+                    name={"twoHanded"}
+                    onClick={() => {
+                      character.toggleItemTwoHanded(item);
+                      setCharChangeFlag((old) => !old);
+                    }}
+                  >
+                    {item.toggles["Two-Handed"] ? "Yes" : "No"}
+                  </button>
+                </span>
+              )}
+            </span>
+          </div>
+        );
+      });
+
+      return weapons;
+    };
+
+    const handleConsumables = (consumables) => {
+      let itemizedConsumables = {};
+
+      // 1st subtype takes priority for sorting
+      consumables.forEach((item) => {
+        if (!(item.subtypes[0] in itemizedConsumables)) {
+          itemizedConsumables[item.subtypes[0]] = [];
         }
-      );
-    }
+        itemizedConsumables[item.subtypes[0]].push(item);
+      });
 
-    return itemizedConsumables;
-  };
+      // Alphabetize categories & items w/in categories
+      itemizedConsumables = Object.keys(itemizedConsumables)
+        .sort()
+        .reduce((sorted, subtype) => {
+          sorted[subtype] = itemizedConsumables[subtype];
+          return sorted;
+        }, {});
 
-  let weapons = character
-    .getItemsByType("Weapon")
-    .filter((item) => item.toggles.Equipped);
-  let consumables = character
-    .getItemsByType("Consumable")
-    .filter((item) => item.toggles.Equipped);
+      for (let subtype in itemizedConsumables) {
+        itemizedConsumables[subtype] = itemizedConsumables[subtype].sort(
+          (first, second) =>
+            first.name > second.name ? 1 : first.name === second.name ? 0 : -1
+        );
 
-  weapons = handleWeapons(weapons);
-  consumables = handleConsumables(consumables);
+        itemizedConsumables[subtype] = itemizedConsumables[subtype].map(
+          (item, i) => {
+            let position = "";
+            if (i < itemizedConsumables[subtype].length - 1) {
+              position = position.concat(" flush-below");
+            }
+            if (i > 0) {
+              position = position.concat(" flush-above");
+            }
+
+            return (
+              <div key={i} className="row-flex">
+                <p
+                  className={`col-1_2${position} clickable`}
+                  onClick={(e) => openModal(e, `quickConsumable${subtype}${i}`)}
+                >
+                  {item.name}
+                </p>
+                {currentModal === `quickConsumable${subtype}${i}` && (
+                  <ItemModal
+                    character={character}
+                    closeModal={closeModal}
+                    item={item}
+                  />
+                )}
+                <p className={`col-1_2${position}`}>{item.count}</p>
+              </div>
+            );
+          }
+        );
+      }
+
+      return itemizedConsumables;
+    };
+
+    const weapons = character
+      .getItemsByType("Weapon")
+      .filter((item) => item.toggles.Equipped);
+    setWeapons(handleWeapons(weapons));
+
+    const consumables = character
+      .getItemsByType("Consumable")
+      .filter((item) => item.toggles.Equipped);
+    setConsumables(handleConsumables(consumables));
+
+    dataLoaded.current = true;
+  }, [
+    character,
+    charChangeFlag,
+    currentModal,
+    setCharChangeFlag,
+    closeModal,
+    openModal,
+  ]);
+
+  if (!dataLoaded.current) return;
 
   return (
     <>

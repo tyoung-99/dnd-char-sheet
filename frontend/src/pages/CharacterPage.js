@@ -51,7 +51,7 @@ const CharacterPage = () => {
   const [tempHitPoints, setTempHitPoints] = useState();
 
   useEffect(() => {
-    const loadChar = async () => {
+    const loadData = async () => {
       let response = await axios.get(`/api/characters/${characterID}`);
       const newChar = await Character.create(
         response.data,
@@ -60,37 +60,34 @@ const CharacterPage = () => {
       );
 
       setCharacter(newChar);
+
+      response = await axios.get("/api/alignments");
+      setAlignmentList(response.data);
     };
 
-    loadChar();
+    loadData();
   }, [characterID]);
 
   useEffect(() => {
-    const loadData = async () => {
-      setCharName(character.name);
-      refreshAvatarImg(character);
-      setInspiration(character.inspiration);
-      setAlignment(character.alignment);
+    if (!character) return;
 
-      setArmorClass(character.getArmorClass());
-      setInitiative(character.getInitiative());
-      setMaxHitPoints(character.getMaxHitPoints());
-      setCurrentHitPoints(character.getCurrentHitPoints());
-      setTempHitPoints(character.hitPoints.temp);
-      let [totalHitDiceVal, totalHitDiceBreakdown] =
-        character.getTotalHitDice();
-      totalHitDiceVal = totalHitDiceVal
-        .map((die) => `${die.number}d${die.sides}`)
-        .join(", ");
-      setTotalHitDice([totalHitDiceVal, totalHitDiceBreakdown]);
+    setCharName(character.name);
+    refreshAvatarImg(character);
+    setInspiration(character.inspiration);
+    setAlignment(character.alignment);
 
-      const response = await axios.get("/api/alignments");
-      setAlignmentList(response.data);
+    setArmorClass(character.getArmorClass());
+    setInitiative(character.getInitiative());
+    setMaxHitPoints(character.getMaxHitPoints());
+    setCurrentHitPoints(character.getCurrentHitPoints());
+    setTempHitPoints(character.hitPoints.temp);
+    let [totalHitDiceVal, totalHitDiceBreakdown] = character.getTotalHitDice();
+    totalHitDiceVal = totalHitDiceVal
+      .map((die) => `${die.number}d${die.sides}`)
+      .join(", ");
+    setTotalHitDice([totalHitDiceVal, totalHitDiceBreakdown]);
 
-      charLoaded.current = true;
-    };
-
-    if (character) loadData();
+    charLoaded.current = true;
   }, [character, charChangeFlag]);
 
   const openModal = (event, modalName) => {
@@ -128,7 +125,7 @@ const CharacterPage = () => {
     }
 
     character.setAvatar(response.data);
-    refreshAvatarImg(character);
+    setCharChangeFlag((old) => !old);
   };
 
   if (!charLoaded.current) {
@@ -145,7 +142,7 @@ const CharacterPage = () => {
         value={inspiration ? "Yes" : "No"}
         onClick={() => {
           character.setInspiration(!inspiration);
-          setInspiration(!inspiration);
+          setCharChangeFlag((old) => !old);
         }}
       ></input>
     </div>
@@ -203,10 +200,10 @@ const CharacterPage = () => {
             onBlur={(event) => {
               if (event.target.innerText === "") {
                 character.setName("Character Name");
-                setCharName("Character Name");
+                setCharChangeFlag((old) => !old);
               } else {
                 character.setName(event.target.innerText);
-                setCharName(event.target.innerText);
+                setCharChangeFlag((old) => !old);
               }
             }}
           >
@@ -218,14 +215,18 @@ const CharacterPage = () => {
             contents={alignmentList}
             onSelect={(newAlignment) => {
               character.setAlignment(newAlignment);
-              setAlignment(newAlignment);
+              setCharChangeFlag((old) => !old);
             }}
           ></MultiColumnDropdownComp>
           <p className="race clickable" onClick={(e) => openModal(e, "race")}>
             {character.ref_subraceName}
           </p>
           {currentModal === "race" && (
-            <RaceModal character={character} closeModal={closeModal} />
+            <RaceModal
+              character={character}
+              setCharChangeFlag={setCharChangeFlag}
+              closeModal={closeModal}
+            />
           )}
           <InlineClassListComp classes={character.classes} />
         </div>
@@ -296,19 +297,18 @@ const CharacterPage = () => {
             <div>
               <NumInputComp
                 buttonText={"Heal"}
-                callback={(amount) =>
-                  setCurrentHitPoints(character.restoreHitPoints(amount))
-                } // Can't pass directly or "this" points to wrong element
+                callback={(amount) => {
+                  character.restoreHitPoints(amount);
+                  setCharChangeFlag((old) => !old);
+                }} // Can't pass directly or "this" points to wrong element
               />
             </div>
             <div>
               <NumInputComp
                 buttonText={"Damage"}
                 callback={(amount) => {
-                  const [newCurrentHP, newTempHP] =
-                    character.dealDamage(amount);
-                  setCurrentHitPoints(newCurrentHP);
-                  setTempHitPoints(newTempHP);
+                  character.dealDamage(amount);
+                  setCharChangeFlag((old) => !old);
                 }}
               />
             </div>
@@ -317,7 +317,7 @@ const CharacterPage = () => {
                 buttonText={"New Temp HP"}
                 callback={(amount) => {
                   character.replaceTempHitPoints(amount);
-                  setTempHitPoints(amount);
+                  setCharChangeFlag((old) => !old);
                 }}
               />
             </div>
@@ -399,6 +399,8 @@ const CharacterPage = () => {
         <TabContentComp id={"main"} activeTab={activeTab}>
           <CharacterMainTab
             character={character}
+            charChangeFlag={charChangeFlag}
+            setCharChangeFlag={setCharChangeFlag}
             openModal={openModal}
             closeModal={closeModal}
             currentModal={currentModal}
