@@ -4,7 +4,11 @@ import axios from "axios";
 import Timer from "./Timer";
 
 class Character {
-  static async create(newCharData, setShowingSavedMessage) {
+  static async create(
+    newCharData,
+    setShowingSavingMessage,
+    setShowingSavedMessage
+  ) {
     // Get this reference data when char created to avoid calls to backend during operation
 
     const weaponProfGroups = (await axios.get("/api/proficiencies/weapons"))
@@ -26,6 +30,7 @@ class Character {
 
     return new Character(
       newCharData,
+      setShowingSavingMessage,
       setShowingSavedMessage,
       weaponProfGroups,
       armorProfGroups,
@@ -129,6 +134,7 @@ class Character {
 
   constructor(
     newCharData,
+    setShowingSavingMessage,
     setShowingSavedMessage,
     ref_weaponProfGroups,
     ref_armorProfGroups,
@@ -137,7 +143,8 @@ class Character {
   ) {
     Object.assign(this, newCharData);
 
-    this.queueSave = Timer(this.saveCharacter, 5000);
+    this.resetSaveTimer = Timer(this.saveCharacter, 5000);
+    this.setShowingSavingMessage = setShowingSavingMessage;
     this.setShowingSavedMessage = setShowingSavedMessage;
     this.ref_weaponProfGroups = ref_weaponProfGroups;
     this.ref_armorProfGroups = ref_armorProfGroups;
@@ -145,47 +152,53 @@ class Character {
     this.ref_subrace = ref_subrace;
   }
 
+  queueSave() {
+    this.setShowingSavingMessage(true);
+    this.resetSaveTimer(this);
+  }
+
+  // Callback function for save timer, needs to act like it's outside Character
   async saveCharacter(newChar) {
     const response = await axios.put(`/api/characters/${newChar.id}/update`, {
       newChar: newChar,
     });
+    newChar.setShowingSavingMessage(false);
     if (response.data.success) newChar.setShowingSavedMessage(true);
     else window.alert(response.data.reason);
   }
 
   setName(newName) {
     this.name = newName;
-    this.queueSave(this);
+    this.queueSave();
   }
 
   setAvatar(newFileId) {
     this.avatarId = newFileId;
-    this.queueSave(this);
+    this.queueSave();
   }
 
   setAlignment(newAlignment) {
     this.alignment = newAlignment;
-    this.queueSave(this);
+    this.queueSave();
   }
 
   setXp(newXp) {
     this.xp.amount = newXp;
-    this.queueSave(this);
+    this.queueSave();
   }
 
   setInspiration(newInspiration) {
     this.inspiration = newInspiration;
-    this.queueSave(this);
+    this.queueSave();
   }
 
   setDeathSaves(successCount, failCount) {
     this.deathSaves.successes = successCount;
     this.deathSaves.failures = failCount;
-    this.queueSave(this);
+    this.queueSave();
   }
 
   async setRace(newRace, newSubrace, newFeatureChoices) {
-    console.log(newRace);
     this.race.raceId = newRace.id;
     this.race.subraceId = newSubrace.id;
     this.featureChoices = newFeatureChoices;
@@ -198,22 +211,23 @@ class Character {
     this.ref_subrace = newSubrace.id
       ? (await axios.get(`/api/subraces/${newSubrace.id}`)).data
       : null;
+    console.log(newSubrace, this.ref_subrace);
     await Character.#raceReplaceIdsWithData(
       this.ref_subrace,
       this.featureChoices
     );
 
-    this.queueSave(this);
+    await this.saveCharacter(this); // Race save can happen immediately b/c changing race is popup w/ own save button - doesn't close until save goes through
   }
 
   spendHitDie(sides) {
     this.usedHitDice.find((checkDice) => checkDice.sides === sides).number += 1;
-    this.queueSave(this);
+    this.queueSave();
   }
 
   restoreHitDie(sides) {
     this.usedHitDice.find((checkDice) => checkDice.sides === sides).number -= 1;
-    this.queueSave(this);
+    this.queueSave();
   }
 
   dealDamage(amount) {
@@ -227,7 +241,8 @@ class Character {
     } else {
       this.hitPoints.temp -= amount;
     }
-    this.queueSave(this);
+    this.queueSave();
+    return [this.getCurrentHitPoints(), this.hitPoints.temp];
   }
 
   restoreHitPoints(amount) {
@@ -237,25 +252,26 @@ class Character {
     if (totalCurrent > totalMax) {
       this.hitPoints.currentBase -= totalCurrent - totalMax;
     }
-    this.queueSave(this);
+    this.queueSave();
+    return this.getCurrentHitPoints();
   }
 
   replaceTempHitPoints(amount) {
     if (amount < 0) amount = 0;
     this.hitPoints.temp = amount;
-    this.queueSave(this);
+    this.queueSave();
   }
 
   setMaxHitPointsBase(amount) {
     const change = amount - this.hitPoints.maxBase;
     this.hitPoints.maxBase += change;
     this.hitPoints.currentBase += change;
-    this.queueSave(this);
+    this.queueSave();
   }
 
   setPointBuy(newPointBuy) {
     this.abilities.pointBuy = newPointBuy;
-    this.queueSave(this);
+    this.queueSave();
   }
 
   setAbilityScores(newAbilities) {
@@ -264,33 +280,33 @@ class Character {
         (checkAbility) => checkAbility.name === ability.name
       ).score = ability.breakdown[0].val;
     });
-    this.queueSave(this);
+    this.queueSave();
   }
 
   updateItem(item, newCount, newToggles) {
     item.count = newCount;
     item.toggles = newToggles;
-    this.queueSave(this);
+    this.queueSave();
   }
 
   toggleItemActive(item) {
     item.toggles.Activated = !item.toggles.Activated;
-    this.queueSave(this);
+    this.queueSave();
   }
 
   toggleItemTwoHanded(item) {
     item.toggles["Two-Handed"] = !item.toggles["Two-Handed"];
-    this.queueSave(this);
+    this.queueSave();
   }
 
   setBackgroundId(newId) {
     this.background.id = newId;
-    this.queueSave(this);
+    this.queueSave();
   }
 
   setBackgroundName(newName) {
     this.background.displayName = newName;
-    this.queueSave(this);
+    this.queueSave();
   }
 
   getAbilities() {

@@ -4,7 +4,13 @@ import { useState } from "react";
 import GenericModal from "./GenericModal";
 import "../../styling/components/modals/MaxHitPointsModal.css";
 
-const MaxHitPointsModal = ({ character, closeModal, breakdown, total }) => {
+const MaxHitPointsModal = ({
+  character,
+  closeModal,
+  breakdown,
+  total,
+  setCharChangeFlag,
+}) => {
   const [base, setBase] = useState(breakdown[0].val);
   const [runningTotal, setRunningTotal] = useState(total);
   breakdown = breakdown.slice(1);
@@ -24,7 +30,10 @@ const MaxHitPointsModal = ({ character, closeModal, breakdown, total }) => {
             setBase(newBase);
             setRunningTotal(runningTotal + change);
           }}
-          onBlur={() => character.setMaxHitPointsBase(base)}
+          onBlur={() => {
+            character.setMaxHitPointsBase(base);
+            setCharChangeFlag((old) => !old);
+          }}
         ></input>
         {breakdown.reduce((fullText, current, i) => {
           if (current.val >= 0) fullText += " + ";

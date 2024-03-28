@@ -1,8 +1,11 @@
 // Shows current XP, allows adjusting amount of XP, displays messages regarding available level ups/inconsistencies in amount of XP
 
+import { useState } from "react";
 import NumInputComp from "./NumInputComp";
 
 const XpComp = ({ character }) => {
+  const [xpAmount, setXpAmount] = useState(character.xp.amount);
+
   const XP_THRESHOLDS = [
     0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000,
     120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000,
@@ -13,13 +16,15 @@ const XpComp = ({ character }) => {
     0
   );
 
-  const addXp = (amount) => {
-    character.setXp((character.xp.amount += amount));
+  const addXp = (newAmount) => {
+    const newXp = xpAmount + newAmount;
+    character.setXp(newXp);
+    setXpAmount(newXp);
   };
 
   return (
     <div>
-      {character.xp.amount < XP_THRESHOLDS[charLevel - 1] && (
+      {xpAmount < XP_THRESHOLDS[charLevel - 1] && (
         <img
           src={process.env.PUBLIC_URL + "/icons/danger.png"}
           alt="Not enough XP for current level"
@@ -27,7 +32,7 @@ const XpComp = ({ character }) => {
           className="hover-icon"
         ></img>
       )}
-      {character.xp.amount >= XP_THRESHOLDS[charLevel] && (
+      {xpAmount >= XP_THRESHOLDS[charLevel] && (
         <img
           src={process.env.PUBLIC_URL + "/icons/up_arrow.png"}
           alt="Level up available"
@@ -35,7 +40,7 @@ const XpComp = ({ character }) => {
           className="hover-icon"
         ></img>
       )}
-      <p>XP: {character.xp.amount}</p>
+      <p>XP: {xpAmount}</p>
       <NumInputComp buttonText={"+"} callback={addXp} />
     </div>
   );

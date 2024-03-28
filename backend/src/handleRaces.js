@@ -41,7 +41,6 @@ export const getRacialFeaturesFromList = async (db, featureIdList) => {
 
 export const getOneRacialFeature = async (db, featureId) => {
   const collection = db.collection("racialFeatures");
-  console.log(featureId);
   const feature = await collection.findOne({
     _id: ObjectId.createFromHexString(featureId),
   });

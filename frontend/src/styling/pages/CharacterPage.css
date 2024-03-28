@@ -103,16 +103,8 @@
   left: 1rem;
 }
 
-.saved-message {
+.save-message {
   margin: 0px 1em;
-}
-.saved-message-shown {
-  opacity: 1;
-  transition: all 250ms linear;
-}
-.saved-message-hidden {
-  opacity: 0;
-  transition: all 250ms linear 2s;
 }
 
 .avatar-edit {
