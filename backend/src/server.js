@@ -21,6 +21,12 @@ import {
   getOneRacialFeature,
 } from "./handleRaces.js";
 import { getFeats, getFeatsFromList, getOneFeat } from "./handleFeats.js";
+import {
+  getBackgrounds,
+  getOneBackground,
+  getBackgroundFeaturesFromList,
+  getOneBackgroundFeature,
+} from "./handleBackgrounds.js";
 
 const app = express();
 app.use(express.json());
@@ -144,6 +150,24 @@ app.get("/api/feats/multiple/:featIds", async (req, res) => {
 app.get("/api/feats/one/:featId", async (req, res) => {
   const { featId } = req.params;
   res.send(await getOneFeat(db, featId));
+});
+
+// Backgrounds
+app.get("/api/backgrounds", async (req, res) => {
+  res.send(await getBackgrounds(db));
+});
+app.get("/api/backgrounds/one/:backgroundId", async (req, res) => {
+  const { backgroundId } = req.params;
+  res.send(await getOneBackground(db, backgroundId));
+});
+app.get("/api/backgroundFeatures/multiple/:featureIds", async (req, res) => {
+  let { featureIds } = req.params;
+  featureIds = featureIds.split(",");
+  res.send(await getBackgroundFeaturesFromList(db, featureIds));
+});
+app.get("/api/backgroundFeatures/one/:featureId", async (req, res) => {
+  const { featureId } = req.params;
+  res.send(await getOneBackgroundFeature(db, featureId));
 });
 
 const PORT = process.env.PORT || 8000;
