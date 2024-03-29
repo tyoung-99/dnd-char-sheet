@@ -80,6 +80,19 @@ const CharacterBackgroundTab = ({
       (checkBackground) => checkBackground._id === background.id
     );
 
+  const getParentBackground = () => {
+    const selected = getSelectedBackground();
+    return backgroundOptions.find(
+      (checkBackground) => checkBackground._id === selected.parent
+    );
+  };
+
+  const getCharacteristicList = (category) => {
+    let list = getSelectedBackground().suggestedCharacteristics[category];
+    if (list.length > 0) return list;
+    return getParentBackground().suggestedCharacteristics[category];
+  };
+
   if (!dataLoaded) return;
 
   const backgroundDisplay = (
@@ -128,9 +141,7 @@ const CharacterBackgroundTab = ({
       {currentModal === "personalityTraits" && (
         <BackgroundCharacteristicModal
           title={"Example Personality Traits"}
-          characteristicList={
-            getSelectedBackground().suggestedCharacteristics.personalityTraits
-          }
+          characteristicList={getCharacteristicList("personalityTraits")}
           closeModal={closeModal}
         />
       )}
@@ -151,9 +162,7 @@ const CharacterBackgroundTab = ({
       {currentModal === "ideals" && (
         <BackgroundCharacteristicModal
           title={"Example Ideals"}
-          characteristicList={
-            getSelectedBackground().suggestedCharacteristics.ideals
-          }
+          characteristicList={getCharacteristicList("ideals")}
           closeModal={closeModal}
         />
       )}
@@ -174,9 +183,7 @@ const CharacterBackgroundTab = ({
       {currentModal === "bonds" && (
         <BackgroundCharacteristicModal
           title={"Example Bonds"}
-          characteristicList={
-            getSelectedBackground().suggestedCharacteristics.bonds
-          }
+          characteristicList={getCharacteristicList("bonds")}
           closeModal={closeModal}
         />
       )}
@@ -197,9 +204,7 @@ const CharacterBackgroundTab = ({
       {currentModal === "flaws" && (
         <BackgroundCharacteristicModal
           title={"Example Flaws"}
-          characteristicList={
-            getSelectedBackground().suggestedCharacteristics.flaws
-          }
+          characteristicList={getCharacteristicList("flaws")}
           closeModal={closeModal}
         />
       )}
