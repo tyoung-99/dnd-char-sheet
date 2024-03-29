@@ -1,13 +1,17 @@
 // Character's background details/backstory
 
 import { useState, useEffect, useRef } from "react";
-import EditorConvertToJSON from "../../components/EditorConvertToJSON";
 import axios from "axios";
+import EditorConvertToJSON from "../../components/EditorConvertToJSON";
+import BackgroundCharacteristicModal from "../../components/modals/BackgroundCharacteristicModal";
 
 const CharacterBackgroundTab = ({
   character,
   charChangeFlag,
   setCharChangeFlag,
+  openModal,
+  closeModal,
+  currentModal,
 }) => {
   const [dataLoaded, setDataLoaded] = useState(false);
 
@@ -71,6 +75,11 @@ const CharacterBackgroundTab = ({
     setCharChangeFlag((old) => !old);
   };
 
+  const getSelectedBackground = () =>
+    backgroundOptions.find(
+      (checkBackground) => checkBackground._id === background.id
+    );
+
   if (!dataLoaded) return;
 
   const backgroundDisplay = (
@@ -84,6 +93,7 @@ const CharacterBackgroundTab = ({
           onChange={(event) => {
             const newBackground = { ...background };
             newBackground.id = event.target.value;
+            newBackground.name = event.target[event.target.selectedIndex].text;
             updateBackground(newBackground);
           }}
         >
@@ -109,7 +119,21 @@ const CharacterBackgroundTab = ({
         ></input>
         <label htmlFor="customName"> (Customized Name)</label>
       </h1>
-      <h2>Personality Traits</h2>
+      <h2
+        className="clickable"
+        onClick={(e) => openModal(e, "personalityTraits")}
+      >
+        Personality Traits (Click for Suggestions)
+      </h2>
+      {currentModal === "personalityTraits" && (
+        <BackgroundCharacteristicModal
+          title={"Example Personality Traits"}
+          characteristicList={
+            getSelectedBackground().suggestedCharacteristics.personalityTraits
+          }
+          closeModal={closeModal}
+        />
+      )}
       <EditorConvertToJSON
         toolbarHidden
         wrapperClassName="wysiwyg-textbox-wrapper"
@@ -121,7 +145,18 @@ const CharacterBackgroundTab = ({
         }}
         defaultTextJSON={background.personalityTraits}
       />
-      <h2>Ideals</h2>
+      <h2 className="clickable" onClick={(e) => openModal(e, "ideals")}>
+        Ideals (Click for Suggestions)
+      </h2>
+      {currentModal === "ideals" && (
+        <BackgroundCharacteristicModal
+          title={"Example Ideals"}
+          characteristicList={
+            getSelectedBackground().suggestedCharacteristics.ideals
+          }
+          closeModal={closeModal}
+        />
+      )}
       <EditorConvertToJSON
         toolbarHidden
         wrapperClassName="wysiwyg-textbox-wrapper"
@@ -133,7 +168,18 @@ const CharacterBackgroundTab = ({
         }}
         defaultTextJSON={background.ideals}
       />
-      <h2>Bonds</h2>
+      <h2 className="clickable" onClick={(e) => openModal(e, "bonds")}>
+        Bonds (Click for Suggestions)
+      </h2>
+      {currentModal === "bonds" && (
+        <BackgroundCharacteristicModal
+          title={"Example Bonds"}
+          characteristicList={
+            getSelectedBackground().suggestedCharacteristics.bonds
+          }
+          closeModal={closeModal}
+        />
+      )}
       <EditorConvertToJSON
         toolbarHidden
         wrapperClassName="wysiwyg-textbox-wrapper"
@@ -145,7 +191,18 @@ const CharacterBackgroundTab = ({
         }}
         defaultTextJSON={background.bonds}
       />
-      <h2>Flaws</h2>
+      <h2 className="clickable" onClick={(e) => openModal(e, "flaws")}>
+        Flaws (Click for Suggestions)
+      </h2>
+      {currentModal === "flaws" && (
+        <BackgroundCharacteristicModal
+          title={"Example Flaws"}
+          characteristicList={
+            getSelectedBackground().suggestedCharacteristics.flaws
+          }
+          closeModal={closeModal}
+        />
+      )}
       <EditorConvertToJSON
         toolbarHidden
         wrapperClassName="wysiwyg-textbox-wrapper"

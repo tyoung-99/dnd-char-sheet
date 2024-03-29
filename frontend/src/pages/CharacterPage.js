@@ -411,6 +411,9 @@ const CharacterPage = () => {
             character={character}
             charChangeFlag={charChangeFlag}
             setCharChangeFlag={setCharChangeFlag}
+            openModal={openModal}
+            closeModal={closeModal}
+            currentModal={currentModal}
           />
         </TabContentComp>
         <TabContentComp id={"features"} activeTab={activeTab}>
