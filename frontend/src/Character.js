@@ -18,13 +18,19 @@ class Character {
     const race = newCharData.race.raceId
       ? (await axios.get(`/api/races/${newCharData.race.raceId}`)).data
       : null;
-    await Character.#raceReplaceIdsWithData(race, newCharData.featureChoices);
+    await Character.#raceCreateReference(race, newCharData.featureChoices);
 
     const subrace = newCharData.race.subraceId
       ? (await axios.get(`/api/subraces/${newCharData.race.subraceId}`)).data
       : null;
-    await Character.#raceReplaceIdsWithData(
-      subrace,
+    await Character.#raceCreateReference(subrace, newCharData.featureChoices);
+
+    const background = newCharData.background.id
+      ? (await axios.get(`/api/backgrounds/one/${newCharData.background.id}`))
+          .data
+      : null;
+    await Character.#backgroundCreateReference(
+      background,
       newCharData.featureChoices
     );
 
@@ -35,32 +41,25 @@ class Character {
       weaponProfGroups,
       armorProfGroups,
       race,
-      subrace
+      subrace,
+      background
     );
   }
 
-  static async #raceReplaceIdsWithData(race, featureChoices) {
-    race.source = (await axios.get(`/api/sources/${race.source}`)).data;
-
-    if (race.features.length > 0) {
-      race.features = (
-        await axios.get(`/api/racialFeatures/multiple/${race.features}`)
-      ).data;
-    }
-
-    // Combining required/chosen effects of racial features/nested feats here simplifies using that data later
-    for (const feature of race.features) {
+  // Combining required/chosen effects of features/nested feats early on simplifies using that data later
+  static async #combineEffectChoices(elem, category, featureChoices) {
+    for (const feature of elem.features) {
       if (!feature.effects) continue;
 
       for (const effect of feature.effects) {
         if (
-          featureChoices.race[feature._id] &&
-          featureChoices.race[feature._id][effect.category]
+          featureChoices[category][feature._id] &&
+          featureChoices[category][feature._id][effect.category]
         ) {
-          effect.changes = Character.#combineEffectChoices(
+          effect.changes = Character.#combineEffectChoicesHelper(
             effect.category,
             effect.changes.required,
-            featureChoices.race[feature._id][effect.category]
+            featureChoices[category][feature._id][effect.category]
           );
         } else {
           effect.changes = effect.changes.required;
@@ -90,7 +89,7 @@ class Character {
             featureChoices.feat[feat._id] &&
             featureChoices.feat[feat._id][featEffect.category]
           ) {
-            featEffect.changes = Character.#combineEffectChoices(
+            featEffect.changes = Character.#combineEffectChoicesHelper(
               featEffect.category,
               featEffect.changes.required,
               featureChoices.feat[feat._id][featEffect.category]
@@ -103,7 +102,7 @@ class Character {
     }
   }
 
-  static #combineEffectChoices(category, required, choicesMade) {
+  static #combineEffectChoicesHelper(category, required, choicesMade) {
     let combined = structuredClone(required);
 
     if (!combined) {
@@ -132,6 +131,57 @@ class Character {
     return combined;
   }
 
+  static async #raceCreateReference(race, featureChoices) {
+    race.source = (await axios.get(`/api/sources/${race.source}`)).data;
+
+    if (race.features.length > 0) {
+      race.features = (
+        await axios.get(`/api/racialFeatures/multiple/${race.features}`)
+      ).data;
+    }
+
+    this.#combineEffectChoices(race, "race", featureChoices);
+  }
+
+  static async #backgroundCreateReference(background, featureChoices) {
+    background.source = (
+      await axios.get(`/api/sources/${background.source}`)
+    ).data;
+
+    if (background.parent) {
+      const parent = (
+        await axios.get(`/api/backgrounds/one/${background.parent}`)
+      ).data;
+      background.features = parent.features.concat(background.features);
+      Object.entries(background.suggestedCharacteristics).forEach(
+        ([category, list]) => {
+          if (list.length === 0) {
+            background.suggestedCharacteristics[category] =
+              parent.suggestedCharacteristics[category];
+          }
+        }
+      );
+      Object.entries(background.suggestedProficiencies).forEach(
+        ([category, list]) => {
+          if (list.length === 0) {
+            background.suggestedProficiencies[category] =
+              parent.suggestedProficiencies[category];
+          }
+        }
+      );
+    }
+
+    if (background.features.length > 0) {
+      background.features = (
+        await axios.get(
+          `/api/backgroundFeatures/multiple/${background.features}`
+        )
+      ).data;
+    }
+
+    this.#combineEffectChoices(background, "background", featureChoices);
+  }
+
   constructor(
     newCharData,
     setShowingSavingMessage,
@@ -139,7 +189,8 @@ class Character {
     ref_weaponProfGroups,
     ref_armorProfGroups,
     ref_race,
-    ref_subrace
+    ref_subrace,
+    ref_background
   ) {
     Object.assign(this, newCharData);
 
@@ -150,6 +201,7 @@ class Character {
     this.ref_armorProfGroups = ref_armorProfGroups;
     this.ref_race = ref_race;
     this.ref_subrace = ref_subrace;
+    this.ref_background = ref_background;
   }
 
   queueSave() {
@@ -206,16 +258,12 @@ class Character {
     this.ref_race = newRace.id
       ? (await axios.get(`/api/races/${newRace.id}`)).data
       : null;
-    await Character.#raceReplaceIdsWithData(this.ref_race, this.featureChoices);
+    await Character.#raceCreateReference(this.ref_race, this.featureChoices);
 
     this.ref_subrace = newSubrace.id
       ? (await axios.get(`/api/subraces/${newSubrace.id}`)).data
       : null;
-    console.log(newSubrace, this.ref_subrace);
-    await Character.#raceReplaceIdsWithData(
-      this.ref_subrace,
-      this.featureChoices
-    );
+    await Character.#raceCreateReference(this.ref_subrace, this.featureChoices);
 
     await this.saveCharacter(this); // Race save can happen immediately b/c changing race is popup w/ own save button - doesn't close until save goes through
   }
@@ -297,8 +345,16 @@ class Character {
     this.queueSave();
   }
 
-  setBackground(newBackground) {
+  async setBackground(newBackground, newFeatureChoices) {
     this.background = newBackground;
+    this.featureChoices = newFeatureChoices;
+
+    // Temp necessary b/c replacing ref_background w/ intermediate causes errors in elements using its values
+    const temp = (await axios.get(`/api/backgrounds/one/${newBackground.id}`))
+      .data;
+    await Character.#backgroundCreateReference(temp, this.featureChoices);
+    this.ref_background = temp;
+
     this.queueSave();
   }
 
@@ -1361,9 +1417,11 @@ class Character {
   }
 
   #getBackgroundFeatures() {
-    // TODO: Update w/ getEffects() after putting background features in (don't forget to check feats)
+    const features = structuredClone(this.ref_background.features);
+    features.forEach((feature) => {
+      feature.background = this.ref_background.name;
+    });
 
-    let features = [];
     return features;
   }
 

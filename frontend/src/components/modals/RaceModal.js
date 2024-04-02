@@ -3,13 +3,18 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import GenericModal from "./GenericModal";
-import FeatureAbilityScoreComp from "./sub-components/FeatureAbilityScoreComp";
-import FeatureLanguageComp from "./sub-components/FeatureLanguageComp";
-import FeatureSkillProfComp from "./sub-components/FeatureSkillProfComp";
-import FeatureFeatComp from "./sub-components/FeatureFeatComp";
+import FeatureAbilityScoreComp from "../feature-components/FeatureAbilityScoreComp";
+import FeatureLanguageComp from "../feature-components/FeatureLanguageComp";
+import FeatureSkillProfComp from "../feature-components/FeatureSkillProfComp";
+import FeatureFeatComp from "../feature-components/FeatureFeatComp";
 import "../../styling/components/modals/RaceModal.css";
 
-const RaceModal = ({ character, setCharChangeFlag, closeModal }) => {
+const RaceModal = ({
+  character,
+  charChangeFlag,
+  setCharChangeFlag,
+  closeModal,
+}) => {
   const srcList = useRef();
   const [raceOptions, setRaceOptions] = useState();
   const [raceDropdownOptions, setRaceDropdownOptions] = useState();
@@ -86,7 +91,12 @@ const RaceModal = ({ character, setCharChangeFlag, closeModal }) => {
       setOriginalFeatureChoices(structuredClone(character.featureChoices));
     };
     loadData();
-  }, [character.race, character.featureChoices, updateSubraceOptions]);
+  }, [
+    character.race,
+    character.featureChoices,
+    updateSubraceOptions,
+    charChangeFlag,
+  ]);
 
   const addNewEffectChoices = (toAdd, effectChoices) => {
     for (const feature of toAdd) {

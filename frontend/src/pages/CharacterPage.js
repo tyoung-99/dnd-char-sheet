@@ -224,6 +224,7 @@ const CharacterPage = () => {
           {currentModal === "race" && (
             <RaceModal
               character={character}
+              charChangeFlag={charChangeFlag}
               setCharChangeFlag={setCharChangeFlag}
               closeModal={closeModal}
             />
