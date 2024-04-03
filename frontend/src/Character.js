@@ -359,6 +359,11 @@ class Character {
     this.queueSave();
   }
 
+  setAppearance(newAppearance) {
+    this.appearance = newAppearance;
+    this.queueSave();
+  }
+
   getAbilities() {
     return this.abilities.values.map((ability) => {
       const [score, breakdown] = this.getAbilityScore(ability.name);

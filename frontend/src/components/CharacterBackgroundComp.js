@@ -290,8 +290,8 @@ const CharacterBackgroundComp = ({
 
   const selected = findBackgroundInList(background.id);
 
-  const backgroundDisplay = (
-    <>
+  return (
+    <div className="grid-tile">
       <h1>
         Background:{" "}
         <select
@@ -431,10 +431,8 @@ const CharacterBackgroundComp = ({
           />
         </>
       )}
-    </>
+    </div>
   );
-
-  return <div className="grid-tile">{backgroundDisplay}</div>;
 };
 
 export default CharacterBackgroundComp;
