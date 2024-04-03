@@ -144,12 +144,21 @@ const CharacterBackgroundComp = ({
     return newFeatureChoices;
   };
 
-  const updateBackground = (newBackground = null, newFeatureChoices = null) => {
+  const updateBackground = (
+    newBackground = null,
+    newFeatureChoices = null,
+    newBackgroundName = null
+  ) => {
     if (newBackground) {
       newFeatureChoices = resetFeatureChoices(featureChoices, newBackground.id);
     } else {
       newBackground = background;
-      newFeatureChoices = balanceToolsLanguages(newFeatureChoices);
+      if (newFeatureChoices) {
+        newFeatureChoices = balanceToolsLanguages(newFeatureChoices);
+      } else {
+        background.displayName = newBackgroundName;
+        newFeatureChoices = featureChoices;
+      }
     }
     character.setBackground(newBackground, newFeatureChoices);
     setCharChangeFlag((old) => !old);
@@ -310,11 +319,7 @@ const CharacterBackgroundComp = ({
           id="customName"
           name="customName"
           value={background.displayName}
-          onChange={(event) => {
-            const newBackground = { ...background };
-            newBackground.displayName = event.target.value;
-            updateBackground(newBackground);
-          }}
+          onChange={(event) => updateBackground(null, null, event.target.value)}
         ></input>
         <label htmlFor="customName"> (Customized Name)</label>
       </h1>
