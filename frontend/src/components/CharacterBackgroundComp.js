@@ -3,6 +3,7 @@ import axios from "axios";
 import EditorConvertToJSON from "./EditorConvertToJSON";
 import BackgroundCharacteristicModal from "./modals/BackgroundCharacteristicModal";
 import FeatureSkillProfComp from "./feature-components/FeatureSkillProfComp";
+import FeatureToolProfComp from "./feature-components/FeatureToolProfComp";
 import FeatureLanguageComp from "./feature-components/FeatureLanguageComp";
 
 const CharacterBackgroundComp = ({
@@ -13,6 +14,9 @@ const CharacterBackgroundComp = ({
   closeModal,
   currentModal,
 }) => {
+  const SKILL_FEATURE_ID = "65fdd750a1fb13543c9b3b6c";
+  const TOOL_LANG_FEATURE_ID = "65fdd88fa1fb13543c9b3b6d";
+
   const [dataLoaded, setDataLoaded] = useState(false);
 
   const srcList = useRef();
@@ -82,9 +86,10 @@ const CharacterBackgroundComp = ({
             ];
             break;
           case "Language":
-            newChoice = new Array(choices);
+            newChoice = new Array(choices).fill("");
             break;
           case "SkillProficiency":
+          case "ToolProficiency":
           case "Feat":
             newChoice = new Array(choices[0]).fill("");
             break;
@@ -98,7 +103,7 @@ const CharacterBackgroundComp = ({
     }
   };
 
-  const updateFeatureChoices = (oldChoices, newBackgroundId) => {
+  const resetFeatureChoices = (oldChoices, newBackgroundId) => {
     let newChoices = { ...oldChoices };
     newChoices.background = {};
 
@@ -110,20 +115,41 @@ const CharacterBackgroundComp = ({
     }
 
     addNewEffectChoices(toAdd, newChoices.background);
-
     setFeatureChoices(newChoices);
-
     return newChoices;
+  };
+
+  const balanceToolsLanguages = (newFeatureChoices) => {
+    const feature = newFeatureChoices.background[TOOL_LANG_FEATURE_ID];
+    const toolsPicked =
+      feature.ToolProficiency.length -
+      feature.ToolProficiency.filter((x) => x === "").length;
+    const langsPicked =
+      feature.Language.length - feature.Language.filter((x) => x === "").length;
+
+    // Resolves issue with empty array causing errors when length extended
+    feature.ToolProficiency = feature.ToolProficiency.concat(["", ""]);
+    feature.Language = feature.Language.concat(["", ""]);
+
+    feature.ToolProficiency.length = 2 - langsPicked;
+    feature.Language.length = 2 - toolsPicked;
+
+    feature.ToolProficiency.forEach((tool, i) => {
+      if (!tool) feature.ToolProficiency[i] = "";
+    });
+    feature.Language.forEach((lang, i) => {
+      if (!lang) feature.Language[i] = "";
+    });
+
+    return newFeatureChoices;
   };
 
   const updateBackground = (newBackground = null, newFeatureChoices = null) => {
     if (newBackground) {
-      newFeatureChoices = updateFeatureChoices(
-        featureChoices,
-        newBackground.id
-      );
+      newFeatureChoices = resetFeatureChoices(featureChoices, newBackground.id);
     } else {
       newBackground = background;
+      newFeatureChoices = balanceToolsLanguages(newFeatureChoices);
     }
     character.setBackground(newBackground, newFeatureChoices);
     setCharChangeFlag((old) => !old);
@@ -149,6 +175,7 @@ const CharacterBackgroundComp = ({
       <Fragment key={feature._id}>
         <h2>Feature: {feature.displayName}</h2>
         <EditorConvertToJSON
+          readOnly
           toolbarHidden
           wrapperClassName="wysiwyg-textbox-wrapper"
           editorClassName="wysiwyg-textbox-editor"
@@ -174,12 +201,11 @@ const CharacterBackgroundComp = ({
     let idNeeded;
     switch (type) {
       case "skills":
-        idNeeded = "65fdd750a1fb13543c9b3b6c";
+        idNeeded = SKILL_FEATURE_ID;
         break;
       case "tools":
-        break;
       case "languages":
-        idNeeded = "65fdd88fa1fb13543c9b3b6d";
+        idNeeded = TOOL_LANG_FEATURE_ID;
         break;
       default:
     }
@@ -212,7 +238,22 @@ const CharacterBackgroundComp = ({
           />
         );
       case "tools":
-        return;
+        return (
+          <FeatureToolProfComp
+            featureType={"background"}
+            featureId={feature._id}
+            category={"ToolProficiency"}
+            choices={feature.effects[0].changes.choices}
+            featureChoices={featureChoices}
+            setFeatureChoices={setFeatureChoices}
+            originalFeatureChoices={originalFeatureChoices}
+            existingProfs={character.getToolProfs()}
+            onChangeCallBack={(newChoices) => {
+              updateBackground(null, newChoices);
+            }}
+            isBackground={true}
+          />
+        );
       case "languages":
         return (
           <FeatureLanguageComp
@@ -284,8 +325,8 @@ const CharacterBackgroundComp = ({
             {getProfSuggestions("skills")})
           </p>
           <p>
-            Tool Proficiencies: <input></input>
-            <input></input> (Suggestions: {getProfSuggestions("tools")})
+            {getFeatureComp("tools")} (Suggestions:{" "}
+            {getProfSuggestions("tools")})
           </p>
           <p>
             {getFeatureComp("languages")} (Suggestions:{" "}

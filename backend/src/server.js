@@ -11,7 +11,12 @@ import {
 import { getImg, removeImg } from "./handleImg.js";
 import { getSources, getOneSource } from "./handleSources.js";
 import { getAlignments } from "./handleAlignments.js";
-import { getWeaponProfs, getArmorProfs } from "./handleOtherProfs.js";
+import {
+  getWeaponProfs,
+  getArmorProfs,
+  getToolProfsAll,
+  getToolProfsByType,
+} from "./handleOtherProfs.js";
 import {
   getRaces,
   getOneRace,
@@ -107,9 +112,13 @@ app.get("/api/alignments", async (req, res) => {
 app.get("/api/proficiencies/weapons", async (req, res) => {
   res.send(await getWeaponProfs(db));
 });
-
 app.get("/api/proficiencies/armor", async (req, res) => {
   res.send(await getArmorProfs(db));
+});
+app.get("/api/proficiencies/tools/:type", async (req, res) => {
+  const { type } = req.params;
+  if (type === "all") res.send(await getToolProfsAll(db));
+  else res.send(await getToolProfsByType(db, type));
 });
 
 // Races

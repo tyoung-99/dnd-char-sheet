@@ -1,4 +1,4 @@
-// Input component for skill proficiency racial features
+// Input component for skill proficiency features
 
 const FeatureSkillProfComp = ({
   featureType,

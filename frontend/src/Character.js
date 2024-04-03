@@ -120,6 +120,7 @@ class Character {
         case "Language":
         case "SkillProficiency":
         case "SkillExpertise":
+        case "ToolProficiency":
         case "Feat":
           combined = combined.concat(structuredClone(choicesMade));
           break;
@@ -791,26 +792,24 @@ class Character {
   }
 
   getToolProfs() {
-    let profsList = [];
-
-    // TODO: Update w/ getEffects() after putting tool prof feature in  (don't forget to check feats)
-    profsList = this.toolProfs.map((prof) => prof.name);
-
-    return [...new Set(profsList)];
+    return this.#getToolLangHelper("ToolProficiency");
   }
 
   getLanguages() {
-    let languages = [];
-    const category = "Language";
+    return this.#getToolLangHelper("Language");
+  }
+
+  #getToolLangHelper(category) {
+    let profsList = [];
 
     const combineBonuses = (bonuses) =>
-      bonuses.forEach((langEffect) => {
-        let effect = langEffect.effects.find(
+      bonuses.forEach((toolEffect) => {
+        let effect = toolEffect.effects.find(
           (checkEffect) => checkEffect.category === category
         );
-        languages = languages.concat(effect.changes);
+        profsList = profsList.concat(effect.changes);
 
-        effect = langEffect.effects.find(
+        effect = toolEffect.effects.find(
           (checkEffect) => checkEffect.category === "Feat"
         );
         if (effect) combineBonuses(effect.changes);
@@ -818,7 +817,7 @@ class Character {
 
     combineBonuses(this.#getEffects(category));
 
-    return [...new Set(languages)];
+    return [...new Set(profsList)];
   }
 
   isProficientWithItem(item) {

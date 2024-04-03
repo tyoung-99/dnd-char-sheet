@@ -1,4 +1,4 @@
-// Input component for language racial features
+// Input component for language features
 
 const FeatureLanguageComp = ({
   featureType,
@@ -11,6 +11,7 @@ const FeatureLanguageComp = ({
 }) => {
   let inputs = [];
   for (let i = 0; i < choices; i++) {
+    if (i >= featureChoices[featureType][featureId][category].length) break;
     inputs.push(
       <input
         key={i}
