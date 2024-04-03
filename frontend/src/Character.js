@@ -578,13 +578,14 @@ class Character {
         let effect = effectsList.effects.find(
           (checkEffect) => checkEffect.category === category
         );
-        if (effect.changes.join() === "") return;
         if (effect.changes) {
           initialize(
             effectsList.displayName || effectsList.name,
             effectsList.race || effectsList.class || effectsList.background
           );
-          effect.changes.forEach(runForEach);
+          effect.changes.forEach((change) => {
+            if (change !== "") runForEach(change);
+          });
         }
 
         effect = effectsList.effects.find(
