@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import EditorConvertToJSON from "./EditorConvertToJSON";
 
 const CharacterAppearanceComp = ({
@@ -8,29 +7,11 @@ const CharacterAppearanceComp = ({
   setCharChangeFlag,
 }) => {
   const [dataLoaded, setDataLoaded] = useState(false);
-
-  const [imgURLs, setImgURLs] = useState([]);
   const [appearance, setAppearance] = useState();
 
   useEffect(() => {
-    const loadData = async () => {
-      setAppearance(character.appearance);
-
-      const newImgURLs = [];
-      for (const id of character.appearance.pictureIds) {
-        try {
-          const imgBlob = await axios.get(`/api/img/char/${id}`, {
-            responseType: "blob",
-          });
-          newImgURLs.push(URL.createObjectURL(imgBlob.data));
-        } catch (error) {}
-      }
-      setImgURLs(newImgURLs);
-
-      setDataLoaded(true);
-    };
-
-    loadData();
+    setAppearance(character.appearance);
+    setDataLoaded(true);
   }, [character, charChangeFlag]);
 
   const updateAppearance = (newAppearance) => {
@@ -138,16 +119,6 @@ const CharacterAppearanceComp = ({
         </div>
       </div>
       <h2>Description</h2>
-      <div className="float-right col-flex">
-        {imgURLs.map((src, i) => (
-          <img
-            key={i}
-            src={src}
-            alt={`${character.name}`}
-            className="height-8"
-          ></img>
-        ))}
-      </div>
       <EditorConvertToJSON
         wrapperClassName="wysiwyg-textbox-wrapper"
         editorClassName="wysiwyg-textbox-editor"
