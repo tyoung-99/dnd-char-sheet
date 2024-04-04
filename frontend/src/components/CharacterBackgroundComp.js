@@ -357,9 +357,10 @@ const CharacterBackgroundComp = ({
           )}
           <EditorConvertToJSON
             toolbarHidden
+            stripPastedStyles
             wrapperClassName="wysiwyg-textbox-wrapper"
             editorClassName="wysiwyg-textbox-editor"
-            onChange={(contentJSON) => {
+            onBlur={(contentJSON) => {
               const newBackground = { ...background };
               newBackground.personalityTraits = contentJSON;
               updateBackground(newBackground);
@@ -378,9 +379,10 @@ const CharacterBackgroundComp = ({
           )}
           <EditorConvertToJSON
             toolbarHidden
+            stripPastedStyles
             wrapperClassName="wysiwyg-textbox-wrapper"
             editorClassName="wysiwyg-textbox-editor"
-            onChange={(contentJSON) => {
+            onBlur={(contentJSON) => {
               const newBackground = { ...background };
               newBackground.ideals = contentJSON;
               updateBackground(newBackground);
@@ -399,9 +401,10 @@ const CharacterBackgroundComp = ({
           )}
           <EditorConvertToJSON
             toolbarHidden
+            stripPastedStyles
             wrapperClassName="wysiwyg-textbox-wrapper"
             editorClassName="wysiwyg-textbox-editor"
-            onChange={(contentJSON) => {
+            onBlur={(contentJSON) => {
               const newBackground = { ...background };
               newBackground.bonds = contentJSON;
               updateBackground(newBackground);
@@ -420,9 +423,10 @@ const CharacterBackgroundComp = ({
           )}
           <EditorConvertToJSON
             toolbarHidden
+            stripPastedStyles
             wrapperClassName="wysiwyg-textbox-wrapper"
             editorClassName="wysiwyg-textbox-editor"
-            onChange={(contentJSON) => {
+            onBlur={(contentJSON) => {
               const newBackground = { ...background };
               newBackground.flaws = contentJSON;
               updateBackground(newBackground);

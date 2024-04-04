@@ -31,9 +31,6 @@ const CharacterBackgroundTab = ({
               character={character}
               charChangeFlag={charChangeFlag}
               setCharChangeFlag={setCharChangeFlag}
-              openModal={openModal}
-              closeModal={closeModal}
-              currentModal={currentModal}
             />
           </div>
         </div>

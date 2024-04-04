@@ -6,9 +6,6 @@ const CharacterAppearanceComp = ({
   character,
   charChangeFlag,
   setCharChangeFlag,
-  openModal,
-  closeModal,
-  currentModal,
 }) => {
   const [dataLoaded, setDataLoaded] = useState(false);
 
@@ -154,18 +151,13 @@ const CharacterAppearanceComp = ({
       <EditorConvertToJSON
         wrapperClassName="wysiwyg-textbox-wrapper"
         editorClassName="wysiwyg-textbox-editor"
-        onChange={(contentJSON) => {
+        onBlur={(contentJSON) => {
           const newAppearance = { ...appearance };
           newAppearance.desc = contentJSON;
           updateAppearance(newAppearance);
         }}
         defaultTextJSON={appearance.desc}
       />
-      {/* {appearance.desc.map((paragraph, i) => (
-        <p key={i} className="text-block">
-          {paragraph}
-        </p>
-      ))} */}
     </div>
   );
 };
