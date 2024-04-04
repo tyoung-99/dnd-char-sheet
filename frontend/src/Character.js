@@ -364,6 +364,11 @@ class Character {
     this.queueSave();
   }
 
+  setBackstory(newBackstory) {
+    this.backstory = newBackstory;
+    this.queueSave();
+  }
+
   getAbilities() {
     return this.abilities.values.map((ability) => {
       const [score, breakdown] = this.getAbilityScore(ability.name);

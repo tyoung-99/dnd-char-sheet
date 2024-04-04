@@ -14,7 +14,7 @@ const CharacterBackgroundTab = ({
 }) => {
   return (
     <div className="grid-container row-flex">
-      <div className="col-flex">
+      <div className="col-flex col-1">
         <div className="row-flex">
           <div className="col-1_2">
             <CharacterBackgroundComp
@@ -40,9 +40,6 @@ const CharacterBackgroundTab = ({
               character={character}
               charChangeFlag={charChangeFlag}
               setCharChangeFlag={setCharChangeFlag}
-              openModal={openModal}
-              closeModal={closeModal}
-              currentModal={currentModal}
             />
           </div>
         </div>

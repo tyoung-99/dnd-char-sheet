@@ -291,150 +291,161 @@ const CharacterBackgroundComp = ({
   const selected = findBackgroundInList(background.id);
 
   return (
-    <div className="grid-tile">
-      <h1>
-        Background:{" "}
-        <select
-          name="background"
-          id="background"
-          value={background.id || ""}
-          onChange={(event) => {
-            const newBackground = { ...background };
-            newBackground.id = event.target.value;
-            newBackground.name = event.target[event.target.selectedIndex].text;
-            updateBackground(newBackground);
-          }}
-        >
-          <option hidden value={""}>
-            Select Background
-          </option>
-          {backgroundOptions.map((option) => (
-            <option key={option._id} value={option._id}>
-              {option.name} ({option.source.abbr})
-            </option>
-          ))}
-        </select>{" "}
-        <input
-          type="text"
-          id="customName"
-          name="customName"
-          value={background.displayName}
-          onChange={(event) => updateBackground(null, null, event.target.value)}
-        ></input>
-        <label htmlFor="customName"> (Customized Name)</label>
-      </h1>
-      {!selected ? null : (
-        <>
-          <p>
-            {getFeatureComp("skills")} (Suggestions:{" "}
-            {getProfSuggestions("skills")})
-          </p>
-          <p>
-            {getFeatureComp("tools")} (Suggestions:{" "}
-            {getProfSuggestions("tools")})
-          </p>
-          <p>
-            {getFeatureComp("languages")} (Suggestions:{" "}
-            {getProfSuggestions("languages")})
-          </p>
-          <p>Equipment:</p>
-          {selected.parent &&
-            findBackgroundInList(selected.parent).features.map(displayFeature)}
-          {selected.features.map(displayFeature)}
-          <h1>Characteristics</h1>
-          <h2
-            className="clickable"
-            onClick={(e) => openModal(e, "personalityTraits")}
-          >
-            Personality Traits (Click for Suggestions)
-          </h2>
-          {currentModal === "personalityTraits" && (
-            <BackgroundCharacteristicModal
-              title={"Example Personality Traits"}
-              characteristicList={getCharacteristicList("personalityTraits")}
-              closeModal={closeModal}
-            />
+    <div className="col-1 row-flex col-end">
+      <div className="col-1 col-flex">
+        <div className="grid-tile col-end">
+          <h1>
+            Background:{" "}
+            <select
+              name="background"
+              id="background"
+              value={background.id || ""}
+              onChange={(event) => {
+                const newBackground = { ...background };
+                newBackground.id = event.target.value;
+                newBackground.name =
+                  event.target[event.target.selectedIndex].text;
+                updateBackground(newBackground);
+              }}
+            >
+              <option hidden value={""}>
+                Select Background
+              </option>
+              {backgroundOptions.map((option) => (
+                <option key={option._id} value={option._id}>
+                  {option.name} ({option.source.abbr})
+                </option>
+              ))}
+            </select>{" "}
+            <input
+              type="text"
+              id="customName"
+              name="customName"
+              value={background.displayName}
+              onChange={(event) =>
+                updateBackground(null, null, event.target.value)
+              }
+            ></input>
+            <label htmlFor="customName"> (Customized Name)</label>
+          </h1>
+          {!selected ? null : (
+            <>
+              <p>
+                {getFeatureComp("skills")} (Suggestions:{" "}
+                {getProfSuggestions("skills")})
+              </p>
+              <p>
+                {getFeatureComp("tools")} (Suggestions:{" "}
+                {getProfSuggestions("tools")})
+              </p>
+              <p>
+                {getFeatureComp("languages")} (Suggestions:{" "}
+                {getProfSuggestions("languages")})
+              </p>
+              <p>Equipment:</p>
+              {selected.parent &&
+                findBackgroundInList(selected.parent).features.map(
+                  displayFeature
+                )}
+              {selected.features.map(displayFeature)}
+              <h1>Characteristics</h1>
+              <h2
+                className="clickable"
+                onClick={(e) => openModal(e, "personalityTraits")}
+              >
+                Personality Traits (Click for Suggestions)
+              </h2>
+              {currentModal === "personalityTraits" && (
+                <BackgroundCharacteristicModal
+                  title={"Example Personality Traits"}
+                  characteristicList={getCharacteristicList(
+                    "personalityTraits"
+                  )}
+                  closeModal={closeModal}
+                />
+              )}
+              <EditorConvertToJSON
+                toolbarHidden
+                stripPastedStyles
+                wrapperClassName="wysiwyg-textbox-wrapper"
+                editorClassName="wysiwyg-textbox-editor"
+                onBlur={(contentJSON) => {
+                  const newBackground = { ...background };
+                  newBackground.personalityTraits = contentJSON;
+                  updateBackground(newBackground);
+                }}
+                defaultTextJSON={background.personalityTraits}
+              />
+              <h2 className="clickable" onClick={(e) => openModal(e, "ideals")}>
+                Ideals (Click for Suggestions)
+              </h2>
+              {currentModal === "ideals" && (
+                <BackgroundCharacteristicModal
+                  title={"Example Ideals"}
+                  characteristicList={getCharacteristicList("ideals")}
+                  closeModal={closeModal}
+                />
+              )}
+              <EditorConvertToJSON
+                toolbarHidden
+                stripPastedStyles
+                wrapperClassName="wysiwyg-textbox-wrapper"
+                editorClassName="wysiwyg-textbox-editor"
+                onBlur={(contentJSON) => {
+                  const newBackground = { ...background };
+                  newBackground.ideals = contentJSON;
+                  updateBackground(newBackground);
+                }}
+                defaultTextJSON={background.ideals}
+              />
+              <h2 className="clickable" onClick={(e) => openModal(e, "bonds")}>
+                Bonds (Click for Suggestions)
+              </h2>
+              {currentModal === "bonds" && (
+                <BackgroundCharacteristicModal
+                  title={"Example Bonds"}
+                  characteristicList={getCharacteristicList("bonds")}
+                  closeModal={closeModal}
+                />
+              )}
+              <EditorConvertToJSON
+                toolbarHidden
+                stripPastedStyles
+                wrapperClassName="wysiwyg-textbox-wrapper"
+                editorClassName="wysiwyg-textbox-editor"
+                onBlur={(contentJSON) => {
+                  const newBackground = { ...background };
+                  newBackground.bonds = contentJSON;
+                  updateBackground(newBackground);
+                }}
+                defaultTextJSON={background.bonds}
+              />
+              <h2 className="clickable" onClick={(e) => openModal(e, "flaws")}>
+                Flaws (Click for Suggestions)
+              </h2>
+              {currentModal === "flaws" && (
+                <BackgroundCharacteristicModal
+                  title={"Example Flaws"}
+                  characteristicList={getCharacteristicList("flaws")}
+                  closeModal={closeModal}
+                />
+              )}
+              <EditorConvertToJSON
+                toolbarHidden
+                stripPastedStyles
+                wrapperClassName="wysiwyg-textbox-wrapper"
+                editorClassName="wysiwyg-textbox-editor"
+                onBlur={(contentJSON) => {
+                  const newBackground = { ...background };
+                  newBackground.flaws = contentJSON;
+                  updateBackground(newBackground);
+                }}
+                defaultTextJSON={background.flaws}
+              />
+            </>
           )}
-          <EditorConvertToJSON
-            toolbarHidden
-            stripPastedStyles
-            wrapperClassName="wysiwyg-textbox-wrapper"
-            editorClassName="wysiwyg-textbox-editor"
-            onBlur={(contentJSON) => {
-              const newBackground = { ...background };
-              newBackground.personalityTraits = contentJSON;
-              updateBackground(newBackground);
-            }}
-            defaultTextJSON={background.personalityTraits}
-          />
-          <h2 className="clickable" onClick={(e) => openModal(e, "ideals")}>
-            Ideals (Click for Suggestions)
-          </h2>
-          {currentModal === "ideals" && (
-            <BackgroundCharacteristicModal
-              title={"Example Ideals"}
-              characteristicList={getCharacteristicList("ideals")}
-              closeModal={closeModal}
-            />
-          )}
-          <EditorConvertToJSON
-            toolbarHidden
-            stripPastedStyles
-            wrapperClassName="wysiwyg-textbox-wrapper"
-            editorClassName="wysiwyg-textbox-editor"
-            onBlur={(contentJSON) => {
-              const newBackground = { ...background };
-              newBackground.ideals = contentJSON;
-              updateBackground(newBackground);
-            }}
-            defaultTextJSON={background.ideals}
-          />
-          <h2 className="clickable" onClick={(e) => openModal(e, "bonds")}>
-            Bonds (Click for Suggestions)
-          </h2>
-          {currentModal === "bonds" && (
-            <BackgroundCharacteristicModal
-              title={"Example Bonds"}
-              characteristicList={getCharacteristicList("bonds")}
-              closeModal={closeModal}
-            />
-          )}
-          <EditorConvertToJSON
-            toolbarHidden
-            stripPastedStyles
-            wrapperClassName="wysiwyg-textbox-wrapper"
-            editorClassName="wysiwyg-textbox-editor"
-            onBlur={(contentJSON) => {
-              const newBackground = { ...background };
-              newBackground.bonds = contentJSON;
-              updateBackground(newBackground);
-            }}
-            defaultTextJSON={background.bonds}
-          />
-          <h2 className="clickable" onClick={(e) => openModal(e, "flaws")}>
-            Flaws (Click for Suggestions)
-          </h2>
-          {currentModal === "flaws" && (
-            <BackgroundCharacteristicModal
-              title={"Example Flaws"}
-              characteristicList={getCharacteristicList("flaws")}
-              closeModal={closeModal}
-            />
-          )}
-          <EditorConvertToJSON
-            toolbarHidden
-            stripPastedStyles
-            wrapperClassName="wysiwyg-textbox-wrapper"
-            editorClassName="wysiwyg-textbox-editor"
-            onBlur={(contentJSON) => {
-              const newBackground = { ...background };
-              newBackground.flaws = contentJSON;
-              updateBackground(newBackground);
-            }}
-            defaultTextJSON={background.flaws}
-          />
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 };

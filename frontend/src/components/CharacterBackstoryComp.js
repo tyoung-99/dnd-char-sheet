@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
+import EditorConvertToJSON from "./EditorConvertToJSON";
 
 const CharacterBackstoryComp = ({
   character,
   charChangeFlag,
   setCharChangeFlag,
-  openModal,
-  closeModal,
-  currentModal,
 }) => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [backstory, setBackstory] = useState();
@@ -15,6 +13,12 @@ const CharacterBackstoryComp = ({
     setBackstory(character.backstory);
     setDataLoaded(true);
   }, [character, charChangeFlag]);
+
+  const updateBackstory = (newBackstory) => {
+    setBackstory(newBackstory);
+    character.setBackstory(newBackstory);
+    setCharChangeFlag((old) => !old);
+  };
 
   if (!dataLoaded)
     return (
@@ -26,11 +30,12 @@ const CharacterBackstoryComp = ({
   return (
     <div className="grid-tile">
       <h1>Backstory</h1>
-      {backstory.map((paragraph, i) => (
-        <p key={i} className="text-block">
-          {paragraph}
-        </p>
-      ))}
+      <EditorConvertToJSON
+        wrapperClassName="wysiwyg-textbox-wrapper"
+        editorClassName="wysiwyg-textbox-editor"
+        onBlur={(contentJSON) => updateBackstory(contentJSON)}
+        defaultTextJSON={backstory}
+      />
     </div>
   );
 };
