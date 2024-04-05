@@ -1825,7 +1825,7 @@ class Character {
       const featEffect = elem.effects.find(
         (effect) => effect.category === category
       );
-      feats = feats.concat(featEffect.changes);
+      if (featEffect.changes) feats = feats.concat(featEffect.changes);
     });
 
     return feats;
