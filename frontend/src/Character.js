@@ -1429,7 +1429,10 @@ class Character {
   #getBackgroundFeatures() {
     const features = structuredClone(this.ref_background.features);
     features.forEach((feature) => {
-      feature.background = this.ref_background.name;
+      feature.background =
+        this.background.displayName === ""
+          ? this.ref_background.name
+          : this.background.displayName;
     });
 
     return features;

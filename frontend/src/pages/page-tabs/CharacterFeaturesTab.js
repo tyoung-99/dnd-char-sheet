@@ -1,34 +1,52 @@
 // Character's racial/class/background features, plus feats
 
-const CharacterAbilitiesTab = ({ character }) => {
+import EditorConvertToJSON from "../../components/EditorConvertToJSON";
+
+const CharacterFeaturesTab = ({ character }) => {
   let fromClass = character.getFeatures({ fromClass: true });
   let fromOther = character.getFeatures({
     fromRace: true,
-    fromSubrace: true,
-    fromFeat: true,
     fromBackground: true,
   });
+  fromOther = fromOther.concat(character.getFeats());
 
-  fromClass = fromClass.map((ability, i) => (
-    <div key={i}>
-      <h2 className="float-right">{ability.class}</h2>
-      <h1>{ability.name}</h1>
-      {ability.desc.map((paragraph, j) => (
-        <p key={j}>{paragraph}</p>
-      ))}
-    </div>
-  ));
-  fromOther = fromOther.map((ability, i) => (
-    <div key={i}>
-      <h2 className="float-right">
-        {ability.background || ability.race || ability.subrace || ability.feat}
-      </h2>
-      <h1>{ability.name}</h1>
-      {ability.desc.map((paragraph, j) => (
-        <p key={j}>{paragraph}</p>
-      ))}
-    </div>
-  ));
+  fromClass = fromClass.map((ability, i) => {
+    if (ability.invisible) return null;
+    return (
+      <div key={i}>
+        <h2 className="float-right">{ability.class}</h2>
+        <h1>{ability.displayName || ability.name}</h1>
+        <EditorConvertToJSON
+          readOnly
+          toolbarHidden
+          wrapperClassName="wysiwyg-textbox-wrapper"
+          editorClassName="wysiwyg-textbox-editor"
+          defaultTextJSON={ability.description}
+        />
+      </div>
+    );
+  });
+  fromOther = fromOther.map((ability, i) => {
+    if (ability.invisible) return null;
+    return (
+      <div key={i}>
+        <h2 className="float-right">
+          {ability.background ||
+            ability.race ||
+            ability.subrace ||
+            ability.feat}
+        </h2>
+        <h1>{ability.displayName || ability.name}</h1>
+        <EditorConvertToJSON
+          readOnly
+          toolbarHidden
+          wrapperClassName="wysiwyg-textbox-wrapper"
+          editorClassName="wysiwyg-textbox-editor"
+          defaultTextJSON={ability.description}
+        />
+      </div>
+    );
+  });
 
   return (
     <div className="grid-container row-flex">
@@ -38,4 +56,4 @@ const CharacterAbilitiesTab = ({ character }) => {
   );
 };
 
-export default CharacterAbilitiesTab;
+export default CharacterFeaturesTab;

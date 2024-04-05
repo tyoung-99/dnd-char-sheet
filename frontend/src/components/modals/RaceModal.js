@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import GenericModal from "./GenericModal";
+import EditorConvertToJSON from "../EditorConvertToJSON";
 import FeatureAbilityScoreComp from "../feature-components/FeatureAbilityScoreComp";
 import FeatureLanguageComp from "../feature-components/FeatureLanguageComp";
 import FeatureSkillProfComp from "../feature-components/FeatureSkillProfComp";
@@ -381,9 +382,13 @@ const RaceModal = ({
     ) : (
       <>
         <h1>{selectedFeatureData.displayName}</h1>
-        {selectedFeatureData.description.map((paragraph, i) => (
-          <p key={i}>{paragraph}</p>
-        ))}
+        <EditorConvertToJSON
+          readOnly
+          toolbarHidden
+          wrapperClassName="wysiwyg-textbox-wrapper"
+          editorClassName="wysiwyg-textbox-editor"
+          defaultTextJSON={selectedFeatureData.description}
+        />
         {selectedFeatureData.effects.map((effect, i) => (
           <div key={i}>
             {getFeatureChoiceInputs(
