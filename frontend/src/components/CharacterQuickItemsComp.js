@@ -131,6 +131,7 @@ const CharacterQuickItemsComp = ({
                 {currentModal === `quickConsumable${subtype}${i}` && (
                   <ItemModal
                     character={character}
+                    setCharChangeFlag={setCharChangeFlag}
                     closeModal={closeModal}
                     item={item}
                   />
