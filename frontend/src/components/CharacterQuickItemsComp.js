@@ -44,7 +44,7 @@ const CharacterQuickItemsComp = ({
                 item={item}
               />
             )}
-            <p className="col-1_6">+{attackMod}</p>
+            <p className="col-1_6">{attackMod}</p>
             <p className="col-1_4">{damage}</p>
             <span className="col-1_4 toggles">
               {typeof item.toggles.Activated === "boolean" && (

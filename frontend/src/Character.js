@@ -1884,9 +1884,9 @@ class Character {
 
   #modifiersToString({ flat, dice, type }) {
     let modStr = dice.reduce((totalStr, current, i) => {
-      if (i > 0) {
-        totalStr += " + ";
-      }
+      if (i > 0) totalStr += " ";
+      totalStr += "+ ";
+
       return totalStr + `${current.number}d${current.sides}`;
     }, "");
 
