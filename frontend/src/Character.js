@@ -369,6 +369,23 @@ class Character {
     this.queueSave();
   }
 
+  addBuff(newBuff) {
+    this.buffs.push(newBuff);
+    this.queueSave();
+  }
+
+  editBuff(oldBuff, newBuff) {
+    const index = this.buffs.findIndex((checkBuff) => checkBuff === oldBuff);
+    this.buffs[index] = newBuff;
+    this.queueSave();
+  }
+
+  deleteBuff(oldBuff) {
+    const index = this.buffs.findIndex((checkBuff) => checkBuff === oldBuff);
+    this.buffs.splice(index, 1);
+    this.queueSave();
+  }
+
   getAbilities() {
     return this.abilities.values.map((ability) => {
       const [score, breakdown] = this.getAbilityScore(ability.name);
