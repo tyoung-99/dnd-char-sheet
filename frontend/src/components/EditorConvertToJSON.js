@@ -10,7 +10,7 @@ const EditorConvertToJSON = ({ defaultTextJSON, ...props }) => {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
-  const [imgList, setImgList] = useState();
+  const [imgList, setImgList] = useState({});
 
   const getImgUrl = async (imgId) => {
     const newImgBlob = await axios.get(`/api/img/char/${imgId}`, {
