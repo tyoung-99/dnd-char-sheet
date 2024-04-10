@@ -14,7 +14,42 @@ const AddEditBuffModal = ({
 }) => {
   const isNewBuff = !initialBuff;
   const [buff, setBuff] = useState(
-    initialBuff || { name: "New buff", isDebuff: isDebuff, desc: ["test"] }
+    initialBuff || {
+      name: "New Buff",
+      desc: {
+        blocks: [
+          {
+            key: "b5i0v",
+            text: "Description",
+            type: "unstyled",
+            depth: 0,
+            inlineStyleRanges: [
+              {
+                offset: 0,
+                length: 28,
+                style: "color-rgb(0,0,0)",
+              },
+              {
+                offset: 0,
+                length: 28,
+                style: "fontsize-medium",
+              },
+              {
+                offset: 0,
+                length: 28,
+                style:
+                  'fontfamily--apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+              },
+            ],
+            entityRanges: [],
+            data: {},
+          },
+        ],
+        entityMap: {},
+      },
+      isDebuff: isDebuff,
+      effects: [],
+    }
   );
 
   console.log(buff);
@@ -76,7 +111,7 @@ const AddEditBuffModal = ({
         <button
           className="delete-button"
           onClick={() => {
-            // TODO: delete
+            character.deleteBuff(initialBuff);
             setCharChangeFlag((old) => !old);
             closeModal();
           }}

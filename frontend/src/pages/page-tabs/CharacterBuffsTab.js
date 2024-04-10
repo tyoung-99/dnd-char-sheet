@@ -54,7 +54,20 @@ const CharacterBuffsTab = ({
     <div className="grid-container row-flex">
       <div className="col-flex col-1">
         <div className="grid-tile row-flex borderless">
-          <button className="add-buff-button">Add Buff/Debuff</button>
+          <button
+            className="add-buff-button"
+            onClick={(e) => openModal(e, "addingBuff")}
+          >
+            Add Buff/Debuff
+          </button>
+          {currentModal === "addingBuff" && (
+            <AddEditBuffModal
+              character={character}
+              setCharChangeFlag={setCharChangeFlag}
+              closeModal={closeModal}
+              isDebuff={false}
+            />
+          )}
         </div>
         <div className="row-flex">
           <div className="col-1_2 grid-tile">
