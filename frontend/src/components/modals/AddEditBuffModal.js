@@ -12,7 +12,7 @@ const AddEditBuffModal = ({
   initialBuff,
   isDebuff,
 }) => {
-  const [isNewBuff, setIsNewBuff] = useState(!initialBuff);
+  const isNewBuff = !initialBuff;
   const [buff, setBuff] = useState(
     initialBuff || { name: "New buff", isDebuff: isDebuff, desc: ["test"] }
   );
@@ -27,6 +27,17 @@ const AddEditBuffModal = ({
 
   const body = (
     <>
+      <button
+        onClick={() =>
+          setBuff((oldBuff) => {
+            const newBuff = { ...oldBuff };
+            newBuff.isDebuff = !newBuff.isDebuff;
+            return newBuff;
+          })
+        }
+      >
+        Switch to {buff.isDebuff ? "" : "de"}buff
+      </button>
       <p>
         <label htmlFor="name">Name: </label>
         <input
