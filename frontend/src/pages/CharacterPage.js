@@ -8,6 +8,7 @@ import Character from "../Character";
 import TabNavComp from "../components/TabNavComp";
 import InlineClassListComp from "../components/InlineClassListComp";
 import TabContentComp from "../components/TabContentComp";
+import NumInputComp from "../components/NumInputComp";
 import CharacterMainTab from "./page-tabs/CharacterMainTab";
 import CharacterBackgroundTab from "./page-tabs/CharacterBackgroundTab";
 import CharacterFeaturesTab from "./page-tabs/CharacterFeaturesTab";
@@ -18,10 +19,14 @@ import DeathSavesComp from "../components/DeathSavesComp";
 import XpComp from "../components/XpComp";
 import MultiColumnDropdownComp from "../components/MultiColumnDropdownComp";
 import RaceModal from "../components/modals/RaceModal";
+import GenericBreakdownModal from "../components/modals/GenericBreakdownModal";
 import CurrentHitDiceModal from "../components/modals/CurrentHitDiceModal";
-import NumInputComp from "../components/NumInputComp";
+import MaxHitPointsModal from "../components/modals/MaxHitPointsModal";
 
 const CharacterPage = () => {
+  const [charLoaded, setCharLoaded] = useState(false);
+  const [charChangeFlag, setCharChangeFlag] = useState(true);
+
   const [activeTab, setActiveTab] = useState("main");
   const [currentModal, setCurrentModal] = useState("");
 
@@ -30,22 +35,31 @@ const CharacterPage = () => {
   const [avatarURL, setAvatarURL] = useState();
   const [alignmentList, setAlignmentList] = useState();
 
+  const [showingSavingMessage, setShowingSavingMessage] = useState(false);
   const [showingSavedMessage, setShowingSavedMessage] = useState(false);
   const fileInput = useRef(null);
 
   const [charName, setCharName] = useState("");
+  const [inspiration, setInspiration] = useState();
+  const [alignment, setAlignment] = useState();
+
+  const [armorClass, setArmorClass] = useState();
+  const [initiative, setInitiative] = useState();
+  const [totalHitDice, setTotalHitDice] = useState();
+  const [maxHitPoints, setMaxHitPoints] = useState();
+  const [currentHitPoints, setCurrentHitPoints] = useState();
+  const [tempHitPoints, setTempHitPoints] = useState();
 
   useEffect(() => {
     const loadData = async () => {
       let response = await axios.get(`/api/characters/${characterID}`);
       const newChar = await Character.create(
         response.data,
+        setShowingSavingMessage,
         setShowingSavedMessage
       );
 
       setCharacter(newChar);
-      setCharName(newChar.name);
-      refreshAvatarImg(newChar);
 
       response = await axios.get("/api/alignments");
       setAlignmentList(response.data);
@@ -54,13 +68,32 @@ const CharacterPage = () => {
     loadData();
   }, [characterID]);
 
-  const openModal = (event) => {
+  useEffect(() => {
+    if (!character) return;
+
+    setCharName(character.name);
+    refreshAvatarImg(character);
+    setInspiration(character.inspiration);
+    setAlignment(character.alignment);
+
+    setArmorClass(character.getArmorClass());
+    setInitiative(character.getInitiative());
+    setMaxHitPoints(character.getMaxHitPoints());
+    setCurrentHitPoints(character.getCurrentHitPoints());
+    setTempHitPoints(character.hitPoints.temp);
+    let [totalHitDiceVal, totalHitDiceBreakdown] = character.getTotalHitDice();
+    totalHitDiceVal = totalHitDiceVal
+      .map((die) => `${die.number}d${die.sides}`)
+      .join(", ");
+    setTotalHitDice([totalHitDiceVal, totalHitDiceBreakdown]);
+
+    setCharLoaded(true);
+  }, [character, charChangeFlag]);
+
+  const openModal = (event, modalName) => {
     event.preventDefault();
     event.stopPropagation();
-    const modal = event.target.dataset.modal;
-    if (modal) {
-      setCurrentModal(modal);
-    }
+    setCurrentModal(modalName);
   };
 
   const closeModal = () => {
@@ -92,10 +125,10 @@ const CharacterPage = () => {
     }
 
     character.setAvatar(response.data);
-    refreshAvatarImg(character);
+    setCharChangeFlag((old) => !old);
   };
 
-  if (!character) {
+  if (!charLoaded) {
     return <div>Loading...</div>;
   }
 
@@ -106,18 +139,14 @@ const CharacterPage = () => {
         type="button"
         id="toggleInspiration"
         name="toggleInspiration"
-        value={character.inspiration ? "Yes" : "No"}
-        onClick={() => character.setInspiration(!character.inspiration)}
+        value={inspiration ? "Yes" : "No"}
+        onClick={() => {
+          character.setInspiration(!inspiration);
+          setCharChangeFlag((old) => !old);
+        }}
       ></input>
     </div>
   );
-
-  const [armorClassVal, armorClassBreakdown] = character.getArmorClass();
-  const [initiativeVal, initiativeBreakdown] = character.getInitiative();
-  const [totalHitDice, totalHitDiceBreakdown] = character.getTotalHitDice();
-  const [maxHitPoints, maxHitPointsBreakdown] = character.getMaxHitPoints();
-  const [currentHitPoints, currentHitPointsBreakdown] =
-    character.getCurrentHitPoints();
 
   return (
     <div>
@@ -130,9 +159,10 @@ const CharacterPage = () => {
             value="< Back to List"
           ></input>
         </Link>
+        {showingSavingMessage && <p className="save-message">Saving</p>}
         <p
-          className={`saved-message ${
-            showingSavedMessage ? "saved-message-shown" : "saved-message-hidden"
+          className={`save-message ${
+            showingSavedMessage ? "fadein" : "fadeout-2-sec"
           }`}
           onTransitionEnd={() => setShowingSavedMessage(false)}
         >
@@ -170,10 +200,10 @@ const CharacterPage = () => {
             onBlur={(event) => {
               if (event.target.innerText === "") {
                 character.setName("Character Name");
-                setCharName("Character Name");
+                setCharChangeFlag((old) => !old);
               } else {
                 character.setName(event.target.innerText);
-                setCharName(event.target.innerText);
+                setCharChangeFlag((old) => !old);
               }
             }}
           >
@@ -181,15 +211,23 @@ const CharacterPage = () => {
           </h1>
           <h2 className="player-name">{character.player}</h2>
           <MultiColumnDropdownComp
-            buttonText={character.alignment}
+            buttonText={alignment}
             contents={alignmentList}
-            onSelect={(newAlignment) => character.setAlignment(newAlignment)}
+            onSelect={(newAlignment) => {
+              character.setAlignment(newAlignment);
+              setCharChangeFlag((old) => !old);
+            }}
           ></MultiColumnDropdownComp>
-          <p className="race" data-modal="race" onClick={openModal}>
+          <p className="race clickable" onClick={(e) => openModal(e, "race")}>
             {character.ref_subraceName}
           </p>
           {currentModal === "race" && (
-            <RaceModal character={character} closeModal={closeModal} />
+            <RaceModal
+              character={character}
+              charChangeFlag={charChangeFlag}
+              setCharChangeFlag={setCharChangeFlag}
+              closeModal={closeModal}
+            />
           )}
           <InlineClassListComp classes={character.classes} />
         </div>
@@ -200,53 +238,110 @@ const CharacterPage = () => {
       </div>
       <div className="combat-header">
         <div>
-          <p className="clickable" title={armorClassBreakdown}>
-            AC: {armorClassVal}
+          <p className="clickable" onClick={(e) => openModal(e, "armorClass")}>
+            AC: {armorClass[0]}
           </p>
-          <p className="clickable" title={initiativeBreakdown}>
-            Initiative: {(initiativeVal >= 0 ? "+" : "") + initiativeVal}
+          {currentModal === "armorClass" && (
+            <GenericBreakdownModal
+              title={"Armor Class"}
+              closeModal={closeModal}
+              breakdown={armorClass[1]}
+              total={armorClass[0]}
+            />
+          )}
+          <p className="clickable" onClick={(e) => openModal(e, "initiative")}>
+            Initiative: {(initiative[0] >= 0 ? "+" : "") + initiative[0]}
           </p>
+          {currentModal === "initiative" && (
+            <GenericBreakdownModal
+              title={"Initiative"}
+              closeModal={closeModal}
+              breakdown={initiative[1]}
+              total={initiative[0]}
+            />
+          )}
         </div>
         <div className="row-flex">
           <div>
-            <p className="clickable" title={maxHitPointsBreakdown}>
-              Max HP: {maxHitPoints}
+            <p
+              className="clickable"
+              onClick={(e) => openModal(e, "maxHitPoints")}
+            >
+              Max HP: {maxHitPoints[0]}
             </p>
-            <p className="clickable" title={currentHitPointsBreakdown}>
-              Current HP: {currentHitPoints}
+            {currentModal === "maxHitPoints" && (
+              <MaxHitPointsModal
+                character={character}
+                closeModal={closeModal}
+                breakdown={maxHitPoints[1]}
+                total={maxHitPoints[0]}
+                setCharChangeFlag={setCharChangeFlag}
+              />
+            )}
+            <p
+              className="clickable"
+              onClick={(e) => openModal(e, "currentHitPoints")}
+            >
+              Current HP: {currentHitPoints[0]}
             </p>
-            <p>Temp HP: {character.hitPoints.temp}</p>
+            {currentModal === "currentHitPoints" && (
+              <GenericBreakdownModal
+                title={"Current Hit Points"}
+                closeModal={closeModal}
+                breakdown={currentHitPoints[1]}
+                total={currentHitPoints[0]}
+              />
+            )}
+            <p>Temp HP: {tempHitPoints}</p>
           </div>
           <div className="col-flex hp-buttons">
             <div>
               <NumInputComp
                 buttonText={"Heal"}
-                callback={(amount) => character.restoreHitPoints(amount)} // Can't pass directly or "this" points to wrong element
+                callback={(amount) => {
+                  character.restoreHitPoints(amount);
+                  setCharChangeFlag((old) => !old);
+                }} // Can't pass directly or "this" points to wrong element
               />
             </div>
             <div>
               <NumInputComp
                 buttonText={"Damage"}
-                callback={(amount) => character.dealDamage(amount)}
+                callback={(amount) => {
+                  character.dealDamage(amount);
+                  setCharChangeFlag((old) => !old);
+                }}
               />
             </div>
             <div>
               <NumInputComp
                 buttonText={"New Temp HP"}
-                callback={(amount) => character.replaceTempHitPoints(amount)}
+                callback={(amount) => {
+                  character.replaceTempHitPoints(amount);
+                  setCharChangeFlag((old) => !old);
+                }}
               />
             </div>
           </div>
         </div>
         <div>
-          <p className="clickable" title={totalHitDiceBreakdown}>
-            Total Hit Dice:{" "}
-            {totalHitDice.map((die) => `${die.number}d${die.sides}`).join(", ")}
-          </p>
           <p
             className="clickable"
-            data-modal="currentHitDice"
-            onClick={openModal}
+            onClick={(e) => openModal(e, "totalHitDice")}
+          >
+            Total Hit Dice: {totalHitDice[0]}
+          </p>
+          {currentModal === "totalHitDice" && (
+            <GenericBreakdownModal
+              title={"Total Hit Dice"}
+              closeModal={closeModal}
+              breakdown={totalHitDice[1]}
+              total={totalHitDice[0]}
+            />
+          )}
+          <p
+            className="clickable"
+            onClick={(e) => openModal(e, "currentHitDice")}
           >
             Current Hit Dice:{" "}
             {character
@@ -303,19 +398,45 @@ const CharacterPage = () => {
       </ul>
       <div>
         <TabContentComp id={"main"} activeTab={activeTab}>
-          <CharacterMainTab character={character} />
+          <CharacterMainTab
+            character={character}
+            charChangeFlag={charChangeFlag}
+            setCharChangeFlag={setCharChangeFlag}
+            openModal={openModal}
+            closeModal={closeModal}
+            currentModal={currentModal}
+          />
         </TabContentComp>
         <TabContentComp id={"background"} activeTab={activeTab}>
-          <CharacterBackgroundTab character={character} />
+          <CharacterBackgroundTab
+            character={character}
+            charChangeFlag={charChangeFlag}
+            setCharChangeFlag={setCharChangeFlag}
+            openModal={openModal}
+            closeModal={closeModal}
+            currentModal={currentModal}
+          />
         </TabContentComp>
         <TabContentComp id={"features"} activeTab={activeTab}>
           <CharacterFeaturesTab character={character} />
         </TabContentComp>
         <TabContentComp id={"buffs"} activeTab={activeTab}>
-          <CharacterBuffsTab character={character} />
+          <CharacterBuffsTab
+            character={character}
+            charChangeFlag={charChangeFlag}
+            setCharChangeFlag={setCharChangeFlag}
+            openModal={openModal}
+            closeModal={closeModal}
+            currentModal={currentModal}
+          />
         </TabContentComp>
         <TabContentComp id={"equipment"} activeTab={activeTab}>
-          <CharacterEquipmentTab character={character} />
+          <CharacterEquipmentTab
+            character={character}
+            openModal={openModal}
+            closeModal={closeModal}
+            currentModal={currentModal}
+          />
         </TabContentComp>
         <TabContentComp id={"spellcasting"} activeTab={activeTab}>
           <CharacterSpellcastingTab character={character} />

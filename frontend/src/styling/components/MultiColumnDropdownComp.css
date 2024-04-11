@@ -5,7 +5,8 @@
 }
 
 .dropdown-toggle {
-  cursor: pointer;
+  line-height: 1rem;
+  padding: 0.25rem;
 }
 
 .toggled-open {
@@ -20,6 +21,7 @@
   display: flex;
   background-color: white;
   border: 1px solid black;
+  z-index: 9999;
 }
 
 .dropdown-column {

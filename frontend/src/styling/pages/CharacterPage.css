@@ -56,7 +56,8 @@
   margin: 0.5rem;
 }
 .race {
-  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1rem;
 }
 
 .xp-inspire-header {
@@ -80,12 +81,8 @@
 }
 .combat-header p {
   line-height: 1rem;
-  height: 1rem;
   padding: 0.25rem;
   margin: 0.5rem 0;
-}
-.combat-header .clickable:hover {
-  background-color: lightgray;
 }
 .combat-header .hp-buttons {
   margin: 0.5rem 0 0.5rem 0.5rem;
@@ -106,16 +103,8 @@
   left: 1rem;
 }
 
-.saved-message {
+.save-message {
   margin: 0px 1em;
-}
-.saved-message-shown {
-  opacity: 1;
-  transition: all 250ms linear;
-}
-.saved-message-hidden {
-  opacity: 0;
-  transition: all 250ms linear 2s;
 }
 
 .avatar-edit {
@@ -134,4 +123,24 @@
 }
 .avatar-container:hover .avatar-edit {
   display: block;
+}
+
+.abilities-table th,
+.abilities-table td {
+  border-bottom: 1px solid black;
+  min-width: 2rem;
+  max-width: 5rem;
+  text-align: center;
+}
+.abilities-table col:nth-child(even) {
+  background-color: rgba(211, 211, 211, 0.3);
+}
+.abilities-table td {
+  border-bottom: 1px dotted black;
+}
+.abilities-table tr:last-child td {
+  border-bottom: none;
+}
+.abilities-table td input[type="number"] {
+  width: 3rem;
 }

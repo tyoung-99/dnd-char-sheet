@@ -2,14 +2,35 @@
 import CharacterStatsComp from "../../components/CharacterStatsComp";
 import CharacterQuickItemsComp from "../../components/CharacterQuickItemsComp";
 
-const CharacterMainTab = ({ character }) => {
+const CharacterMainTab = ({
+  character,
+  charChangeFlag,
+  setCharChangeFlag,
+  openModal,
+  closeModal,
+  currentModal,
+}) => {
   return (
     <div className="grid-container row-flex">
       <div className="col-1_2">
-        <CharacterStatsComp character={character} />
+        <CharacterStatsComp
+          character={character}
+          charChangeFlag={charChangeFlag}
+          setCharChangeFlag={setCharChangeFlag}
+          openModal={openModal}
+          closeModal={closeModal}
+          currentModal={currentModal}
+        />
       </div>
       <div className="col-1_2">
-        <CharacterQuickItemsComp character={character} />
+        <CharacterQuickItemsComp
+          character={character}
+          charChangeFlag={charChangeFlag}
+          setCharChangeFlag={setCharChangeFlag}
+          openModal={openModal}
+          closeModal={closeModal}
+          currentModal={currentModal}
+        />
       </div>
     </div>
   );

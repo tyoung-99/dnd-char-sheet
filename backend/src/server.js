@@ -11,7 +11,12 @@ import {
 import { getImg, removeImg } from "./handleImg.js";
 import { getSources, getOneSource } from "./handleSources.js";
 import { getAlignments } from "./handleAlignments.js";
-import { getWeaponProfs, getArmorProfs } from "./handleOtherProfs.js";
+import {
+  getWeaponProfs,
+  getArmorProfs,
+  getToolProfsAll,
+  getToolProfsByType,
+} from "./handleOtherProfs.js";
 import {
   getRaces,
   getOneRace,
@@ -29,6 +34,12 @@ import {
   insertSubrace,
 } from "./handleRaces.js";
 import { getFeats, getFeatsFromList, getOneFeat } from "./handleFeats.js";
+import {
+  getBackgrounds,
+  getOneBackground,
+  getBackgroundFeaturesFromList,
+  getOneBackgroundFeature,
+} from "./handleBackgrounds.js";
 
 const app = express();
 app.use(express.json());
@@ -110,9 +121,13 @@ app.get("/api/alignments", async (req, res) => {
 app.get("/api/proficiencies/weapons", async (req, res) => {
   res.send(await getWeaponProfs(db));
 });
-
 app.get("/api/proficiencies/armor", async (req, res) => {
   res.send(await getArmorProfs(db));
+});
+app.get("/api/proficiencies/tools/:type", async (req, res) => {
+  const { type } = req.params;
+  if (type === "all") res.send(await getToolProfsAll(db));
+  else res.send(await getToolProfsByType(db, type));
 });
 
 // Races
@@ -200,6 +215,24 @@ app.get("/api/feats/multiple/:featIds", async (req, res) => {
 app.get("/api/feats/one/:featId", async (req, res) => {
   const { featId } = req.params;
   res.send(await getOneFeat(db, featId));
+});
+
+// Backgrounds
+app.get("/api/backgrounds", async (req, res) => {
+  res.send(await getBackgrounds(db));
+});
+app.get("/api/backgrounds/one/:backgroundId", async (req, res) => {
+  const { backgroundId } = req.params;
+  res.send(await getOneBackground(db, backgroundId));
+});
+app.get("/api/backgroundFeatures/multiple/:featureIds", async (req, res) => {
+  let { featureIds } = req.params;
+  featureIds = featureIds.split(",");
+  res.send(await getBackgroundFeaturesFromList(db, featureIds));
+});
+app.get("/api/backgroundFeatures/one/:featureId", async (req, res) => {
+  const { featureId } = req.params;
+  res.send(await getOneBackgroundFeature(db, featureId));
 });
 
 const PORT = process.env.PORT || 8000;

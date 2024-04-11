@@ -1,4 +1,4 @@
-// Input component for skill proficiency racial features
+// Input component for skill proficiency features
 
 const FeatureSkillProfComp = ({
   featureType,
@@ -7,6 +7,7 @@ const FeatureSkillProfComp = ({
   choices,
   featureChoices,
   setFeatureChoices,
+  onChangeCallBack = (newChoices) => {},
   originalFeatureChoices,
   existingProfs,
 }) => {
@@ -60,6 +61,7 @@ const FeatureSkillProfComp = ({
           const newChoices = { ...featureChoices };
           newChoices[featureType][featureId][category][i] = event.target.value;
           setFeatureChoices(newChoices);
+          onChangeCallBack(newChoices);
         }}
       >
         <option hidden value={""}>
@@ -85,7 +87,7 @@ const FeatureSkillProfComp = ({
 
   return (
     <>
-      <label>Skill proficienc{inputs.length > 1 ? "ies" : "y"}:</label>
+      <label>Skill proficienc{inputs.length > 1 ? "ies" : "y"}: </label>
       {inputs}
     </>
   );

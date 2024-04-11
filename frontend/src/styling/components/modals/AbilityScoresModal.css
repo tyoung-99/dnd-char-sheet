@@ -1,0 +1,33 @@
+.ability-scores-modal-container .ability-scores-header h1 {
+  font-size: 1.5rem;
+}
+
+.ability-scores-modal-container .ability-scores-body .point-buy-options button {
+  cursor: pointer;
+  background-color: white;
+  border: 1px solid black;
+}
+.ability-scores-modal-container
+  .ability-scores-body
+  .point-buy-options
+  button:hover {
+  background-color: lightgray;
+}
+.ability-scores-modal-container
+  .ability-scores-body
+  .point-buy-options
+  button.selected {
+  background-color: black;
+  color: white;
+}
+.ability-scores-modal-container .ability-scores-body .point-buy-options p {
+  display: inline-block;
+  padding: 0.25rem;
+  margin: 0;
+}
+.ability-scores-modal-container
+  .ability-scores-body
+  .point-buy-options
+  .hover-icon {
+  height: 0.75rlh;
+}

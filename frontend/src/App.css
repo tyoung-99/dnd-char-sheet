@@ -24,6 +24,9 @@
 .text-center {
   text-align: center;
 }
+.text-right {
+  text-align: right;
+}
 
 .height-1 {
   height: 1lh;
@@ -121,7 +124,7 @@
 }
 
 .hover-icon {
-  height: 1rlh;
+  height: 0.9rlh;
   margin: 1px;
   vertical-align: middle;
 }
@@ -163,9 +166,29 @@ p:has(> .hover-icon) {
 .clickable {
   cursor: pointer;
 }
+.clickable:hover {
+  background-color: lightgray;
+}
 
 .hidden {
   visibility: hidden;
+}
+
+.fadein {
+  opacity: 1;
+  transition: all 250ms linear;
+}
+.fadeout-2-sec {
+  opacity: 0;
+  transition: all 250ms linear 2s;
+}
+
+.wysiwyg-textbox-wrapper {
+  border: solid 1px black;
+}
+
+.wysiwyg-textbox-editor {
+  padding: 0 0.1rem;
 }
 
 .wrap {

@@ -3,13 +3,19 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import GenericModal from "./GenericModal";
-import FeatureAbilityScoreComp from "./sub-components/FeatureAbilityScoreComp";
-import FeatureLanguageComp from "./sub-components/FeatureLanguageComp";
-import FeatureSkillProfComp from "./sub-components/FeatureSkillProfComp";
-import FeatureFeatComp from "./sub-components/FeatureFeatComp";
+import EditorConvertToJSON from "../EditorConvertToJSON";
+import FeatureAbilityScoreComp from "../feature-components/FeatureAbilityScoreComp";
+import FeatureLanguageComp from "../feature-components/FeatureLanguageComp";
+import FeatureSkillProfComp from "../feature-components/FeatureSkillProfComp";
+import FeatureFeatComp from "../feature-components/FeatureFeatComp";
 import "../../styling/components/modals/RaceModal.css";
 
-const RaceModal = ({ character, closeModal }) => {
+const RaceModal = ({
+  character,
+  charChangeFlag,
+  setCharChangeFlag,
+  closeModal,
+}) => {
   const srcList = useRef();
   const [raceOptions, setRaceOptions] = useState();
   const [raceDropdownOptions, setRaceDropdownOptions] = useState();
@@ -86,7 +92,12 @@ const RaceModal = ({ character, closeModal }) => {
       setOriginalFeatureChoices(structuredClone(character.featureChoices));
     };
     loadData();
-  }, [character.race, character.featureChoices, updateSubraceOptions]);
+  }, [
+    character.race,
+    character.featureChoices,
+    updateSubraceOptions,
+    charChangeFlag,
+  ]);
 
   const addNewEffectChoices = (toAdd, effectChoices) => {
     for (const feature of toAdd) {
@@ -371,9 +382,13 @@ const RaceModal = ({ character, closeModal }) => {
     ) : (
       <>
         <h1>{selectedFeatureData.displayName}</h1>
-        {selectedFeatureData.description.map((paragraph, i) => (
-          <p key={i}>{paragraph}</p>
-        ))}
+        <EditorConvertToJSON
+          readOnly
+          toolbarHidden
+          wrapperClassName="wysiwyg-textbox-wrapper"
+          editorClassName="wysiwyg-textbox-editor"
+          defaultTextJSON={selectedFeatureData.description}
+        />
         {selectedFeatureData.effects.map((effect, i) => (
           <div key={i}>
             {getFeatureChoiceInputs(
@@ -480,6 +495,7 @@ const RaceModal = ({ character, closeModal }) => {
       <button
         onClick={async () => {
           await character.setRace(savedRace, savedSubrace, featureChoices);
+          setCharChangeFlag((old) => !old);
           closeModal();
         }}
       >

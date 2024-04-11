@@ -1,5 +1,5 @@
 import fs from "fs";
-import { readFile } from "fs/promises";
+import { readFile, unlink } from "fs/promises";
 
 export const getImg = async (id) => {
   let imgList = fs.readdirSync("./img/");

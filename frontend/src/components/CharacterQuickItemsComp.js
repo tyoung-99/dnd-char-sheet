@@ -1,119 +1,172 @@
 // Character's weapons/attacks, ammo/consumables
+
+import { useEffect, useState } from "react";
+import ItemModal from "./modals/ItemModal";
 import "../styling/components/CharacterQuickItemsComp.css";
 
-const CharacterQuickItemsComp = ({ character }) => {
-  const handleWeapons = (weapons) => {
-    weapons = weapons.sort((first, second) =>
-      first.name > second.name ? 1 : first.name === second.name ? 0 : -1
-    );
-    weapons = weapons.map((item, i) => {
-      const [attackMod, damage] = character.getAttack(item);
+const CharacterQuickItemsComp = ({
+  character,
+  charChangeFlag,
+  setCharChangeFlag,
+  openModal,
+  closeModal,
+  currentModal,
+}) => {
+  const [dataLoaded, setDataLoaded] = useState(false);
 
-      let attackModStr = `${attackMod.flat >= 0 ? "+" : ""}${attackMod.flat}`;
-      if (attackMod.dice.length > 0) {
-        const attackDice = attackMod.dice.map(
-          (die) => ` + ${die.number}d${die.sides}`
-        );
-        attackModStr = attackModStr.concat(attackDice.join(""));
-      }
+  const [weapons, setWeapons] = useState();
+  const [consumables, setConsumables] = useState();
 
-      return (
-        <div key={i} className="row-flex">
-          <div className="col-1_3">
-            <p className="weapon">{item.name}</p>
-            <p className="weapon-properties">
-              {item.properties.join(", ") || ""}
-            </p>
-          </div>
-          <p className="col-1_6">{attackModStr}</p>
-          <p className="col-1_3">
-            {damage.map((group, j) => {
-              let damageMod;
-              if (group.flat > 0) {
-                damageMod = ` + ${group.flat}`;
-              } else if (!group.flat || group.flat === 0) {
-                damageMod = "";
-              } else {
-                damageMod = ` - ${Math.abs(group.flat)}`; // Uses absolute value so there's space between minus and number
-              }
-
-              let groupDice = group.dice.map(
-                (die, k) =>
-                  `${die.number}d${die.sides}${
-                    k === group.dice.length - 1 ? "" : " + "
-                  }`
-              );
-              return `${groupDice}${damageMod} ${group.type}${
-                j === damage.length - 1 ? "" : " + "
-              }`;
-            })}
-          </p>
-          <p className="col-1_6">
-            {item.damage.activated ? (item.activated ? "Yes" : "No") : "-"}
-          </p>
-        </div>
+  useEffect(() => {
+    const handleWeapons = (weapons) => {
+      weapons = weapons.sort((first, second) =>
+        first.name > second.name ? 1 : first.name === second.name ? 0 : -1
       );
-    });
+      weapons = weapons.map((item, i) => {
+        const [[attackMod], [damage]] = character.getAttack(item);
 
-    return weapons;
-  };
-
-  const handleConsumables = (consumables) => {
-    let itemizedConsumables = {};
-
-    consumables.forEach((item) => {
-      if (!(item.subtype in itemizedConsumables)) {
-        itemizedConsumables[item.subtype] = [];
-      }
-      itemizedConsumables[item.subtype].push(item);
-    });
-
-    // Alphabetize categories & items w/in categories
-    itemizedConsumables = Object.keys(itemizedConsumables)
-      .sort()
-      .reduce((sorted, subtype) => {
-        sorted[subtype] = itemizedConsumables[subtype];
-        return sorted;
-      }, {});
-
-    for (let subtype in itemizedConsumables) {
-      itemizedConsumables[subtype] = itemizedConsumables[subtype].sort(
-        (first, second) =>
-          first.name > second.name ? 1 : first.name === second.name ? 0 : -1
-      );
-
-      itemizedConsumables[subtype] = itemizedConsumables[subtype].map(
-        (item, i) => {
-          let position = "";
-          if (i < itemizedConsumables[subtype].length - 1) {
-            position = position.concat(" flush-below");
-          }
-          if (i > 0) {
-            position = position.concat(" flush-above");
-          }
-
-          return (
-            <div key={i} className="row-flex">
-              <p className={`col-1_2${position}`}>{item.name}</p>
-              <p className={`col-1_2${position}`}>{item.count}</p>
+        return (
+          <div key={i} className="row-flex">
+            <div
+              className="col-1_3 clickable"
+              onClick={(e) => openModal(e, `quickWeapon${i}`)}
+            >
+              <p className="weapon">{item.name}</p>
+              <p className="weapon-properties">
+                {item.properties.join(", ") || ""}
+              </p>
             </div>
-          );
+            {currentModal === `quickWeapon${i}` && (
+              <ItemModal
+                character={character}
+                setCharChangeFlag={setCharChangeFlag}
+                closeModal={closeModal}
+                item={item}
+              />
+            )}
+            <p className="col-1_6">{attackMod}</p>
+            <p className="col-1_4">{damage}</p>
+            <span className="col-1_4 toggles">
+              {typeof item.toggles.Activated === "boolean" && (
+                <span>
+                  <label htmlFor={"activated"}>Activated: </label>
+                  <button
+                    id={"activated"}
+                    name={"activated"}
+                    onClick={() => {
+                      character.toggleItemActive(item);
+                      setCharChangeFlag((old) => !old);
+                    }}
+                  >
+                    {item.toggles.Activated ? "Yes" : "No"}
+                  </button>
+                </span>
+              )}
+              {typeof item.toggles["Two-Handed"] === "boolean" && (
+                <span>
+                  <label htmlFor={"twoHanded"}>Two-Handed: </label>
+                  <button
+                    id={"twoHanded"}
+                    name={"twoHanded"}
+                    onClick={() => {
+                      character.toggleItemTwoHanded(item);
+                      setCharChangeFlag((old) => !old);
+                    }}
+                  >
+                    {item.toggles["Two-Handed"] ? "Yes" : "No"}
+                  </button>
+                </span>
+              )}
+            </span>
+          </div>
+        );
+      });
+
+      return weapons;
+    };
+
+    const handleConsumables = (consumables) => {
+      let itemizedConsumables = {};
+
+      // 1st subtype takes priority for sorting
+      consumables.forEach((item) => {
+        if (!(item.subtypes[0] in itemizedConsumables)) {
+          itemizedConsumables[item.subtypes[0]] = [];
         }
-      );
-    }
+        itemizedConsumables[item.subtypes[0]].push(item);
+      });
 
-    return itemizedConsumables;
-  };
+      // Alphabetize categories & items w/in categories
+      itemizedConsumables = Object.keys(itemizedConsumables)
+        .sort()
+        .reduce((sorted, subtype) => {
+          sorted[subtype] = itemizedConsumables[subtype];
+          return sorted;
+        }, {});
 
-  let weapons = character
-    .getItemsByType("Weapon")
-    .filter((item) => item.equipped);
-  let consumables = character
-    .getItemsByType("Consumable")
-    .filter((item) => item.equipped);
+      for (let subtype in itemizedConsumables) {
+        itemizedConsumables[subtype] = itemizedConsumables[subtype].sort(
+          (first, second) =>
+            first.name > second.name ? 1 : first.name === second.name ? 0 : -1
+        );
 
-  weapons = handleWeapons(weapons);
-  consumables = handleConsumables(consumables);
+        itemizedConsumables[subtype] = itemizedConsumables[subtype].map(
+          (item, i) => {
+            let position = "";
+            if (i < itemizedConsumables[subtype].length - 1) {
+              position = position.concat(" flush-below");
+            }
+            if (i > 0) {
+              position = position.concat(" flush-above");
+            }
+
+            return (
+              <div key={i} className="row-flex">
+                <p
+                  className={`col-1_2${position} clickable`}
+                  onClick={(e) => openModal(e, `quickConsumable${subtype}${i}`)}
+                >
+                  {item.name}
+                </p>
+                {currentModal === `quickConsumable${subtype}${i}` && (
+                  <ItemModal
+                    character={character}
+                    setCharChangeFlag={setCharChangeFlag}
+                    closeModal={closeModal}
+                    item={item}
+                  />
+                )}
+                <p className={`col-1_2${position}`}>{item.count}</p>
+              </div>
+            );
+          }
+        );
+      }
+
+      return itemizedConsumables;
+    };
+
+    const weapons = character
+      .getItemsByType("Weapon")
+      .filter((item) => item.toggles.Equipped);
+    setWeapons(handleWeapons(weapons));
+
+    const consumables = character
+      .getItemsByType("Consumable")
+      .filter((item) => item.toggles.Equipped);
+    setConsumables(handleConsumables(consumables));
+
+    setDataLoaded(true);
+  }, [
+    character,
+    charChangeFlag,
+    currentModal,
+    setCharChangeFlag,
+    closeModal,
+    openModal,
+  ]);
+
+  if (!dataLoaded) return;
 
   return (
     <>
@@ -125,8 +178,8 @@ const CharacterQuickItemsComp = ({ character }) => {
               <div className="row-flex">
                 <h2 className="col-1_3">Name</h2>
                 <h2 className="col-1_6">Attack</h2>
-                <h2 className="col-1_3">Damage</h2>
-                <h2 className="col-1_6">Activated</h2>
+                <h2 className="col-1_4">Damage</h2>
+                <h2 className="col-1_4">Toggles</h2>
               </div>
               {weapons.length === 0 ? (
                 <p>-Equip a weapon to display it here-</p>

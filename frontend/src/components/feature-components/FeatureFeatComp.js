@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import EditorConvertToJSON from "../EditorConvertToJSON";
 
 const FeatureFeatComp = ({
   featureType,
@@ -101,9 +102,13 @@ const FeatureFeatComp = ({
     );
     const featOptions = currentFeat ? (
       <>
-        {currentFeat.description.map((paragraph, i) => (
-          <p key={i}>{paragraph}</p>
-        ))}
+        <EditorConvertToJSON
+          readOnly
+          toolbarHidden
+          wrapperClassName="wysiwyg-textbox-wrapper"
+          editorClassName="wysiwyg-textbox-editor"
+          defaultTextJSON={currentFeat.description}
+        />
         {currentFeat.effects.map((effect, i) => (
           <div key={i}>
             {getFeatureChoiceInputs(
