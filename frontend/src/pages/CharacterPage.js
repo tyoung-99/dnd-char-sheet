@@ -433,6 +433,8 @@ const CharacterPage = () => {
         <TabContentComp id={"equipment"} activeTab={activeTab}>
           <CharacterEquipmentTab
             character={character}
+            charChangeFlag={charChangeFlag}
+            setCharChangeFlag={setCharChangeFlag}
             openModal={openModal}
             closeModal={closeModal}
             currentModal={currentModal}

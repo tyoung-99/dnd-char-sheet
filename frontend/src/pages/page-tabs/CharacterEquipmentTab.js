@@ -6,12 +6,16 @@ import "../../styling/pages/page-tabs/CharacterEquipmentTab.css";
 
 const CharacterEquipmentTab = ({
   character,
+  charChangeFlag,
+  setCharChangeFlag,
   openModal,
   closeModal,
   currentModal,
 }) => {
   let itemizedInventory = character.getItems();
   let treasure = character.getTreasure();
+  const attunable = [];
+  let attuned = [];
 
   // Alphabetize categories & items w/in categories
   itemizedInventory = Object.keys(itemizedInventory)
@@ -29,7 +33,13 @@ const CharacterEquipmentTab = ({
     first.name > second.name ? 1 : first.name === second.name ? 0 : -1
   );
 
-  for (let type in itemizedInventory) {
+  for (const type in itemizedInventory) {
+    for (const item of itemizedInventory[type]) {
+      if (item.attunable) {
+        attunable.push(item);
+        if (item.toggles.Attuned) attuned.push(`${attunable.length - 1}`);
+      }
+    }
     itemizedInventory[type] = itemizedInventory[type].map((item, i) => (
       <Fragment key={i}>
         <div className="row-flex">
@@ -44,6 +54,7 @@ const CharacterEquipmentTab = ({
         {currentModal === `item${type}${i}` && (
           <ItemModal
             character={character}
+            setCharChangeFlag={setCharChangeFlag}
             closeModal={closeModal}
             item={item}
           />
@@ -79,15 +90,51 @@ const CharacterEquipmentTab = ({
     );
   });
 
+  attuned = attuned.concat(["", "", ""]);
+  attuned.length = 3;
+
+  const attunementSection = (
+    <div className="grid-tile attunements">
+      <h1>Attunements</h1>
+      {attuned.map((itemIndex, i) => (
+        <select
+          key={i}
+          name={`attunement${i}`}
+          id={`attunement${i}`}
+          value={itemIndex}
+          onChange={(event) => {
+            const newIndex = event.target.value;
+            if (itemIndex !== "") {
+              const newItem = structuredClone(attunable[itemIndex]);
+              newItem.toggles.Attuned = false;
+              character.updateItem(attunable[itemIndex], newItem);
+            }
+            if (newIndex !== "") {
+              const newItem = structuredClone(attunable[newIndex]);
+              newItem.toggles.Attuned = true;
+              character.updateItem(attunable[newIndex], newItem);
+            }
+            setCharChangeFlag((old) => !old);
+          }}
+        >
+          <option value={""}>-None-</option>
+          {attunable.map((item, j) => {
+            if (attuned.includes(`${j}`) && `${j}` !== itemIndex) return null;
+            return (
+              <option key={j} value={j}>
+                {item.name}
+              </option>
+            );
+          })}
+        </select>
+      ))}
+    </div>
+  );
+
   return (
     <div className="grid-container row-flex">
       <div className="col-flex col-1_2">
-        <div className="grid-tile">
-          <h1>Attunements</h1>
-          {character.attunements.map((item, i) => (
-            <p key={i}>{item ? item : "-Empty-"}</p>
-          ))}
-        </div>
+        {attunementSection}
         <div className="grid-tile col-end">
           <div className="row-flex">
             <h1 className="col-1_2">Item</h1>

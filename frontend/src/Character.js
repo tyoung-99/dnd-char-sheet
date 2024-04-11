@@ -330,9 +330,11 @@ class Character {
     this.queueSave();
   }
 
-  updateItem(item, newCount, newToggles) {
-    item.count = newCount;
-    item.toggles = newToggles;
+  updateItem(oldItem, newItem) {
+    const index = this.equipment.findIndex(
+      (checkItem) => checkItem === oldItem
+    );
+    this.equipment[index] = newItem;
     this.queueSave();
   }
 
@@ -383,6 +385,16 @@ class Character {
   deleteBuff(oldBuff) {
     const index = this.buffs.findIndex((checkBuff) => checkBuff === oldBuff);
     this.buffs.splice(index, 1);
+    this.queueSave();
+  }
+
+  setEquipment(newEquipment) {
+    this.equipment = newEquipment;
+    this.queueSave();
+  }
+
+  setCoins(newCoins) {
+    this.coins = newCoins;
     this.queueSave();
   }
 
@@ -1333,8 +1345,10 @@ class Character {
       });
     });
 
+    console.log(damage);
+
     damage = damage.reduce((totalString, damageType, i) => {
-      if (i > 0) totalString += " + ";
+      if (i > 0) totalString += " "; // modifiersToString() will add the plus sign
       return totalString + this.#modifiersToString(damageType);
     }, "");
 

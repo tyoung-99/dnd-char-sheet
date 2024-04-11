@@ -35,11 +35,10 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
       "You have disadvantage on Dexterity (Stealth) checks while wearing this armor.",
   };
 
-  const [itemCount, setItemCount] = useState(item.count);
-  const [toggles, setToggles] = useState(structuredClone(item.toggles));
+  const [newItem, setNewItem] = useState(structuredClone(item));
 
   const saveAndClose = () => {
-    character.updateItem(item, itemCount, toggles);
+    character.updateItem(item, newItem);
     setCharChangeFlag((old) => !old);
     closeModal();
   };
@@ -100,44 +99,50 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
           type="number"
           id="itemCount"
           name="itemCount"
-          value={itemCount}
+          value={newItem.count}
           min={0}
-          onChange={(e) => setItemCount(e.target.value)}
+          onChange={(e) =>
+            setNewItem((oldItem) => {
+              const newItem = { ...oldItem };
+              newItem.count = e.target.value;
+              return newItem;
+            })
+          }
         ></input>
       </span>
-      {typeof toggles.Equipped === "boolean" && (
+      {typeof newItem.toggles.Equipped === "boolean" && (
         <span>
           <label htmlFor={"equipped"}>Equipped: </label>
           <button
             id={"equipped"}
             name={"equipped"}
             onClick={() =>
-              setToggles((oldToggles) => {
-                const newToggles = { ...oldToggles };
-                newToggles.Equipped = !newToggles.Equipped;
-                return newToggles;
+              setNewItem((oldItem) => {
+                const newItem = { ...oldItem };
+                newItem.toggles.Equipped = !newItem.toggles.Equipped;
+                return newItem;
               })
             }
           >
-            {toggles.Equipped ? "Yes" : "No"}
+            {newItem.toggles.Equipped ? "Yes" : "No"}
           </button>
         </span>
       )}
-      {typeof toggles.Attuned === "boolean" && (
+      {typeof newItem.toggles.Attuned === "boolean" && (
         <span>
           <label htmlFor={"attuned"}>Attuned: </label>
           <button
             id={"attuned"}
             name={"attuned"}
             onClick={() =>
-              setToggles((oldToggles) => {
-                const newToggles = { ...oldToggles };
-                newToggles.Attuned = !newToggles.Attuned;
-                return newToggles;
+              setNewItem((oldItem) => {
+                const newItem = { ...oldItem };
+                newItem.toggles.Attuned = !newItem.toggles.Attuned;
+                return newItem;
               })
             }
           >
-            {toggles.Attuned ? "Yes" : "No"}
+            {newItem.toggles.Attuned ? "Yes" : "No"}
           </button>
         </span>
       )}
@@ -175,7 +180,7 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
           </p>
         </>
       )}
-      {typeof toggles["Two-Handed"] === "boolean" && (
+      {typeof newItem.toggles["Two-Handed"] === "boolean" && (
         <span>
           <label htmlFor={"twoHanded"}>Two-Handed: </label>
           <button
@@ -183,18 +188,18 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
             name={"twoHanded"}
             onClick={() => {
               character.toggleItemTwoHanded(item);
-              setToggles((oldToggles) => {
-                const newToggles = { ...oldToggles };
-                newToggles["Two-Handed"] = !newToggles["Two-Handed"];
-                return newToggles;
+              setNewItem((oldItem) => {
+                const newItem = { ...oldItem };
+                newItem.toggles["Two-Handed"] = !newItem.toggles["Two-Handed"];
+                return newItem;
               });
             }}
           >
-            {toggles["Two-Handed"] ? "Yes" : "No"}
+            {newItem.toggles["Two-Handed"] ? "Yes" : "No"}
           </button>
         </span>
       )}
-      {typeof toggles.Activated === "boolean" && (
+      {typeof newItem.toggles.Activated === "boolean" && (
         <span>
           <label htmlFor={"activated"}>Activated: </label>
           <button
@@ -202,14 +207,14 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
             name={"activated"}
             onClick={() => {
               character.toggleItemActive(item);
-              setToggles((oldToggles) => {
-                const newToggles = { ...oldToggles };
-                newToggles.Activated = !newToggles.Activated;
-                return newToggles;
+              setNewItem((oldItem) => {
+                const newItem = { ...oldItem };
+                newItem.toggles.Activated = !newItem.toggles.Activated;
+                return newItem;
               });
             }}
           >
-            {toggles.Activated ? "Yes" : "No"}
+            {newItem.toggles.Activated ? "Yes" : "No"}
           </button>
         </span>
       )}

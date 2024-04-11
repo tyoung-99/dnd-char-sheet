@@ -52,8 +52,6 @@ const AddEditBuffModal = ({
     }
   );
 
-  console.log(buff);
-
   const header = (
     <h1>
       {isNewBuff ? "Add" : "Edit"} {buff.isDebuff ? "Debuff" : "Buff"}

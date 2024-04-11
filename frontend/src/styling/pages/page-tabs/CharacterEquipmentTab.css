@@ -1,7 +1,11 @@
-/* Coins section */
 .coins {
   text-align: center;
 }
 .coin-entry {
   margin: auto;
+}
+
+.attunements > select {
+  width: 100%;
+  max-width: 20rem;
 }
