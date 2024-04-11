@@ -1345,8 +1345,6 @@ class Character {
       });
     });
 
-    console.log(damage);
-
     damage = damage.reduce((totalString, damageType, i) => {
       if (i > 0) totalString += " "; // modifiersToString() will add the plus sign
       return totalString + this.#modifiersToString(damageType);
