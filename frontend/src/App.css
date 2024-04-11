@@ -190,3 +190,7 @@ p:has(> .hover-icon) {
 .wysiwyg-textbox-editor {
   padding: 0 0.1rem;
 }
+
+.wrap {
+  flex-wrap: wrap;
+}

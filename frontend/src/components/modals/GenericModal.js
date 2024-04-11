@@ -10,6 +10,7 @@ const GenericModal = ({
   body,
   footer,
   category,
+  closeOnOutsideClick = true,
 }) => {
   // Prevent scroll while open
   useEffect(() => {
@@ -23,7 +24,7 @@ const GenericModal = ({
     <div
       className={`modal-background ${category}-modal-background`}
       onClick={(event) => {
-        if (!event.target.closest(".modal-container")) {
+        if (closeOnOutsideClick && !event.target.closest(".modal-container")) {
           closeModal();
         }
       }}

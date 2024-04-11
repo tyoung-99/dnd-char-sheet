@@ -1,0 +1,133 @@
+.admin-create {
+  height: 2rlh;
+  width: 8rlh;
+  margin: 1rem;
+  border-radius: 0.5rem;
+  background-color: #52e352;
+  font: small-caps bold 32px/1 sans-serif;
+}
+
+.admin-create:hover {
+  background-color: #0d8a0d;
+}
+
+.row-flex:has(> .admin-create) {
+  align-items: center;
+}
+
+.catalogue-item {
+  margin: 1rem;
+}
+
+.catalogue-item > span {
+  color: rgb(255, 255, 255);
+  border-radius: 0.5rem;
+  border-color: black;
+  border-style: solid;
+  border-width: 0.15rem;
+  background-color: rgb(80, 83, 87);
+  padding: 0.5rem;
+  margin: 1rem;
+}
+
+.catalogue-item > span:hover {
+  background-color: rgb(104, 108, 112);
+}
+
+.sub-section {
+  margin: 1rem;
+  background-color: rgb(184, 187, 189);
+}
+
+.sub-item {
+  padding: 1rem;
+}
+
+.sub-item > span {
+  color: rgb(0, 0, 0);
+  border-radius: 0.5rem;
+  border-style: solid;
+  border-width: 0.1rem;
+  background-color: rgb(255, 255, 255);
+  padding: 0.4rem;
+  margin-right: 1rem;
+}
+
+.name-box {
+  margin: 0.5rem 1rem;
+  width: 35rem;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 2rem;
+  font-family: inherit;
+  text-align: center;
+}
+
+.display-name-box {
+  padding-top: 1rem;
+  padding-left: 1rem;
+  width: 20rem;
+  font-style: normal;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.scrollable-list {
+  height: 10rem; /* Adjust height as needed */
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 5px;
+}
+
+.list-with-columns {
+  column-count: 2;
+  column-gap: 1rem;
+}
+
+.search-bar {
+  margin-bottom: 10px;
+}
+
+.feature-list-item {
+  padding: 5px;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.feature-list-item:hover {
+  background: lightgray;
+}
+
+.source-drop {
+  justify-content: flex-end;
+}
+
+.added-feature {
+  margin-right: 0.5rem;
+}
+
+.added-feature:hover {
+  text-decoration: line-through;
+}
+
+.delete-button {
+  background: #c0392b;
+  color: white;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  border: 1px solid black;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  display: inline-block;
+  padding: 0.1rem;
+  margin: 0.1rem;
+}
+
+.delete-button:hover {
+  transform: scale(1.02);
+  background: #c41e0c;
+}
+
+.admin-center {
+  justify-content: center;
+}
