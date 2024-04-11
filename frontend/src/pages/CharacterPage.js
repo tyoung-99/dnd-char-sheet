@@ -18,6 +18,8 @@ import DeathSavesComp from "../components/DeathSavesComp";
 import XpComp from "../components/XpComp";
 import MultiColumnDropdownComp from "../components/MultiColumnDropdownComp";
 import RaceModal from "../components/modals/RaceModal";
+import CurrentHitDiceModal from "../components/modals/CurrentHitDiceModal";
+import NumInputComp from "../components/NumInputComp";
 
 const CharacterPage = () => {
   const [activeTab, setActiveTab] = useState("main");
@@ -31,20 +33,18 @@ const CharacterPage = () => {
   const [showingSavedMessage, setShowingSavedMessage] = useState(false);
   const fileInput = useRef(null);
 
-  const [editingCharName, setEditingCharName] = useState(false);
+  const [charName, setCharName] = useState("");
 
   useEffect(() => {
     const loadData = async () => {
       let response = await axios.get(`/api/characters/${characterID}`);
-      const newChar = Object.assign(
-        await Character.create(
-          setShowingSavedMessage,
-          response.data.race.raceId,
-          response.data.race.subraceId
-        ),
-        response.data
+      const newChar = await Character.create(
+        response.data,
+        setShowingSavedMessage
       );
+
       setCharacter(newChar);
+      setCharName(newChar.name);
       refreshAvatarImg(newChar);
 
       response = await axios.get("/api/alignments");
@@ -112,6 +112,13 @@ const CharacterPage = () => {
     </div>
   );
 
+  const [armorClassVal, armorClassBreakdown] = character.getArmorClass();
+  const [initiativeVal, initiativeBreakdown] = character.getInitiative();
+  const [totalHitDice, totalHitDiceBreakdown] = character.getTotalHitDice();
+  const [maxHitPoints, maxHitPointsBreakdown] = character.getMaxHitPoints();
+  const [currentHitPoints, currentHitPointsBreakdown] =
+    character.getCurrentHitPoints();
+
   return (
     <div>
       <div className="menu-bar row-flex">
@@ -156,24 +163,22 @@ const CharacterPage = () => {
           ></input>
         </div>
         <div className="avatar-label">
-          {editingCharName ? (
-            <textarea
-              id="char-name"
-              name="char-name"
-              className="char-name"
-              autoFocus
-              defaultValue={character.name}
-              placeholder="Character Name"
-              onBlur={(event) => {
-                character.setName(event.target.value);
-                setEditingCharName(false);
-              }}
-            ></textarea>
-          ) : (
-            <h1 className="char-name" onClick={() => setEditingCharName(true)}>
-              {character.name || "Character Name"}
-            </h1>
-          )}
+          <h1
+            className="char-name"
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(event) => {
+              if (event.target.innerText === "") {
+                character.setName("Character Name");
+                setCharName("Character Name");
+              } else {
+                character.setName(event.target.innerText);
+                setCharName(event.target.innerText);
+              }
+            }}
+          >
+            {charName}
+          </h1>
           <h2 className="player-name">{character.player}</h2>
           <MultiColumnDropdownComp
             buttonText={character.alignment}
@@ -195,35 +200,68 @@ const CharacterPage = () => {
       </div>
       <div className="combat-header">
         <div>
-          <p>AC: {character.getArmorClass()}</p>
-          <p>
-            Initiative:{" "}
-            {(character.getInitiative() >= 0 ? "+" : "") +
-              character.getInitiative()}
+          <p className="clickable" title={armorClassBreakdown}>
+            AC: {armorClassVal}
+          </p>
+          <p className="clickable" title={initiativeBreakdown}>
+            Initiative: {(initiativeVal >= 0 ? "+" : "") + initiativeVal}
           </p>
         </div>
-        <div>
-          <p>Max HP: {character.getMaxHitPoints()}</p>
-          <p>Current HP: {character.getCurrentHitPoints()}</p>
-          <p>Temp HP: {character.hitPoints.temp}</p>
+        <div className="row-flex">
+          <div>
+            <p className="clickable" title={maxHitPointsBreakdown}>
+              Max HP: {maxHitPoints}
+            </p>
+            <p className="clickable" title={currentHitPointsBreakdown}>
+              Current HP: {currentHitPoints}
+            </p>
+            <p>Temp HP: {character.hitPoints.temp}</p>
+          </div>
+          <div className="col-flex hp-buttons">
+            <div>
+              <NumInputComp
+                buttonText={"Heal"}
+                callback={(amount) => character.restoreHitPoints(amount)} // Can't pass directly or "this" points to wrong element
+              />
+            </div>
+            <div>
+              <NumInputComp
+                buttonText={"Damage"}
+                callback={(amount) => character.dealDamage(amount)}
+              />
+            </div>
+            <div>
+              <NumInputComp
+                buttonText={"New Temp HP"}
+                callback={(amount) => character.replaceTempHitPoints(amount)}
+              />
+            </div>
+          </div>
         </div>
         <div>
-          <p>
+          <p className="clickable" title={totalHitDiceBreakdown}>
             Total Hit Dice:{" "}
-            {character
-              .getTotalHitDice()
-              .map((die) => `${die.number}d${die.sides}`)
-              .join(", ")}
+            {totalHitDice.map((die) => `${die.number}d${die.sides}`).join(", ")}
           </p>
-          <p>
+          <p
+            className="clickable"
+            data-modal="currentHitDice"
+            onClick={openModal}
+          >
             Current Hit Dice:{" "}
             {character
               .getCurrentHitDice()
               .map((die) => `${die.number}d${die.sides}`)
               .join(", ")}
           </p>
+          {currentModal === "currentHitDice" && (
+            <CurrentHitDiceModal
+              character={character}
+              closeModal={closeModal}
+            />
+          )}
         </div>
-        <DeathSavesComp deathSaves={character.deathSaves} />
+        <DeathSavesComp character={character} />
       </div>
       <ul className="nav">
         <TabNavComp

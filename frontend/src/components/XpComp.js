@@ -1,7 +1,6 @@
 // Shows current XP, allows adjusting amount of XP, displays messages regarding available level ups/inconsistencies in amount of XP
 
-import "../styling/components/XpComp.css";
-import { useState, useRef } from "react";
+import NumInputComp from "./NumInputComp";
 
 const XpComp = ({ character }) => {
   const XP_THRESHOLDS = [
@@ -9,18 +8,13 @@ const XpComp = ({ character }) => {
     120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000,
   ];
 
-  const [isOpen, setIsOpen] = useState(false);
-  const xpInput = useRef(null);
-
   const charLevel = character.classes.reduce(
     (totalLevel, charClass) => totalLevel + charClass.classLevel,
     0
   );
 
-  const addXp = () => {
-    const addAmount = parseInt(xpInput.current.value);
-    character.setXp((character.xp.amount += addAmount));
-    setIsOpen(false);
+  const addXp = (amount) => {
+    character.setXp((character.xp.amount += amount));
   };
 
   return (
@@ -42,40 +36,7 @@ const XpComp = ({ character }) => {
         ></img>
       )}
       <p>XP: {character.xp.amount}</p>
-      <input
-        type="button"
-        id="addXpButton"
-        name="addXpButton"
-        value="+"
-        onClick={() => setIsOpen(!isOpen)}
-      ></input>
-      {isOpen && (
-        <>
-          <div
-            className="catch-outside-clicks"
-            onClick={() => setIsOpen(false)}
-          ></div>
-          <div className="xp-popup">
-            <input
-              type="number"
-              id="addXpVal"
-              name="addXpVal"
-              autoFocus
-              ref={xpInput}
-              onKeyUp={(event) => {
-                if (event.key === "Enter") addXp();
-              }}
-            ></input>
-            <input
-              type="button"
-              id="submitXpButton"
-              name="submitXpButton"
-              value="OK"
-              onClick={addXp}
-            ></input>
-          </div>
-        </>
-      )}
+      <NumInputComp buttonText={"+"} callback={addXp} />
     </div>
   );
 };

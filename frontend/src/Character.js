@@ -4,41 +4,145 @@ import axios from "axios";
 import Timer from "./Timer";
 
 class Character {
-  static async create(setShowingSavedMessage, raceId, subraceId) {
-    // Reverse order of groups b/c when inserting into list of profs, order gets reversed again
-    const weaponProfGroups = (
-      await axios.get("/api/proficiencies/weapons")
-    ).data.reverse();
-    const armorProfGroups = (
-      await axios.get("/api/proficiencies/armor")
-    ).data.reverse();
+  static async create(newCharData, setShowingSavedMessage) {
+    // Get this reference data when char created to avoid calls to backend during operation
 
-    const raceName = (await axios.get(`/api/races/${raceId}`)).data.name;
-    const subraceName = (await axios.get(`/api/subraces/${subraceId}`)).data
-      .displayName;
+    const weaponProfGroups = (await axios.get("/api/proficiencies/weapons"))
+      .data;
+    const armorProfGroups = (await axios.get("/api/proficiencies/armor")).data;
+
+    const race = newCharData.race.raceId
+      ? (await axios.get(`/api/races/${newCharData.race.raceId}`)).data
+      : null;
+    await Character.#raceReplaceIdsWithData(race, newCharData.featureChoices);
+
+    const subrace = newCharData.race.subraceId
+      ? (await axios.get(`/api/subraces/${newCharData.race.subraceId}`)).data
+      : null;
+    await Character.#raceReplaceIdsWithData(
+      subrace,
+      newCharData.featureChoices
+    );
 
     return new Character(
+      newCharData,
       setShowingSavedMessage,
       weaponProfGroups,
       armorProfGroups,
-      raceName,
-      subraceName
+      race,
+      subrace
     );
   }
 
+  static async #raceReplaceIdsWithData(race, featureChoices) {
+    race.source = (await axios.get(`/api/sources/${race.source}`)).data;
+
+    if (race.features.length > 0) {
+      race.features = (
+        await axios.get(`/api/racialFeatures/multiple/${race.features}`)
+      ).data;
+    }
+
+    // Combining required/chosen effects of racial features/nested feats here simplifies using that data later
+    for (const feature of race.features) {
+      if (!feature.effects) continue;
+
+      for (const effect of feature.effects) {
+        if (
+          featureChoices.race[feature._id] &&
+          featureChoices.race[feature._id][effect.category]
+        ) {
+          effect.changes = Character.#combineEffectChoices(
+            effect.category,
+            effect.changes.required,
+            featureChoices.race[feature._id][effect.category]
+          );
+        } else {
+          effect.changes = effect.changes.required;
+        }
+      }
+
+      const featIndex = feature.effects.findIndex(
+        (effect) => effect.category === "Feat"
+      );
+
+      if (featIndex < 0) continue;
+
+      if (feature.effects[featIndex].changes.join() === "") {
+        feature.effects[featIndex].changes = null;
+        continue;
+      }
+
+      feature.effects[featIndex].changes = (
+        await axios.get(
+          `/api/feats/multiple/${feature.effects[featIndex].changes}`
+        )
+      ).data;
+
+      for (const feat of feature.effects[featIndex].changes) {
+        for (const featEffect of feat.effects) {
+          if (
+            featureChoices.feat[feat._id] &&
+            featureChoices.feat[feat._id][featEffect.category]
+          ) {
+            featEffect.changes = Character.#combineEffectChoices(
+              featEffect.category,
+              featEffect.changes.required,
+              featureChoices.feat[feat._id][featEffect.category]
+            );
+          } else {
+            featEffect.changes = featEffect.changes.required;
+          }
+        }
+      }
+    }
+  }
+
+  static #combineEffectChoices(category, required, choicesMade) {
+    let combined = structuredClone(required);
+
+    if (!combined) {
+      combined = structuredClone(choicesMade);
+    } else {
+      switch (category) {
+        case "AbilityScore":
+          combined.forEach((ability) => {
+            ability.amount += choicesMade.find(
+              (checkAbility) => (checkAbility.ability = ability.ability)
+            ).amount;
+          });
+          break;
+
+        case "Language":
+        case "SkillProficiency":
+        case "SkillExpertise":
+        case "Feat":
+          combined = combined.concat(structuredClone(choicesMade));
+          break;
+
+        default:
+      }
+    }
+
+    return combined;
+  }
+
   constructor(
+    newCharData,
     setShowingSavedMessage,
     ref_weaponProfGroups,
     ref_armorProfGroups,
-    ref_raceName,
-    ref_subraceName
+    ref_race,
+    ref_subrace
   ) {
+    Object.assign(this, newCharData);
+
     this.queueSave = Timer(this.saveCharacter, 5000);
     this.setShowingSavedMessage = setShowingSavedMessage;
     this.ref_weaponProfGroups = ref_weaponProfGroups;
     this.ref_armorProfGroups = ref_armorProfGroups;
-    this.ref_raceName = ref_raceName;
-    this.ref_subraceName = ref_subraceName;
+    this.ref_race = ref_race;
+    this.ref_subrace = ref_subrace;
   }
 
   async saveCharacter() {
@@ -74,17 +178,70 @@ class Character {
     this.saveCharacter();
   }
 
-  setRace(newRace, newSubrace) {
-    this.ref_raceName = newRace.name;
-    this.race.raceId = newRace.id;
-    this.race.raceSourceId = newRace.src;
-    this.setSubrace(newSubrace);
+  setDeathSaves(successCount, failCount) {
+    this.deathSaves.successes = successCount;
+    this.deathSaves.failures = failCount;
+    this.saveCharacter();
   }
 
-  setSubrace(newSubrace) {
-    this.ref_subraceName = newSubrace.name;
+  async setRace(newRace, newSubrace, newFeatureChoices) {
+    this.race.raceId = newRace.id;
     this.race.subraceId = newSubrace.id;
-    this.race.subraceSourceId = newSubrace.src;
+    this.featureChoices = newFeatureChoices;
+
+    this.ref_race = newRace.id
+      ? (await axios.get(`/api/races/${newRace.id}`)).data
+      : null;
+    await Character.#raceReplaceIdsWithData(this.ref_race, this.featureChoices);
+
+    this.ref_subrace = newSubrace.id
+      ? (await axios.get(`/api/subraces/${newSubrace.id}`)).data
+      : null;
+    await Character.#raceReplaceIdsWithData(
+      this.ref_subrace,
+      this.featureChoices
+    );
+
+    this.saveCharacter();
+  }
+
+  spendHitDie(sides) {
+    this.usedHitDice.find((checkDice) => checkDice.sides === sides).number += 1;
+    this.saveCharacter();
+  }
+
+  restoreHitDie(sides) {
+    this.usedHitDice.find((checkDice) => checkDice.sides === sides).number -= 1;
+    this.saveCharacter();
+  }
+
+  dealDamage(amount) {
+    const dmgLeft = amount - this.hitPoints.temp;
+    if (dmgLeft >= 0) {
+      this.hitPoints.temp = 0;
+      this.hitPoints.currentBase -= dmgLeft;
+
+      const [totalCurrent] = this.getCurrentHitPoints();
+      if (totalCurrent < 0) this.hitPoints.currentBase -= totalCurrent;
+    } else {
+      this.hitPoints.temp -= amount;
+    }
+    this.saveCharacter();
+  }
+
+  restoreHitPoints(amount) {
+    this.hitPoints.currentBase += amount;
+    const [totalCurrent] = this.getCurrentHitPoints(),
+      [totalMax] = this.getMaxHitPoints();
+    if (totalCurrent > totalMax) {
+      this.hitPoints.currentBase -= totalCurrent - totalMax;
+    }
+    this.saveCharacter();
+  }
+
+  replaceTempHitPoints(amount) {
+    if (amount < 0) amount = 0;
+    this.hitPoints.temp = amount;
     this.saveCharacter();
   }
 
@@ -97,23 +254,35 @@ class Character {
   }
 
   getAbilityScore(ability) {
-    const category = "AbilityScore";
-    const bonuses = this.#getEffects(category);
-
-    return (
-      this.abilities.find((stat) => stat.name === ability).score +
+    const combineBonuses = (bonuses) =>
       bonuses.reduce(
         (total, elem) =>
           total +
-          elem.effects.reduce(
-            (subtotal, effect) =>
-              effect.category === category
-                ? subtotal + effect.changes[ability] || 0
-                : subtotal,
-            0
-          ),
+          elem.effects.reduce((subtotal, effect) => {
+            if (effect.category === category) {
+              const abilityBonus = effect.changes.find(
+                (checkAbility) => checkAbility.ability === ability
+              );
+              subtotal +=
+                abilityBonus &&
+                (!abilityBonus.cap ||
+                  subtotal + abilityBonus.amount <= abilityBonus.cap)
+                  ? abilityBonus.amount
+                  : 0;
+            } else if (effect.category === "Feat") {
+              subtotal += combineBonuses(effect.changes);
+            }
+            return subtotal;
+          }, 0),
+
         0
-      )
+      );
+
+    const category = "AbilityScore";
+
+    return (
+      this.abilities.find((stat) => stat.name === ability).score +
+      combineBonuses(this.#getEffects(category))
     );
   }
 
@@ -133,57 +302,145 @@ class Character {
   }
 
   getSkills() {
-    let skills = [];
-    this.abilities.forEach((ability) => {
-      ability.skillProfs.forEach((skill) => {
-        const newSkill = {
-          name: skill.name,
-          prof: 0,
-          mod: this.getAbilityMod(ability.name),
-          ability: ability.name,
-        };
+    const skills = [
+      {
+        name: "Athletics",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "STR",
+      },
+      {
+        name: "Acrobatics",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "DEX",
+      },
+      {
+        name: "Sleight of Hand",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "DEX",
+      },
+      {
+        name: "Stealth",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "DEX",
+      },
+      {
+        name: "Arcana",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "INT",
+      },
+      {
+        name: "History",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "INT",
+      },
+      {
+        name: "Investigation",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "INT",
+      },
+      {
+        name: "Nature",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "INT",
+      },
+      {
+        name: "Religion",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "INT",
+      },
+      {
+        name: "Animal Handling",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "WIS",
+      },
+      {
+        name: "Insight",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "WIS",
+      },
+      {
+        name: "Medicine",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "WIS",
+      },
+      {
+        name: "Perception",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "WIS",
+      },
+      {
+        name: "Survival",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "WIS",
+      },
+      {
+        name: "Deception",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "CHA",
+      },
+      {
+        name: "Intimidation",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "CHA",
+      },
+      {
+        name: "Performance",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "CHA",
+      },
+      {
+        name: "Persuasion",
+        prof: 0,
+        mod: { flat: 0, dice: [] },
+        ability: "CHA",
+      },
+    ];
 
-        if (skill.expSrc && !skill.profSrc) {
-          newSkill.error = `Ineligible for expertise in ${skill.name}`;
-        } else {
-          newSkill.prof = skill.proficiency;
-          newSkill.mod += skill.proficiency * this.getProfBonus();
-        }
-
-        skills.push(newSkill);
-      });
+    let category = "SkillProficiency";
+    this.#getSkillsHelper(category, (newProf) => {
+      skills.find((checkSkill) => checkSkill.name === newProf).prof = 1; // Mark prof as 1, expertise as 2, so prof bonus can be multiplied by prof val
     });
 
-    const category = "Skill";
-    this.#getEffects(category).forEach((bonus) => {
-      const effect = bonus.effects.find(
-        (checkEffect) => checkEffect.category === category
+    category = "SkillExpertise";
+    this.#getSkillsHelper(category, (newExp) => {
+      const affectedSkill = skills.find(
+        (checkSkill) => checkSkill.name === newExp
       );
+      if (affectedSkill.prof >= 1) affectedSkill.prof = 2;
+      else {
+        affectedSkill.error = `Ineligible for ${affectedSkill.name} expertise`;
+      }
+    });
 
-      Object.keys(effect.changes.flat).forEach((skillName) => {
-        skills.find((checkSkill) => checkSkill.name === skillName).mod +=
-          effect.changes.flat[skillName];
-      });
+    category = "SkillModifier";
+    this.#getSkillsHelper(category, (newMod) => {
+      const affectedSkill = skills.find(
+        (checkSkill) => checkSkill.name === newMod.skillName
+      );
+      affectedSkill.mod += newMod.flat;
+      this.#addDiceToArr(affectedSkill.mod.dice, newMod.dice);
+    });
 
-      effect.changes.proficiency.forEach((skillName) => {
-        const skill = skills.find(
-          (checkSkill) => checkSkill.name === skillName
-        );
-        skill.prof += 1;
-        skill.mod += this.getProfBonus();
-      });
-
-      effect.changes.expertise.forEach((skillName) => {
-        const skill = skills.find(
-          (checkSkill) => checkSkill.name === skillName
-        );
-        if (skill.prof !== 1) {
-          skill.error = `Ineligible for expertise in ${skill.name}`;
-          return;
-        }
-        skill.prof += 1;
-        skill.mod += this.getProfBonus();
-      });
+    skills.forEach((skill) => {
+      skill.mod.flat +=
+        this.getAbilityMod(skill.ability) + this.getProfBonus() * skill.prof;
     });
 
     skills.sort((first, second) =>
@@ -193,35 +450,51 @@ class Character {
     return skills;
   }
 
+  #getSkillsHelper(category, callback) {
+    const combineBonuses = (bonuses) => {
+      bonuses.forEach((effectsList) => {
+        let effect = effectsList.effects.find(
+          (checkEffect) => checkEffect.category === category
+        );
+        if (effect.changes.join() === "") return;
+        if (effect.changes) effect.changes.forEach(callback);
+
+        effect = effectsList.effects.find(
+          (checkEffect) => checkEffect.category === "Feat"
+        );
+        if (effect) combineBonuses(effect.changes);
+      });
+    };
+
+    combineBonuses(this.#getEffects(category));
+  }
+
   getSkillByName(skill) {
-    const ability = this.abilities.find((ability) =>
-      ability.skillProfs.some((checkSkill) => checkSkill.name === skill)
-    );
-    return (
-      this.getAbilityMod(ability.name) +
-      ability.skillProfs.find((checkSkill) => checkSkill.name === skill)
-        .proficiency *
-        this.getProfBonus()
-    );
+    return this.getSkills().find((checkSkill) => checkSkill.name === skill);
   }
 
   getPassivePerception() {
-    const category = "PassivePerception";
-    return (
-      10 +
-      this.getSkillByName("Perception") +
-      this.#getEffects(category).reduce(
+    const combineBonuses = (bonuses) =>
+      bonuses.reduce(
         (total, elem) =>
           total +
-          elem.effects.reduce(
-            (subtotal, effect) =>
-              effect.category === category
-                ? subtotal + effect.changes.bonus
-                : subtotal,
-            0
-          ),
+          elem.effects.reduce((subtotal, effect) => {
+            if (effect.category === category) {
+              subtotal += effect.changes.bonus;
+            } else if (effect.category === "Feat") {
+              subtotal += combineBonuses(effect.changes);
+            }
+            return subtotal;
+          }, 0),
         0
-      )
+      );
+
+    const category = "PassivePerception";
+
+    return (
+      10 +
+      this.getSkillByName("Perception").mod.flat +
+      combineBonuses(this.#getEffects(category))
     );
   }
 
@@ -239,7 +512,7 @@ class Character {
       current.mod += this.getProfBonus();
     });
 
-    const bonuses = this.#getSaveOtherBonuses();
+    const bonuses = this.#getSaveModBonuses();
     Object.keys(bonuses).forEach((ability) => {
       saves.find((checkSave) => checkSave.name === ability).mod +=
         bonuses[ability];
@@ -249,52 +522,56 @@ class Character {
   }
 
   #getSaveProfBonuses() {
-    const baseClass = this.classes.find(
-      (checkClass) => checkClass.startingClass
-    ).className;
+    // TODO: Update w/ getEffects() after putting save prof feature in (don't forget to check feats)
+
+    // const baseClass = this.classes.find(
+    //   (checkClass) => checkClass.startingClass
+    // ).className;
     const saveProfs = [];
 
-    if (["Barbarian", "Fighter", "Monk", "Ranger"].includes(baseClass)) {
-      saveProfs.push("STR");
-    }
-    if (["Bard", "Monk", "Ranger", "Rogue"].includes(baseClass)) {
-      saveProfs.push("DEX");
-    }
-    if (["Artificer", "Barbarian", "Fighter", "Sorcerer"].includes(baseClass)) {
-      saveProfs.push("CON");
-    }
-    if (["Artificer", "Druid", "Rogue", "Wizard"].includes(baseClass)) {
-      saveProfs.push("INT");
-    }
-    if (
-      ["Cleric", "Druid", "Paladin", "Warlock", "Wizard"].includes(baseClass)
-    ) {
-      saveProfs.push("WIS");
-    }
-    if (
-      ["Bard", "Cleric", "Paladin", "Sorcerer", "Warlock"].includes(baseClass)
-    ) {
-      saveProfs.push("CHA");
-    }
+    // if (["Barbarian", "Fighter", "Monk", "Ranger"].includes(baseClass)) {
+    //   saveProfs.push("STR");
+    // }
+    // if (["Bard", "Monk", "Ranger", "Rogue"].includes(baseClass)) {
+    //   saveProfs.push("DEX");
+    // }
+    // if (["Artificer", "Barbarian", "Fighter", "Sorcerer"].includes(baseClass)) {
+    //   saveProfs.push("CON");
+    // }
+    // if (["Artificer", "Druid", "Rogue", "Wizard"].includes(baseClass)) {
+    //   saveProfs.push("INT");
+    // }
+    // if (
+    //   ["Cleric", "Druid", "Paladin", "Warlock", "Wizard"].includes(baseClass)
+    // ) {
+    //   saveProfs.push("WIS");
+    // }
+    // if (
+    //   ["Bard", "Cleric", "Paladin", "Sorcerer", "Warlock"].includes(baseClass)
+    // ) {
+    //   saveProfs.push("CHA");
+    // }
 
-    const category = "SavingThrow";
-    this.#getEffects(category).forEach((bonus) => {
-      const effect = bonus.effects.find(
-        (checkEffect) => checkEffect.category === category
-      );
-      if (effect.changes.prof) {
-        effect.changes.prof.forEach((ability) => {
-          if (!saveProfs.includes(ability)) saveProfs.push(ability);
-        });
-      }
-    });
+    // const category = "SavingThrowProficiency";
+    // this.#getEffects(category).forEach((bonus) => {
+    //   const effect = bonus.effects.find(
+    //     (checkEffect) => checkEffect.category === category
+    //   );
+    //   if (effect.changes.prof) {
+    //     effect.changes.prof.forEach((ability) => {
+    //       if (!saveProfs.includes(ability)) saveProfs.push(ability);
+    //     });
+    //   }
+    // });
 
     return saveProfs;
   }
 
-  #getSaveOtherBonuses() {
-    const category = "SavingThrow";
-    const bonuses = this.#getEffects(category);
+  #getSaveModBonuses() {
+    // TODO: Update w/ getEffects() after putting save mod feature in  (don't forget to check feats)
+
+    // const category = "SavingThrowModifier";
+    // const bonuses = this.#getEffects(category);
     const bonusesParsed = {
       STR: 0,
       DEX: 0,
@@ -304,65 +581,88 @@ class Character {
       CHA: 0,
     };
 
-    bonuses.forEach((bonus) => {
-      const effect = bonus.effects.find(
-        (checkEffect) => checkEffect.category === category
-      );
-      if (effect.changes.flat) {
-        Object.keys(effect.changes.flat).forEach((ability) => {
-          bonusesParsed[ability] += effect.changes.flat[ability];
-        });
-      }
-    });
+    // bonuses.forEach((bonus) => {
+    //   const effect = bonus.effects.find(
+    //     (checkEffect) => checkEffect.category === category
+    //   );
+    //   if (effect.changes.flat) {
+    //     Object.keys(effect.changes.flat).forEach((ability) => {
+    //       bonusesParsed[ability] += effect.changes.flat[ability];
+    //     });
+    //   }
+    // });
 
     return bonusesParsed;
   }
 
   getWeaponProfs() {
-    let cleanProfs = [
-      ...new Set([...this.weaponProfs].map((prof) => prof.name)),
-    ];
+    return this.#filterProfGroups(
+      this.#getWeaponProfsUnfiltered(),
+      this.ref_weaponProfGroups
+    );
+  }
 
-    this.ref_weaponProfGroups.forEach((group) => {
-      if (group.profs.every((prof) => cleanProfs.includes(prof))) {
-        cleanProfs.unshift(group.name);
-        cleanProfs = cleanProfs.filter((prof) => !group.profs.includes(prof));
-      }
-    });
-    return cleanProfs;
+  #getWeaponProfsUnfiltered() {
+    let profsList = [];
+
+    // TODO: Update w/ getEffects() after putting weapon prof feature in  (don't forget to check feats)
+
+    profsList = [...new Set(profsList)];
+    return profsList;
   }
 
   getArmorProfs() {
-    let cleanProfs = [
-      ...new Set([...this.armorProfs].map((prof) => prof.name)),
-    ];
-    this.ref_armorProfGroups.forEach((group) => {
-      if (group.profs.every((prof) => cleanProfs.includes(prof))) {
-        cleanProfs = cleanProfs.filter((prof) => !group.profs.includes(prof));
-        cleanProfs.unshift(group.name);
+    return this.#filterProfGroups(
+      this.#getArmorProfsUnfiltered(),
+      this.ref_armorProfGroups
+    );
+  }
+
+  #getArmorProfsUnfiltered() {
+    let profsList = [];
+
+    // TODO: Update w/ getEffects() after putting armor prof feature in  (don't forget to check feats)
+
+    profsList = [...new Set(profsList)];
+    return profsList;
+  }
+
+  #filterProfGroups(profsList, groups) {
+    groups.forEach((group) => {
+      if (group.profs.every((prof) => profsList.includes(prof))) {
+        profsList = profsList.filter((prof) => !group.profs.includes(prof));
+        profsList.push(group.name);
       }
     });
-    return cleanProfs;
+    return profsList;
   }
 
   getToolProfs() {
-    return [...new Set([...this.toolProfs].map((prof) => prof.name))];
+    let profsList = [];
+
+    // TODO: Update w/ getEffects() after putting tool prof feature in  (don't forget to check feats)
+
+    return [...new Set(profsList)];
   }
 
   getLanguages() {
     let languages = [];
-    const category = "Languages";
-    const langEffects = this.#getEffects(category);
+    const category = "Language";
 
-    langEffects.forEach((langEffect) => {
-      const effect = langEffect.effects.find(
-        (checkEffect) => checkEffect.category === category
-      );
+    const combineBonuses = (bonuses) =>
+      bonuses.forEach((langEffect) => {
+        let effect = langEffect.effects.find(
+          (checkEffect) => checkEffect.category === category
+        );
+        languages = languages.concat(effect.changes);
 
-      languages = languages
-        .concat(effect.changes.required)
-        .concat(effect.changes.choices);
-    });
+        effect = langEffect.effects.find(
+          (checkEffect) => checkEffect.category === "Feat"
+        );
+        if (effect) combineBonuses(effect.changes);
+      });
+
+    combineBonuses(this.#getEffects(category));
 
     return [...new Set(languages)];
   }
@@ -370,17 +670,29 @@ class Character {
   isProficientWithItem(item) {
     return item.profRequired.some(
       (prof) =>
-        this.weaponProfs.includes(prof) ||
-        this.armorProfs.includes(prof) ||
-        this.toolProfs.includes(prof)
+        this.#getWeaponProfsUnfiltered().includes(prof) ||
+        this.#getArmorProfsUnfiltered().includes(prof) ||
+        this.getToolProfs().includes(prof)
     );
   }
 
   getInitiative() {
-    return this.getAbilityMod("DEX");
+    // TODO: Update w/ getEffects() after putting init feature in  (don't forget to check feats)
+    let breakdown = "";
+    let bonuses = [];
+
+    const dexMod = this.getAbilityMod("DEX");
+    bonuses.unshift(dexMod);
+    breakdown = `${dexMod} (DEX)` + breakdown;
+
+    bonuses = bonuses.reduce((total, bonus) => (total += bonus), 0);
+
+    return [bonuses, breakdown];
   }
 
   getArmorClass() {
+    // TODO: Update w/ getEffects() after putting AC feature in  (don't forget to check feats)
+
     // Compare every currently legal AC calculation, select highest
     let replacements = [],
       bonuses = [];
@@ -392,29 +704,27 @@ class Character {
         (checkEffect) => checkEffect.category === category
       );
 
+      const name = option.displayName ? option.displayName : option.name;
+
       if (effect.changes.replace) {
-        replacements.push(effect.changes);
+        replacements.push({ ...effect.changes, name: name });
       } else if (effect.changes.bonus) {
-        bonuses.push(effect.changes);
+        bonuses.push({ ...effect.changes, name: name });
       }
     });
 
-    replacements = this.#validateArmorClassReplacements(replacements);
-    bonuses = this.#validateArmorClassBonuses(bonuses);
+    let replacementsBreakdown, bonusesBreakdown;
+    [replacements, replacementsBreakdown] =
+      this.#validateArmorClassReplacements(replacements);
+    [bonuses, bonusesBreakdown] = this.#validateArmorClassBonuses(bonuses);
 
-    if (!this.getEquippedItems().some((item) => item.type === "Armor")) {
-      replacements.push(10 + this.getAbilityMod("DEX"));
-    }
-
-    return (
-      Math.max(...replacements) +
-      bonuses.reduce((total, bonus) => total + bonus, 0)
-    );
+    return [replacements + bonuses, replacementsBreakdown + bonusesBreakdown];
   }
 
   #validateArmorClassReplacements(replacements) {
+    const breakdown = new Array(replacements.length).fill("");
     const equippedItems = this.getEquippedItems();
-    replacements = replacements.map((option) => {
+    replacements = replacements.map((option, i) => {
       if (
         option.noArmor &&
         equippedItems.some(
@@ -433,20 +743,56 @@ class Character {
         return -1;
       }
 
-      const mods = option.replace.mods.map((mod, i) => {
+      breakdown[i] = `${option.replace.base} (${option.name})`;
+
+      const mods = option.replace.mods.map((mod, j) => {
         let val = this.getAbilityMod(mod);
-        if (option.replace.modCaps && val > option.replace.modCaps[i]) {
-          val = option.replace.modCaps[i];
+        if (option.replace.modCaps && val > option.replace.modCaps[j]) {
+          val = option.replace.modCaps[j];
         }
+        if (val !== 0) breakdown[i] += this.#breakdownValToStr(val, mod);
         return val;
       });
 
       return option.replace.base + mods.reduce((total, mod) => total + mod);
     });
-    return replacements;
+
+    if (!equippedItems.some((item) => item.type === "Armor")) {
+      const dexMod = this.getAbilityMod("DEX");
+      replacements.push(10 + dexMod);
+      if (dexMod !== 0) {
+        breakdown.push(
+          `10 (Unarmored)` + this.#breakdownValToStr(dexMod, "DEX")
+        );
+      } else breakdown.push(`10 (Unarmored)`);
+    }
+
+    // Custom max index finder b/c it does fewer calculations than indexof(max())
+    const findMaxIndex = (arr) => {
+      if (arr.length === 0) {
+        return -1;
+      }
+
+      let max = arr[0];
+      let maxIndex = 0;
+
+      for (let i = 1; i < arr.length; i++) {
+        if (arr[i] > max) {
+          maxIndex = i;
+          max = arr[i];
+        }
+      }
+
+      return maxIndex;
+    };
+
+    const maxIndex = findMaxIndex(replacements);
+
+    return [replacements[maxIndex], breakdown[maxIndex]];
   }
 
   #validateArmorClassBonuses(bonuses) {
+    let breakdown = "";
     const equippedItems = this.getEquippedItems();
     bonuses = bonuses.map((option) => {
       if (
@@ -469,34 +815,49 @@ class Character {
 
       let mods = option.bonus.mods.map((mod, i) => {
         let val = this.getAbilityMod(mod);
-        if (val > option.replace.modCaps[i]) {
-          val = option.replace.modCaps[i];
+        if (val > option.bonus.modCaps[i]) {
+          val = option.bonus.modCaps[i];
+        }
+        if (val !== 0) {
+          breakdown += this.#breakdownValToStr(val, `${option.name}: ${mod}`);
         }
         return val;
       });
       mods.push(option.bonus.flat);
+      if (option.bonus.flat !== 0) {
+        breakdown += this.#breakdownValToStr(option.bonus.flat, option.name);
+      }
       mods = mods.reduce((total, mod) => total + mod);
 
       return mods;
     });
-    return bonuses;
+
+    bonuses = bonuses.reduce((total, bonus) => total + bonus, 0);
+    return [bonuses, breakdown];
   }
 
   getSpeeds() {
     const category = "Speed";
-    const bonuses = this.#getEffects(category);
     const modifiers = { walk: 0, swim: 0, fly: 0 };
     const multipliers = { walk: 1, swim: 1, fly: 1 };
 
-    bonuses.forEach((bonus) => {
-      const effect = bonus.effects.find(
-        (checkEffect) => checkEffect.category === category
-      );
-      Object.keys(effect.changes).forEach((speedType) => {
-        modifiers[speedType] += effect.changes[speedType].modifier || 0;
-        multipliers[speedType] *= effect.changes[speedType].multiplier || 1;
+    const combineBonuses = (bonuses) =>
+      bonuses.forEach((bonus) => {
+        let effect = bonus.effects.find(
+          (checkEffect) => checkEffect.category === category
+        );
+        Object.keys(effect.changes).forEach((speedType) => {
+          modifiers[speedType] += effect.changes[speedType].modifier || 0;
+          multipliers[speedType] *= effect.changes[speedType].multiplier || 1;
+        });
+
+        effect = bonus.effects.find(
+          (checkEffect) => checkEffect.category === "Feat"
+        );
+        if (effect) combineBonuses(effect.changes);
       });
-    });
+
+    combineBonuses(this.#getEffects(category));
 
     /* RAW doesn't address order of operations, using modifiers before multipliers 
     b/c it's consistent w/ how damage resistance is handled, and it makes modifiers 
@@ -512,54 +873,75 @@ class Character {
   }
 
   getMaxHitPoints() {
-    return (
-      this.#getHitPointsHelper(this.hitPoints.max, "MaxHitPoints") +
+    let [modifiers, breakdown] = this.#getHitPointsHelper("MaxHitPoints");
+
+    const cumulativeConMod =
       this.getAbilityMod("CON") *
-        this.classes.reduce(
-          (total, charClass) => total + charClass.classLevel,
-          0
-        )
-    );
+      this.classes.reduce(
+        (total, charClass) => total + charClass.classLevel,
+        0
+      );
+
+    breakdown =
+      `${this.hitPoints.maxBase} (Base)` +
+      this.#breakdownValToStr(cumulativeConMod, "CON x lvl") +
+      breakdown;
+
+    return [this.hitPoints.maxBase + cumulativeConMod + modifiers, breakdown];
   }
 
   getCurrentHitPoints() {
-    return this.#getHitPointsHelper(this.hitPoints.current, "CurrentHitPoints");
+    let [modifiers, breakdown] = this.#getHitPointsHelper("CurrentHitPoints");
+    breakdown = `${this.hitPoints.currentBase} (Base)` + breakdown;
+    return [this.hitPoints.currentBase + modifiers, breakdown];
   }
 
-  #getHitPointsHelper(category, categoryName) {
-    const bonuses = this.#getEffects(categoryName);
-
-    return (
-      category.base +
+  #getHitPointsHelper(category) {
+    const combineBonuses = (bonuses) =>
       bonuses.reduce(
-        (total, elem) =>
-          total +
-          elem.effects.reduce(
-            (subtotal, effect) =>
-              effect.category === categoryName
-                ? subtotal + effect.changes.bonus
-                : subtotal,
-            0
-          ),
+        (total, elem) => {
+          const val = elem.effects.reduce((subtotal, effect) => {
+            if (effect.category === category) {
+              subtotal += effect.changes.bonus;
+            } else if (effect.category === "Feat") {
+              subtotal += combineBonuses(effect.changes);
+            }
+            return subtotal;
+          }, 0);
+
+          breakdown += this.#breakdownValToStr(val, elem.name);
+          return total + val;
+        },
+
         0
-      )
-    );
+      );
+
+    let breakdown = "";
+    const bonuses = combineBonuses(this.#getEffects(category));
+
+    return [bonuses, breakdown];
   }
 
   getCurrentHitDice() {
-    const total = this.getTotalHitDice();
-    const current = this.usedHitDice.map((usedDie) => ({
-      number:
-        total.find((totalDie) => totalDie.sides === usedDie.sides).number -
-        usedDie.number,
-      sides: usedDie.sides,
-    }));
+    const [current] = this.getTotalHitDice();
+    this.usedHitDice.forEach(
+      (usedDie) =>
+        (current.find(
+          (currentDie) => currentDie.sides === usedDie.sides
+        ).number -= usedDie.number)
+    );
     return current;
   }
 
   getTotalHitDice() {
+    // TODO: Update w/ getEffects() after putting hit dice feature in (are there any?) (don't forget to check feats)
+
+    let breakdown = "";
     let total = [];
     this.classes.forEach((charClass) => {
+      if (breakdown !== "") breakdown += " + ";
+      breakdown += `${charClass.classLevel}d${charClass.hitDie} (${charClass.className})`;
+
       let index = total.findIndex((die) => die.sides === charClass.hitDie);
       if (index === -1) {
         total.push({
@@ -570,7 +952,7 @@ class Character {
         total[index].number += charClass.classLevel;
       }
     });
-    return total;
+    return [total, breakdown];
   }
 
   getAttack(item) {
@@ -578,6 +960,8 @@ class Character {
   }
 
   #getAttackMod(item) {
+    // TODO: Update w/ getEffects() after putting attack mod features in (don't forget to check feats)
+
     const strMod = this.getAbilityMod("STR");
     const dexMod = this.getAbilityMod("DEX");
     const abilityMod =
@@ -617,6 +1001,8 @@ class Character {
   }
 
   #getAttackDamage(item) {
+    // TODO: Update w/ getEffects() after putting attack damage features in (don't forget to check feats)
+
     const strMod = this.getAbilityMod("STR");
     const dexMod = this.getAbilityMod("DEX");
     const abilityMod =
@@ -662,19 +1048,6 @@ class Character {
     return damage;
   }
 
-  #addDiceToArr(diceArr, newDice) {
-    newDice.forEach((die) => {
-      const index = diceArr.findIndex(
-        (checkDie) => checkDie.sides === die.sides
-      );
-      if (index < 0) {
-        diceArr.push({ number: die.number, sides: die.sides });
-      } else {
-        diceArr[index].number += die.number;
-      }
-    });
-  }
-
   getItems() {
     const items = {};
     this.equipment.forEach((item) => {
@@ -715,54 +1088,109 @@ class Character {
     return this.equipment.filter((item) => item.type === "Treasure");
   }
 
-  getFeature(featureName) {
-    return this.features.find((feature) => feature.name === featureName);
-  }
-
-  getFeatures({
-    fromClass,
-    fromRace,
-    fromSubrace,
-    fromBackground,
-    fromFeat,
-  } = {}) {
+  getFeatures(
+    { fromClass, fromRace, fromBackground } = {
+      fromClass: true,
+      fromRace: true,
+      fromBackground: true,
+    }
+  ) {
     let features = [];
 
     if (fromClass) {
-      features = features.concat(
-        this.features.filter((feature) => feature.class)
-      );
+      features = features.concat(this.#getClassFeatures());
     }
     if (fromRace) {
-      features = features.concat(
-        this.features.filter((feature) => feature.race)
-      );
-    }
-    if (fromSubrace) {
-      features = features.concat(
-        this.features.filter((feature) => feature.subrace)
-      );
+      features = features.concat(this.#getRaceFeatures());
     }
     if (fromBackground) {
-      features = features.concat(
-        this.features.filter((feature) => feature.background)
-      );
-    }
-    if (fromFeat) {
-      features = features.concat(
-        this.features.filter((feature) => feature.feat)
-      );
+      features = features.concat(this.#getBackgroundFeatures());
     }
 
     return features;
   }
 
+  #getClassFeatures() {
+    // TODO: Update w/ getEffects() after putting class features in (don't forget to check feats)
+
+    let features = [];
+    return features;
+  }
+
+  #getRaceFeatures() {
+    let features = [];
+
+    if (this.ref_race) {
+      let raceFeatures = structuredClone(this.ref_race.features);
+
+      if (this.ref_subrace) {
+        this.ref_subrace.features.forEach((feature) => {
+          feature.replaces.forEach((replaceId) => {
+            const index = raceFeatures.findIndex(
+              (checkFeature) => checkFeature._id === replaceId
+            );
+            if (index >= 0) {
+              raceFeatures.splice(index, 1);
+            }
+          });
+        });
+
+        raceFeatures = raceFeatures.concat(
+          structuredClone(this.ref_subrace.features)
+        );
+      }
+
+      // raceFeatures.forEach((feature) => {
+      //   feature.effects.forEach((effect) => {
+      //     if (effect.changes.choices) {
+      //       effect.changes = this.#combineEffectChoices(
+      //         effect.category,
+      //         effect.changes.required,
+      //         this.featureChoices.race[feature._id][effect.category]
+      //       );
+      //     } else {
+      //       effect.changes = effect.changes.required;
+      //     }
+      //   });
+      // });
+
+      features = features.concat(raceFeatures);
+    }
+
+    return features;
+  }
+
+  #getBackgroundFeatures() {
+    // TODO: Update w/ getEffects() after putting background features in (don't forget to check feats)
+
+    let features = [];
+    return features;
+  }
+
   #getFeatureEffects(category) {
-    return this.features.filter(
-      (feature) =>
-        feature.effects &&
-        feature.effects.some((effect) => effect.category === category)
-    );
+    const temp = this.getFeatures().filter((feature) => {
+      if (!feature.effects) return false;
+
+      const hasMatchingCategory = feature.effects.some(
+        (effect) => effect.category === category
+      );
+
+      let hasMatchingFeat = false;
+      const featIndex = feature.effects.findIndex(
+        (effect) => effect.category === "Feat"
+      );
+      if (featIndex >= 0) {
+        hasMatchingFeat =
+          feature.effects[featIndex].changes &&
+          feature.effects[featIndex].changes.some((feat) =>
+            feat.effects.some((effect) => effect.category === category)
+          );
+      }
+
+      return hasMatchingCategory || hasMatchingFeat;
+    });
+
+    return temp;
   }
 
   getSpellcastingAbility(source) {
@@ -789,6 +1217,8 @@ class Character {
   }
 
   #spellBonusHelper(source, category) {
+    // TODO: Update w/ getEffects() after putting spell bonus features in (don't forget to check feats)
+
     return this.#getEffects(category).reduce(
       (total, elem) =>
         total +
@@ -804,6 +1234,8 @@ class Character {
   }
 
   getTotalSpellSlots() {
+    // TODO: Update w/ getEffects() after putting spell slot features in (don't forget to check feats)
+
     let [spellcastingLevel, pactLevel] = this.#createSpellcastingLevelArr();
 
     spellcastingLevel = Object.keys(spellcastingLevel).reduce(
@@ -1118,6 +1550,20 @@ class Character {
     return compsArr.join(", ");
   }
 
+  getFeats() {
+    const category = "Feat";
+    let feats = [];
+
+    this.#getEffects(category).forEach((elem) => {
+      const featEffect = elem.effects.find(
+        (effect) => effect.category === category
+      );
+      feats = feats.concat(featEffect.changes);
+    });
+
+    return feats;
+  }
+
   getBuff(buffName) {
     return this.buffs.find((buff) => buff.name === buffName);
   }
@@ -1134,6 +1580,29 @@ class Character {
     return this.#getFeatureEffects(category)
       .concat(this.#getBuffEffects(category))
       .concat(this.#getItemEffects(category));
+  }
+
+  #addDiceToArr(diceArr, newDice) {
+    newDice.forEach((die) => {
+      const index = diceArr.findIndex(
+        (checkDie) => checkDie.sides === die.sides
+      );
+      if (index < 0) {
+        diceArr.push({ number: die.number, sides: die.sides });
+      } else {
+        diceArr[index].number += die.number;
+      }
+    });
+  }
+
+  #breakdownValToStr(val, label) {
+    let str = val !== 0 ? `${Math.abs(val)} (${label})` : "";
+    if (val > 0) {
+      str = " + " + str;
+    } else if (val < 0) {
+      str = " - " + str;
+    }
+    return str;
   }
 }
 

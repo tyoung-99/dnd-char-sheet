@@ -28,6 +28,7 @@ import {
   insertRace,
   insertSubrace,
 } from "./handleRaces.js";
+import { getFeats, getFeatsFromList, getOneFeat } from "./handleFeats.js";
 
 const app = express();
 app.use(express.json());
@@ -185,6 +186,20 @@ app.post("/api/subraces/insert", async (req, res) => {
   const { name, displayName, parentRace, source, features } = req.body;
   await insertSubrace(db, name, displayName, parentRace, source, features);
   res.json(await getSubracesFromParent(db, parentRace));
+});
+
+// Feats
+app.get("/api/feats", async (req, res) => {
+  res.send(await getFeats(db));
+});
+app.get("/api/feats/multiple/:featIds", async (req, res) => {
+  let { featIds } = req.params;
+  featIds = featIds.split(",");
+  res.send(await getFeatsFromList(db, featIds));
+});
+app.get("/api/feats/one/:featId", async (req, res) => {
+  const { featId } = req.params;
+  res.send(await getOneFeat(db, featId));
 });
 
 const PORT = process.env.PORT || 8000;
