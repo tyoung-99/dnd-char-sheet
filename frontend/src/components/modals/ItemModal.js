@@ -2,6 +2,7 @@
 
 import { useState, Fragment } from "react";
 import GenericModal from "./GenericModal";
+import EditorConvertToJSON from "../EditorConvertToJSON";
 import "../../styling/components/modals/ItemModal.css";
 
 const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
@@ -218,6 +219,19 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
           </button>
         </span>
       )}
+      <p>Additional information:</p>
+      <EditorConvertToJSON
+        wrapperClassName="wysiwyg-textbox-wrapper"
+        editorClassName="wysiwyg-textbox-editor"
+        onBlur={(contentJSON) =>
+          setNewItem((oldItem) => {
+            const newItem = { ...oldItem };
+            newItem.description = contentJSON;
+            return newItem;
+          })
+        }
+        defaultTextJSON={newItem.description}
+      />
     </>
   );
 

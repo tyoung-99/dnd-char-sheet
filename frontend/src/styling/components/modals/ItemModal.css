@@ -15,3 +15,7 @@
 .item-modal-container .item-body input[type="number"] {
   width: 3rem;
 }
+
+.item-modal-container .item-body .wysiwyg-textbox-wrapper {
+  max-width: 50rem;
+}
