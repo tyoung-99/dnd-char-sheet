@@ -916,25 +916,33 @@ class Character {
     ];
   }
 
+  #checkWearingArmor(equippedItems) {
+    return equippedItems.some((item) => {
+      const index = item.types.findIndex((checkType) => checkType === "Armor");
+      if (index < 0) return false;
+      if (item.subtypes[index].includes["Shield"]) return false;
+      return true;
+    });
+  }
+
+  #checkWearingShield(equippedItems) {
+    equippedItems.some((item) => {
+      const index = item.types.findIndex((checkType) => checkType === "Armor");
+      if (index < 0) return false;
+      if (item.subtypes[index].includes["Shield"]) return true;
+      return false;
+    });
+  }
+
   #validateArmorClassReplacements(replacements) {
     const breakdown = new Array(replacements.length).fill([]);
     const equippedItems = this.getEquippedItems();
     replacements = replacements.map((option, i) => {
-      if (
-        option.noArmor &&
-        equippedItems.some(
-          (item) => item.type === "Armor" && !item.subtypes.includes["Shield"]
-        )
-      ) {
+      if (option.noArmor && this.#checkWearingArmor(equippedItems)) {
         return -1;
       }
 
-      if (
-        option.noShield &&
-        equippedItems.some(
-          (item) => item.type === "Armor" && item.subtypes.includes["Shield"]
-        )
-      ) {
+      if (option.noShield && this.#checkWearingShield(equippedItems)) {
         return -1;
       }
 
@@ -952,7 +960,7 @@ class Character {
       return option.replace.base + mods.reduce((total, mod) => total + mod);
     });
 
-    if (!equippedItems.some((item) => item.type === "Armor")) {
+    if (!equippedItems.some((item) => item.types.includes("Armor"))) {
       const dexMod = this.getAbilityMod("DEX");
       replacements.push(10 + dexMod);
       breakdown.push([{ val: 10, label: "Unarmored" }]);
@@ -989,21 +997,11 @@ class Character {
     let breakdown = [];
     const equippedItems = this.getEquippedItems();
     bonuses = bonuses.map((option) => {
-      if (
-        option.noArmor &&
-        equippedItems.some(
-          (item) => item.type === "Armor" && !item.subtypes.includes["Shield"]
-        )
-      ) {
+      if (option.noArmor && this.#checkWearingArmor(equippedItems)) {
         return 0;
       }
 
-      if (
-        option.noShield &&
-        equippedItems.some(
-          (item) => item.type === "Armor" && item.subtypes.includes["Shield"]
-        )
-      ) {
+      if (option.noShield && this.#checkWearingShield(equippedItems)) {
         return 0;
       }
 
@@ -1183,8 +1181,11 @@ class Character {
     const dexMod = this.getAbilityMod("DEX");
 
     let abilityMod;
+    const subtypeIndex = item.types.findIndex(
+      (checkType) => checkType === "Weapon"
+    );
     if (
-      item.subtypes.includes("Ranged") ||
+      item.subtypes[subtypeIndex].includes("Ranged") ||
       (item.properties.includes("Finesse") && dexMod > strMod)
     ) {
       abilityMod = dexMod;
@@ -1253,8 +1254,11 @@ class Character {
     const dexMod = this.getAbilityMod("DEX");
 
     let abilityMod;
+    const subtypeIndex = item.types.findIndex(
+      (checkType) => checkType === "Weapon"
+    );
     if (
-      item.subtypes.includes("Ranged") ||
+      item.subtypes[subtypeIndex].includes("Ranged") ||
       (item.properties.includes("Finesse") && dexMod > strMod)
     ) {
       abilityMod = dexMod;
@@ -1356,11 +1360,12 @@ class Character {
   getItems() {
     const items = {};
     this.equipment.forEach((item) => {
-      if (item.type !== "Treasure") {
-        if (!(item.type in items)) {
-          items[item.type] = [];
+      const type = item.types[0];
+      if (type !== "Treasure") {
+        if (!(type in items)) {
+          items[type] = [];
         }
-        items[item.type].push(item);
+        items[type].push(item);
       }
     });
     return items;
@@ -1373,7 +1378,7 @@ class Character {
   }
 
   getItemsByType(type) {
-    return this.equipment.filter((item) => item.type === type);
+    return this.equipment.filter((item) => item.types.includes(type));
   }
 
   getItem(itemName) {
@@ -1395,7 +1400,7 @@ class Character {
   }
 
   getTreasure() {
-    return this.equipment.filter((item) => item.type === "Treasure");
+    return this.equipment.filter((item) => item.types.includes("Treasure"));
   }
 
   getFeatures(

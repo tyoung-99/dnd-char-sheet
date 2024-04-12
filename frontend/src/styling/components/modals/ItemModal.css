@@ -1,5 +1,19 @@
-.item-modal-container .item-header h1 {
+.item-modal-container .item-header {
+  position: relative;
+}
+
+.item-modal-container .item-header h1,
+.item-modal-container .item-header input.item-name {
   font-size: 1.5rem;
+  text-align: center;
+}
+
+.item-modal-container .item-header img.edit-item {
+  position: absolute;
+  top: -1rem;
+  right: -1rem;
+  width: 2rem;
+  cursor: pointer;
 }
 
 .item-modal-container .item-body {
@@ -8,8 +22,8 @@
 }
 .item-modal-container .item-body p,
 .item-modal-container .item-body label,
-.item-modal-container .item-body input,
-.item-modal-container .item-body button {
+.item-modal-container .item-body :has(> input),
+.item-modal-container .item-body :has(> button:not(.x-button)) {
   margin: 0.5rem 0;
 }
 .item-modal-container .item-body input[type="number"] {
@@ -18,4 +32,24 @@
 
 .item-modal-container .item-body .wysiwyg-textbox-wrapper {
   max-width: 50rem;
+}
+
+.item-modal-container .item-body .subtype {
+  cursor: pointer;
+}
+.item-modal-container .item-body .subtype:hover {
+  text-decoration: line-through;
+}
+
+.item-modal-container .item-body .x-button {
+  background-color: white;
+  border: 1px solid black;
+}
+.item-modal-container .item-body .x-button:hover {
+  background-color: red;
+  color: white;
+}
+
+.item-modal-container .item-body .add-type {
+  margin: 0 0.25rem;
 }

@@ -36,6 +36,36 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
       "You have disadvantage on Dexterity (Stealth) checks while wearing this armor.",
   };
 
+  const ITEM_TYPES = {
+    "Adventuring Gear": null,
+    Armor: ["Light", "Medium", "Heavy", "Shield"],
+    Consumable: ["Ammunition", "Food/Drink", "Poison", "Potion", "Scroll"],
+    Mount: null,
+    Other: null,
+    Ring: null,
+    "Spellcasting Focus": [
+      "Crystal",
+      "Orb",
+      "Rod",
+      "Staff",
+      "Wand",
+      "Sprig of Mistletoe",
+      "Totem",
+      "Amulet",
+      "Emblem",
+      "Reliquary",
+    ],
+    Storage: null,
+    "Tack/Harness": null,
+    Tattoo: null,
+    Tool: ["Artisan's Tool", "Gaming Set", "Instrument", "Generic Tool"],
+    "Trade Good": null,
+    Vehicle: ["Land", "Air", "Space", "Water"],
+    Weapon: ["Martial", "Melee", "Ranged", "Simple", "Firearm"],
+    "Wondrous Item": null,
+  };
+
+  const [editing, setEditing] = useState(false);
   const [newItem, setNewItem] = useState(structuredClone(item));
 
   const saveAndClose = () => {
@@ -80,20 +110,177 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
     });
   };
 
-  const header = <h1>{item.name}</h1>;
+  const header = (
+    <>
+      <h1>
+        {editing ? (
+          <input
+            type="text"
+            className="item-name"
+            id="itemName"
+            name="itemName"
+            value={newItem.name}
+            onChange={(event) =>
+              setNewItem((oldItem) => {
+                const newItem = { ...oldItem };
+                newItem.name = event.target.value;
+                return newItem;
+              })
+            }
+          ></input>
+        ) : (
+          newItem.name
+        )}
+      </h1>
+      <img
+        src={
+          process.env.PUBLIC_URL +
+          `/icons/edit${editing ? "_selected" : ""}.png`
+        }
+        alt=""
+        className="edit-item"
+        onClick={() => setEditing(!editing)}
+      ></img>
+    </>
+  );
 
   let attackMod, attackModBreakdown, damage, damageBreakdown;
-  if (item.type === "Weapon") {
+  if (newItem.type === "Weapon") {
     [[attackMod, attackModBreakdown], [damage, damageBreakdown]] =
       character.getAttack(item);
   }
 
+  const typeSelection = newItem.types.map((type, i) => (
+    <span key={i}>
+      <select
+        name={`type${i}`}
+        id={`type${i}`}
+        value={type}
+        onChange={(event) => {
+          setNewItem((oldItem) => {
+            const newItem = { ...oldItem };
+            newItem.types[i] = event.target.value;
+            newItem.subtypes[i] = ITEM_TYPES[event.target.value] ? [] : null;
+            return newItem;
+          });
+        }}
+      >
+        <option hidden value={""}>
+          Select type
+        </option>
+        {Object.keys(ITEM_TYPES).map((refType) => {
+          if (newItem.types.includes(refType) && refType !== type) return null;
+          return (
+            <option key={refType} value={refType}>
+              {refType}
+            </option>
+          );
+        })}
+      </select>{" "}
+      {ITEM_TYPES[type] && (
+        <>
+          Subtypes:{" "}
+          {newItem.subtypes[i].map((subtype, j) => (
+            <Fragment key={j}>
+              {j > 0 && ", "}
+              <span
+                className="subtype"
+                onClick={() =>
+                  setNewItem((oldItem) => {
+                    const newItem = { ...oldItem };
+                    newItem.subtypes[i].splice(j, 1);
+                    return newItem;
+                  })
+                }
+              >
+                {subtype}
+              </span>
+            </Fragment>
+          ))}{" "}
+          <select
+            name={`type${i}Subtype`}
+            id={`type${i}Subtype`}
+            value={""}
+            onChange={(event) =>
+              setNewItem((oldItem) => {
+                const newItem = { ...oldItem };
+                newItem.subtypes[i].push(event.target.value);
+                newItem.subtypes[i].sort();
+                return newItem;
+              })
+            }
+          >
+            <option hidden value={""}>
+              Add subtype
+            </option>
+            {ITEM_TYPES[type].map((refSubtype) => {
+              if (newItem.subtypes[i].includes(refSubtype)) return null;
+              return (
+                <option key={refSubtype} value={refSubtype}>
+                  {refSubtype}
+                </option>
+              );
+            })}
+          </select>
+        </>
+      )}{" "}
+      {i > 0 && (
+        <button
+          className="x-button"
+          onClick={() =>
+            setNewItem((oldItem) => {
+              const newItem = { ...oldItem };
+              newItem.types.splice(i, 1);
+              newItem.subtypes.splice(i, 1);
+              return newItem;
+            })
+          }
+        >
+          X
+        </button>
+      )}
+    </span>
+  ));
+
   const body = (
     <>
-      <p>
-        Type: {item.type}
-        {item.subtypes ? ` (${item.subtypes.join(", ")})` : ""}
-      </p>
+      {editing ? (
+        <>
+          <label className="col-flex" htmlFor="">
+            <span>
+              Type: (First type determines sorting)
+              <button
+                className="add-type"
+                id="addType"
+                name="addType"
+                onClick={() =>
+                  setNewItem((oldItem) => {
+                    const newItem = { ...oldItem };
+                    oldItem.types.push("");
+                    oldItem.subtypes.push([]);
+                    return newItem;
+                  })
+                }
+              >
+                Add type
+              </button>
+            </span>
+            {typeSelection}
+          </label>
+        </>
+      ) : (
+        <p>
+          Type:{" "}
+          {newItem.types.map(
+            (type, i) =>
+              `${i > 0 ? ", " : ""}${type}${
+                newItem.subtypes[i]
+                  ? ` (${newItem.subtypes[i].join(", ")})`
+                  : ""
+              }`
+          )}
+        </p>
+      )}
       <span>
         <label htmlFor="itemCount">Amount: </label>
         <input
@@ -147,13 +334,13 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
           </button>
         </span>
       )}
-      {!item.profRequired ? null : (
-        <p>Requires proficiency in one of: {item.profRequired.join(", ")}</p>
+      {!newItem.profRequired ? null : (
+        <p>Requires proficiency in one of: {newItem.profRequired.join(", ")}</p>
       )}
-      {!item.properties ? null : (
+      {!newItem.properties ? null : (
         <p>
           Properties:{" "}
-          {item.properties.map((property, i) => (
+          {newItem.properties.map((property, i) => (
             <Fragment key={i}>
               {i !== 0 ? ", " : ""}
               <span
@@ -169,7 +356,7 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
           ))}
         </p>
       )}
-      {!(item.type === "Weapon") ? null : (
+      {!(newItem.type === "Weapon") ? null : (
         <>
           <p>
             Attack Modifier: {combineBreakdown(attackModBreakdown)}
@@ -221,7 +408,9 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
       )}
       <p>Additional information:</p>
       <EditorConvertToJSON
-        wrapperClassName="wysiwyg-textbox-wrapper"
+        readOnly={!editing}
+        toolbarHidden={!editing}
+        wrapperClassName={editing && "wysiwyg-textbox-wrapper"}
         editorClassName="wysiwyg-textbox-editor"
         onBlur={(contentJSON) =>
           setNewItem((oldItem) => {
