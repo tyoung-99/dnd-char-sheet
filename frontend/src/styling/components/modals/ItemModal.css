@@ -34,10 +34,10 @@
   max-width: 50rem;
 }
 
-.item-modal-container .item-body .subtype {
+.item-modal-container .item-body .click-to-remove {
   cursor: pointer;
 }
-.item-modal-container .item-body .subtype:hover {
+.item-modal-container .item-body .click-to-remove:hover {
   text-decoration: line-through;
 }
 
@@ -52,4 +52,8 @@
 
 .item-modal-container .item-body .add-type {
   margin: 0 0.25rem;
+}
+
+.item-modal-container .item-body .dice-input {
+  max-width: 2.5rem;
 }

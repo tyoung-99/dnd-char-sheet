@@ -1,3 +1,9 @@
+export const getAllItemProfs = async (db) => {
+  const collection = db.collection("proficiencies");
+  const profs = await collection.find().toArray();
+  return profs;
+};
+
 export const getWeaponProfs = async (db) => {
   const collection = db.collection("proficiencies");
   const weaponProfs = await collection.find({ profType: "Weapon" }).toArray();

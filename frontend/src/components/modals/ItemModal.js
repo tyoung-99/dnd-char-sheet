@@ -1,12 +1,13 @@
 // Modal to view/edit item details
 
-import { useState, Fragment } from "react";
+import { useState, Fragment, useEffect } from "react";
+import axios from "axios";
 import GenericModal from "./GenericModal";
 import EditorConvertToJSON from "../EditorConvertToJSON";
 import "../../styling/components/modals/ItemModal.css";
 
 const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
-  const PROPERTIES_DESCS = {
+  const PROPERTIES = {
     Ammunition:
       "You can use a weapon that has the ammunition property to make a ranged attack only if you have ammunition to fire from the weapon. Each time you attack with the weapon, you expend one piece of ammunition. Drawing the ammunition from a quiver, case, or other container is part of the attack (you need a free hand to load a one-handed weapon). At the end of the battle, you can recover half your expended ammunition by taking a minute to search the battlefield. If you use a weapon that has the ammunition property to make a melee attack, you treat the weapon as an improvised weapon. A sling must be loaded to deal any damage when used in this way.",
     Finesse:
@@ -67,6 +68,23 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
 
   const [editing, setEditing] = useState(false);
   const [newItem, setNewItem] = useState(structuredClone(item));
+
+  const [profTypes, setProfTypes] = useState([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      const profsList = (await axios.get("/api/proficiencies/all")).data.reduce(
+        (groupedList, profGroup) => {
+          const combinedName = `${profGroup.profType} (${profGroup.name})`;
+          groupedList[combinedName] = profGroup.profs;
+          return groupedList;
+        },
+        {}
+      );
+      setProfTypes(profsList);
+    };
+    loadData();
+  }, []);
 
   const saveAndClose = () => {
     character.updateItem(item, newItem);
@@ -159,12 +177,12 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
   );
 
   let attackMod, attackModBreakdown, damage, damageBreakdown;
-  if (newItem.type === "Weapon") {
+  if (newItem.types.includes("Weapon")) {
     [[attackMod, attackModBreakdown], [damage, damageBreakdown]] =
       character.getAttack(item);
   }
 
-  const typeSelection = newItem.types.map((type, i) => (
+  const typeSelector = newItem.types.map((type, i) => (
     <span key={i}>
       <select
         name={`type${i}`}
@@ -198,7 +216,7 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
             <Fragment key={j}>
               {j > 0 && ", "}
               <span
-                className="subtype"
+                className="click-to-remove"
                 onClick={() =>
                   setNewItem((oldItem) => {
                     const newItem = { ...oldItem };
@@ -256,170 +274,330 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
     </span>
   ));
 
-  const body = (
+  const typeSection = editing ? (
     <>
+      <label className="col-flex" htmlFor="">
+        <span>
+          Type: (First type determines sorting)
+          <button
+            className="add-type"
+            id="addType"
+            name="addType"
+            onClick={() =>
+              setNewItem((oldItem) => {
+                const newItem = { ...oldItem };
+                oldItem.types.push("");
+                oldItem.subtypes.push([]);
+                return newItem;
+              })
+            }
+          >
+            Add type
+          </button>
+        </span>
+        {typeSelector}
+      </label>
+    </>
+  ) : (
+    <p>
+      Type:{" "}
+      {newItem.types.map(
+        (type, i) =>
+          `${i > 0 ? ", " : ""}${type}${
+            newItem.subtypes[i] ? ` (${newItem.subtypes[i].join(", ")})` : ""
+          }`
+      )}
+    </p>
+  );
+
+  const amountSection = (
+    <span>
+      <label htmlFor="itemCount">Amount: </label>
+      <input
+        type="number"
+        id="itemCount"
+        name="itemCount"
+        value={newItem.count}
+        min={0}
+        onChange={(e) =>
+          setNewItem((oldItem) => {
+            const newItem = { ...oldItem };
+            newItem.count = e.target.value;
+            return newItem;
+          })
+        }
+      ></input>
+    </span>
+  );
+
+  const equippedSection = typeof newItem.toggles.Equipped === "boolean" && (
+    <span>
+      <label htmlFor={"equipped"}>Equipped: </label>
+      <button
+        id={"equipped"}
+        name={"equipped"}
+        onClick={() =>
+          setNewItem((oldItem) => {
+            const newItem = { ...oldItem };
+            newItem.toggles.Equipped = !newItem.toggles.Equipped;
+            return newItem;
+          })
+        }
+      >
+        {newItem.toggles.Equipped ? "Yes" : "No"}
+      </button>
+    </span>
+  );
+
+  const attunedSection = typeof newItem.toggles.Attuned === "boolean" && (
+    <span>
+      <label htmlFor={"attuned"}>Attuned: </label>
+      <button
+        id={"attuned"}
+        name={"attuned"}
+        onClick={() =>
+          setNewItem((oldItem) => {
+            const newItem = { ...oldItem };
+            newItem.toggles.Attuned = !newItem.toggles.Attuned;
+            return newItem;
+          })
+        }
+      >
+        {newItem.toggles.Attuned ? "Yes" : "No"}
+      </button>
+    </span>
+  );
+
+  if (!newItem.profRequired) newItem.profRequired = [];
+
+  const proficiencySection = (newItem.profRequired.length > 0 || editing) && (
+    <p>
+      Requires proficiency in one of:{" "}
       {editing ? (
         <>
-          <label className="col-flex" htmlFor="">
-            <span>
-              Type: (First type determines sorting)
-              <button
-                className="add-type"
-                id="addType"
-                name="addType"
+          {newItem.profRequired.map((prof, i) => (
+            <Fragment key={i}>
+              {i > 0 && ", "}
+              <span
+                className="click-to-remove"
                 onClick={() =>
                   setNewItem((oldItem) => {
                     const newItem = { ...oldItem };
-                    oldItem.types.push("");
-                    oldItem.subtypes.push([]);
+                    newItem.profRequired.splice(i, 1);
                     return newItem;
                   })
                 }
               >
-                Add type
-              </button>
-            </span>
-            {typeSelection}
-          </label>
-        </>
-      ) : (
-        <p>
-          Type:{" "}
-          {newItem.types.map(
-            (type, i) =>
-              `${i > 0 ? ", " : ""}${type}${
-                newItem.subtypes[i]
-                  ? ` (${newItem.subtypes[i].join(", ")})`
-                  : ""
-              }`
-          )}
-        </p>
-      )}
-      <span>
-        <label htmlFor="itemCount">Amount: </label>
-        <input
-          type="number"
-          id="itemCount"
-          name="itemCount"
-          value={newItem.count}
-          min={0}
-          onChange={(e) =>
-            setNewItem((oldItem) => {
-              const newItem = { ...oldItem };
-              newItem.count = e.target.value;
-              return newItem;
-            })
-          }
-        ></input>
-      </span>
-      {typeof newItem.toggles.Equipped === "boolean" && (
-        <span>
-          <label htmlFor={"equipped"}>Equipped: </label>
-          <button
-            id={"equipped"}
-            name={"equipped"}
-            onClick={() =>
-              setNewItem((oldItem) => {
-                const newItem = { ...oldItem };
-                newItem.toggles.Equipped = !newItem.toggles.Equipped;
-                return newItem;
-              })
-            }
-          >
-            {newItem.toggles.Equipped ? "Yes" : "No"}
-          </button>
-        </span>
-      )}
-      {typeof newItem.toggles.Attuned === "boolean" && (
-        <span>
-          <label htmlFor={"attuned"}>Attuned: </label>
-          <button
-            id={"attuned"}
-            name={"attuned"}
-            onClick={() =>
-              setNewItem((oldItem) => {
-                const newItem = { ...oldItem };
-                newItem.toggles.Attuned = !newItem.toggles.Attuned;
-                return newItem;
-              })
-            }
-          >
-            {newItem.toggles.Attuned ? "Yes" : "No"}
-          </button>
-        </span>
-      )}
-      {!newItem.profRequired ? null : (
-        <p>Requires proficiency in one of: {newItem.profRequired.join(", ")}</p>
-      )}
-      {!newItem.properties ? null : (
-        <p>
-          Properties:{" "}
-          {newItem.properties.map((property, i) => (
-            <Fragment key={i}>
-              {i !== 0 ? ", " : ""}
-              <span
-                title={
-                  property.includes("Versatile")
-                    ? PROPERTIES_DESCS["Versatile"]
-                    : PROPERTIES_DESCS[property]
-                }
-              >
-                {property}
+                {prof}
               </span>
             </Fragment>
-          ))}
-        </p>
-      )}
-      {!(newItem.type === "Weapon") ? null : (
-        <>
-          <p>
-            Attack Modifier: {combineBreakdown(attackModBreakdown)}
-            {` = ${attackMod}`}
-          </p>
-          <p>
-            Damage: {combineBreakdown(damageBreakdown)}
-            {` = ${damage}`}
-          </p>
+          ))}{" "}
+          <select
+            name={`profAdder`}
+            id={`profAdder`}
+            value={""}
+            onChange={(event) =>
+              setNewItem((oldItem) => {
+                const newItem = { ...oldItem };
+                newItem.profRequired.push(event.target.value);
+                newItem.profRequired.sort();
+                return newItem;
+              })
+            }
+          >
+            <option hidden value={""}>
+              Add proficiency
+            </option>
+            {Object.keys(profTypes)
+              .sort()
+              .map((group) => (
+                <optgroup label={group} key={group}>
+                  {profTypes[group].map((prof) => {
+                    if (newItem.profRequired.includes(prof)) return null;
+                    return (
+                      <option key={prof} value={prof}>
+                        {prof}
+                      </option>
+                    );
+                  })}
+                </optgroup>
+              ))}
+          </select>
         </>
+      ) : (
+        newItem.profRequired.join(", ")
       )}
-      {typeof newItem.toggles["Two-Handed"] === "boolean" && (
-        <span>
-          <label htmlFor={"twoHanded"}>Two-Handed: </label>
-          <button
-            id={"twoHanded"}
-            name={"twoHanded"}
-            onClick={() => {
-              character.toggleItemTwoHanded(item);
+    </p>
+  );
+
+  if (!newItem.properties) newItem.properties = [];
+
+  const propertiesSection = (newItem.properties.length > 0 || editing) && (
+    <p>
+      Properties:{" "}
+      {editing ? (
+        <>
+          {newItem.properties.map((property, i) => (
+            <Fragment key={i}>
+              {i > 0 && ", "}
+              <span
+                className="click-to-remove"
+                onClick={() =>
+                  setNewItem((oldItem) => {
+                    const newItem = { ...oldItem };
+                    newItem.properties.splice(i, 1);
+                    return newItem;
+                  })
+                }
+                title={PROPERTIES[property]}
+              >
+                {property}
+              </span>{" "}
+              {property === "Versatile" && (
+                <>
+                  (
+                  <input
+                    id="versatile-dice-number"
+                    name="versatile-dice-number"
+                    className="dice-input"
+                    type="number"
+                    min={1}
+                    value={newItem.versatileDice.number}
+                    onChange={(event) => {
+                      setNewItem((oldItem) => {
+                        const newItem = { ...oldItem };
+                        newItem.versatileDice.number = event.target.value;
+                        return newItem;
+                      });
+                    }}
+                  ></input>
+                  d
+                  <input
+                    id="versatile-dice-sides"
+                    name="versatile-dice-sides"
+                    className="dice-input"
+                    type="number"
+                    min={2}
+                    value={newItem.versatileDice.sides}
+                    onChange={(event) => {
+                      setNewItem((oldItem) => {
+                        const newItem = { ...oldItem };
+                        newItem.versatileDice.sides = event.target.value;
+                        return newItem;
+                      });
+                    }}
+                  ></input>
+                  )
+                </>
+              )}
+            </Fragment>
+          ))}{" "}
+          <select
+            name={`propertyAdder`}
+            id={`propertyAdder`}
+            value={""}
+            onChange={(event) =>
               setNewItem((oldItem) => {
                 const newItem = { ...oldItem };
-                newItem.toggles["Two-Handed"] = !newItem.toggles["Two-Handed"];
+                newItem.properties.push(event.target.value);
+                newItem.properties.sort();
+                if (event.target.value === "Versatile") {
+                  newItem.versatileDice = { number: 1, sides: 2 };
+                }
                 return newItem;
-              });
-            }}
+              })
+            }
           >
-            {newItem.toggles["Two-Handed"] ? "Yes" : "No"}
-          </button>
-        </span>
+            <option hidden value={""}>
+              Add property
+            </option>
+            {Object.keys(PROPERTIES)
+              .sort()
+              .map((property) => {
+                if (newItem.properties.includes(property)) return null;
+                return (
+                  <option
+                    key={property}
+                    value={property}
+                    title={PROPERTIES[property]}
+                  >
+                    {property}
+                  </option>
+                );
+              })}
+          </select>
+        </>
+      ) : (
+        newItem.properties.map((property, i) => (
+          <Fragment key={i}>
+            {i > 0 && ", "}
+            <span title={PROPERTIES[property]}>
+              {property}
+              {property === "Versatile" &&
+                ` (${newItem.versatileDice.number}d${newItem.versatileDice.sides})`}
+            </span>
+          </Fragment>
+        ))
       )}
-      {typeof newItem.toggles.Activated === "boolean" && (
-        <span>
-          <label htmlFor={"activated"}>Activated: </label>
-          <button
-            id={"activated"}
-            name={"activated"}
-            onClick={() => {
-              character.toggleItemActive(item);
-              setNewItem((oldItem) => {
-                const newItem = { ...oldItem };
-                newItem.toggles.Activated = !newItem.toggles.Activated;
-                return newItem;
-              });
-            }}
-          >
-            {newItem.toggles.Activated ? "Yes" : "No"}
-          </button>
-        </span>
-      )}
+    </p>
+  );
+
+  const attackSection = newItem.types.includes("Weapon") && (
+    <>
+      <p>
+        Attack Modifier: {combineBreakdown(attackModBreakdown)}
+        {` = ${attackMod}`}
+      </p>
+      <p>
+        Damage: {combineBreakdown(damageBreakdown)}
+        {` = ${damage}`}
+      </p>
+    </>
+  );
+
+  const twoHandedSection = typeof newItem.toggles["Two-Handed"] ===
+    "boolean" && (
+    <span>
+      <label htmlFor={"twoHanded"}>Two-Handed: </label>
+      <button
+        id={"twoHanded"}
+        name={"twoHanded"}
+        onClick={() => {
+          character.toggleItemTwoHanded(item);
+          setNewItem((oldItem) => {
+            const newItem = { ...oldItem };
+            newItem.toggles["Two-Handed"] = !newItem.toggles["Two-Handed"];
+            return newItem;
+          });
+        }}
+      >
+        {newItem.toggles["Two-Handed"] ? "Yes" : "No"}
+      </button>
+    </span>
+  );
+
+  const activatedSection = typeof newItem.toggles.Activated === "boolean" && (
+    <span>
+      <label htmlFor={"activated"}>Activated: </label>
+      <button
+        id={"activated"}
+        name={"activated"}
+        onClick={() => {
+          character.toggleItemActive(item);
+          setNewItem((oldItem) => {
+            const newItem = { ...oldItem };
+            newItem.toggles.Activated = !newItem.toggles.Activated;
+            return newItem;
+          });
+        }}
+      >
+        {newItem.toggles.Activated ? "Yes" : "No"}
+      </button>
+    </span>
+  );
+
+  const descriptionSection = (
+    <>
       <p>Additional information:</p>
       {isJsonEditorEmpty(newItem.description) && !editing ? (
         <p>-None-</p>
@@ -439,6 +617,21 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
           defaultTextJSON={newItem.description}
         />
       )}
+    </>
+  );
+
+  const body = (
+    <>
+      {typeSection}
+      {amountSection}
+      {equippedSection}
+      {attunedSection}
+      {proficiencySection}
+      {propertiesSection}
+      {attackSection}
+      {twoHandedSection}
+      {activatedSection}
+      {descriptionSection}
     </>
   );
 

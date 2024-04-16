@@ -12,6 +12,7 @@ import { getImg, removeImg } from "./handleImg.js";
 import { getSources, getOneSource } from "./handleSources.js";
 import { getAlignments } from "./handleAlignments.js";
 import {
+  getAllItemProfs,
   getWeaponProfs,
   getArmorProfs,
   getToolProfsAll,
@@ -118,6 +119,9 @@ app.get("/api/alignments", async (req, res) => {
 });
 
 // Proficiencies
+app.get("/api/proficiencies/all", async (req, res) => {
+  res.send(await getAllItemProfs(db));
+});
 app.get("/api/proficiencies/weapons", async (req, res) => {
   res.send(await getWeaponProfs(db));
 });

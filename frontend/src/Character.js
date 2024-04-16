@@ -1278,12 +1278,7 @@ class Character {
 
     let damage = JSON.parse(JSON.stringify(item.damage.base));
     if (item.toggles["Two-Handed"]) {
-      let newBase = item.properties
-        .find((prop) => prop.includes("Versatile"))
-        .split(/[()]+/)[1]; // Removes parentheses
-      newBase = newBase.split("d");
-      damage[0].dice[0].number = newBase[0];
-      damage[0].dice[0].sides = newBase[1];
+      damage[0].dice[0] = { ...item.versatileDice };
     }
 
     breakdown.unshift({
