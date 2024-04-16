@@ -110,6 +110,20 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
     });
   };
 
+  const isJsonEditorEmpty = (textJson) => {
+    if (!textJson) return true;
+    if (textJson.entityMap && Object.keys(textJson.entityMap).length > 0)
+      return false;
+    if (textJson.blocks) {
+      for (const block of textJson.blocks) {
+        if (block.text !== "") {
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
   const header = (
     <>
       <h1>
@@ -407,20 +421,24 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
         </span>
       )}
       <p>Additional information:</p>
-      <EditorConvertToJSON
-        readOnly={!editing}
-        toolbarHidden={!editing}
-        wrapperClassName={editing && "wysiwyg-textbox-wrapper"}
-        editorClassName="wysiwyg-textbox-editor"
-        onBlur={(contentJSON) =>
-          setNewItem((oldItem) => {
-            const newItem = { ...oldItem };
-            newItem.description = contentJSON;
-            return newItem;
-          })
-        }
-        defaultTextJSON={newItem.description}
-      />
+      {isJsonEditorEmpty(newItem.description) && !editing ? (
+        <p>-None-</p>
+      ) : (
+        <EditorConvertToJSON
+          readOnly={!editing}
+          toolbarHidden={!editing}
+          wrapperClassName={editing && "wysiwyg-textbox-wrapper"}
+          editorClassName="wysiwyg-textbox-editor"
+          onBlur={(contentJSON) =>
+            setNewItem((oldItem) => {
+              const newItem = { ...oldItem };
+              newItem.description = contentJSON;
+              return newItem;
+            })
+          }
+          defaultTextJSON={newItem.description}
+        />
+      )}
     </>
   );
 
