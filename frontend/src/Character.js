@@ -343,6 +343,16 @@ class Character {
     this.queueSave();
   }
 
+  toggleItemActivatable(item) {
+    if (typeof item.toggles.Activated === "boolean") {
+      item.toggles.Activated = undefined;
+    } else {
+      item.toggles.Activated = false;
+      item.damage.activated = [];
+    }
+    this.queueSave();
+  }
+
   toggleItemTwoHanded(item) {
     item.toggles["Two-Handed"] = !item.toggles["Two-Handed"];
     this.queueSave();

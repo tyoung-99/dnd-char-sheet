@@ -349,22 +349,49 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
     </span>
   );
 
-  const attunedSection = typeof newItem.toggles.Attuned === "boolean" && (
+  const attunedSection = (typeof newItem.toggles.Attuned === "boolean" ||
+    editing) && (
     <span>
-      <label htmlFor={"attuned"}>Attuned: </label>
-      <button
-        id={"attuned"}
-        name={"attuned"}
-        onClick={() =>
-          setNewItem((oldItem) => {
-            const newItem = { ...oldItem };
-            newItem.toggles.Attuned = !newItem.toggles.Attuned;
-            return newItem;
-          })
-        }
-      >
-        {newItem.toggles.Attuned ? "Yes" : "No"}
-      </button>
+      {editing && (
+        <>
+          <label htmlFor={"attunable"}>Attunable: </label>
+          <button
+            id={"attunable"}
+            name={"attunable"}
+            onClick={() =>
+              setNewItem((oldItem) => {
+                const newItem = { ...oldItem };
+                if (typeof newItem.toggles.Attuned === "boolean") {
+                  newItem.toggles.Attuned = undefined;
+                } else {
+                  newItem.toggles.Attuned = false;
+                }
+                return newItem;
+              })
+            }
+          >
+            {typeof newItem.toggles.Attuned === "boolean" ? "Yes" : "No"}
+          </button>{" "}
+        </>
+      )}
+      {typeof newItem.toggles.Attuned === "boolean" && (
+        <>
+          <label htmlFor={"attuned"}>Attuned: </label>
+          <button
+            id={"attuned"}
+            name={"attuned"}
+            onClick={() =>
+              setNewItem((oldItem) => {
+                const newItem = { ...oldItem };
+                newItem.toggles.Attuned = !newItem.toggles.Attuned;
+                return newItem;
+              })
+            }
+          >
+            {newItem.toggles.Attuned ? "Yes" : "No"}
+          </button>
+        </>
+      )}
     </span>
   );
 
@@ -445,6 +472,9 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
                 onClick={() =>
                   setNewItem((oldItem) => {
                     const newItem = { ...oldItem };
+                    if (newItem.properties[i] === "Versatile") {
+                      newItem.toggles["Two-Handed"] = undefined;
+                    }
                     newItem.properties.splice(i, 1);
                     return newItem;
                   })
@@ -503,6 +533,7 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
                 newItem.properties.sort();
                 if (event.target.value === "Versatile") {
                   newItem.versatileDice = { number: 1, sides: 2 };
+                  newItem.toggles["Two-Handed"] = false;
                 }
                 return newItem;
               })
@@ -576,23 +607,52 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
     </span>
   );
 
-  const activatedSection = typeof newItem.toggles.Activated === "boolean" && (
+  const activatedSection = (typeof newItem.toggles.Activated === "boolean" ||
+    editing) && (
     <span>
-      <label htmlFor={"activated"}>Activated: </label>
-      <button
-        id={"activated"}
-        name={"activated"}
-        onClick={() => {
-          character.toggleItemActive(item);
-          setNewItem((oldItem) => {
-            const newItem = { ...oldItem };
-            newItem.toggles.Activated = !newItem.toggles.Activated;
-            return newItem;
-          });
-        }}
-      >
-        {newItem.toggles.Activated ? "Yes" : "No"}
-      </button>
+      {editing && (
+        <>
+          <label htmlFor={"activatable"}>Activatable: </label>
+          <button
+            id={"activatable"}
+            name={"activatable"}
+            onClick={() =>
+              setNewItem((oldItem) => {
+                character.toggleItemActivatable(item);
+                const newItem = { ...oldItem };
+                if (typeof newItem.toggles.Activated === "boolean") {
+                  newItem.toggles.Activated = undefined;
+                } else {
+                  newItem.toggles.Activated = false;
+                  newItem.damage.activated = [];
+                }
+                return newItem;
+              })
+            }
+          >
+            {typeof newItem.toggles.Activated === "boolean" ? "Yes" : "No"}
+          </button>{" "}
+        </>
+      )}
+      {typeof newItem.toggles.Activated === "boolean" && (
+        <>
+          <label htmlFor={"activated"}>Activated: </label>
+          <button
+            id={"activated"}
+            name={"activated"}
+            onClick={() => {
+              character.toggleItemActive(item);
+              setNewItem((oldItem) => {
+                const newItem = { ...oldItem };
+                newItem.toggles.Activated = !newItem.toggles.Activated;
+                return newItem;
+              });
+            }}
+          >
+            {newItem.toggles.Activated ? "Yes" : "No"}
+          </button>
+        </>
+      )}
     </span>
   );
 

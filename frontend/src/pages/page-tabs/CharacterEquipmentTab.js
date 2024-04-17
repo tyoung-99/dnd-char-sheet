@@ -35,7 +35,7 @@ const CharacterEquipmentTab = ({
 
   for (const type in itemizedInventory) {
     for (const item of itemizedInventory[type]) {
-      if (item.attunable) {
+      if (typeof item.toggles.Attuned === "boolean") {
         attunable.push(item);
         if (item.toggles.Attuned) attuned.push(`${attunable.length - 1}`);
       }
