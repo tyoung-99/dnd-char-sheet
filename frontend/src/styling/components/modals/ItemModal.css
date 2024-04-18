@@ -38,18 +38,6 @@
   text-decoration: line-through;
 }
 
-.item-modal-container .item-body .x-button {
-  background-color: white;
-  border: 1px solid black;
-  width: 1rem;
-  height: 1rem;
-  padding: 0;
-}
-.item-modal-container .item-body .x-button:hover {
-  background-color: red;
-  color: white;
-}
-
 .item-modal-container .item-body .dice-input {
   border: none;
   border-bottom: 1px solid black;

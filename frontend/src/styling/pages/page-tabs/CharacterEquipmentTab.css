@@ -9,3 +9,13 @@
   width: 100%;
   max-width: 20rem;
 }
+
+.item-entry {
+  border-bottom: 1px dashed gray;
+}
+:has(> .add-item),
+:has(> .x-button) {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}

@@ -336,7 +336,19 @@ class Character {
     );
     this.equipment[index] = newItem;
     this.queueSave();
-    return this.equipment[index];
+  }
+
+  removeItem(oldItem) {
+    const index = this.equipment.findIndex(
+      (checkItem) => checkItem === oldItem
+    );
+    this.equipment.splice(index, 1);
+    this.queueSave();
+  }
+
+  addItem(newItem) {
+    this.equipment.push(newItem);
+    this.queueSave();
   }
 
   itemToggle(item, toggleName) {

@@ -6,7 +6,13 @@ import GenericModal from "./GenericModal";
 import EditorConvertToJSON from "../EditorConvertToJSON";
 import "../../styling/components/modals/ItemModal.css";
 
-const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
+const ItemModal = ({
+  character,
+  setCharChangeFlag,
+  closeModal,
+  item,
+  isTreasure,
+}) => {
   const PROPERTIES = {
     Ammunition:
       "You can use a weapon that has the ammunition property to make a ranged attack only if you have ammunition to fire from the weapon. Each time you attack with the weapon, you expend one piece of ammunition. Drawing the ammunition from a quiver, case, or other container is part of the attack (you need a free hand to load a one-handed weapon). At the end of the battle, you can recover half your expended ammunition by taking a minute to search the battlefield. If you use a weapon that has the ammunition property to make a melee attack, you treat the weapon as an improvised weapon. A sling must be loaded to deal any damage when used in this way.",
@@ -93,8 +99,67 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
     type: "bludgeoning",
   };
 
+  const ITEM_TEMPLATE = isTreasure
+    ? {
+        name: "New Treasure",
+        count: 1,
+        types: ["Treasure"],
+        value: [
+          ["cp", 0],
+          ["sp", 0],
+          ["ep", 0],
+          ["gp", 0],
+          ["pp", 0],
+        ],
+        description: {
+          blocks: [
+            {
+              key: "6ccsg",
+              text: "",
+              type: "unstyled",
+              depth: 0,
+              inlineStyleRanges: [],
+              entityRanges: [],
+              data: {},
+            },
+          ],
+          entityMap: {},
+        },
+        profRequired: [],
+        properties: [],
+      }
+    : {
+        name: "New Item",
+        count: 1,
+        toggles: {
+          Equipped: false,
+        },
+        types: ["Adventuring Gear"],
+        subtypes: [null],
+        description: {
+          blocks: [
+            {
+              key: "6ccsg",
+              text: "",
+              type: "unstyled",
+              depth: 0,
+              inlineStyleRanges: [],
+              entityRanges: [],
+              data: {},
+            },
+          ],
+          entityMap: {},
+        },
+        profRequired: [],
+        properties: [],
+      };
+
+  const isNew = !item;
+
   const [editing, setEditing] = useState(false);
-  const [currentItem, setCurrentItem] = useState(structuredClone(item));
+  const [currentItem, setCurrentItem] = useState(
+    structuredClone(isNew ? ITEM_TEMPLATE : item)
+  );
 
   const [profTypes, setProfTypes] = useState([]);
 
@@ -114,7 +179,8 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
   }, []);
 
   const saveAndClose = () => {
-    character.replaceItem(item, currentItem);
+    if (isNew) character.addItem(currentItem);
+    else character.replaceItem(item, currentItem);
     setCharChangeFlag((old) => !old);
     closeModal();
   };
@@ -204,158 +270,19 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
     </>
   );
 
-  let attackMod, attackModBreakdown, damage, damageBreakdown;
-  if (currentItem.types.includes("Weapon")) {
-    [[attackMod, attackModBreakdown], [damage, damageBreakdown]] =
-      character.getAttack(currentItem);
-  }
+  let typeSection,
+    amountSection,
+    equippedSection,
+    attunedSection,
+    proficiencySection,
+    propertiesSection,
+    attackSection,
+    twoHandedSection,
+    activatedSection,
+    descriptionSection,
+    valueSection;
 
-  const typeSelector = currentItem.types.map((type, i) => (
-    <span key={i}>
-      <select
-        name={`type${i}`}
-        id={`type${i}`}
-        value={type}
-        onChange={(event) => {
-          setCurrentItem((oldItem) => {
-            const newItem = { ...oldItem };
-            const newType = event.target.value;
-            const oldType = newItem.types[i];
-            newItem.types[i] = newType;
-            newItem.subtypes[i] = ITEM_TYPES[newType] ? [] : null;
-            if (newType === "Weapon") {
-              newItem.damage = structuredClone({ base: [DAMAGE_TEMPLATE] });
-
-              if (typeof newItem.toggles.Activated === "boolean") {
-                newItem.damage.activated = [];
-              }
-
-              newItem.attackBonus = 0;
-            } else if (oldType === "Weapon") {
-              newItem.damage = undefined;
-              newItem.attackBonus = undefined;
-            }
-            return newItem;
-          });
-        }}
-      >
-        <option hidden value={""}>
-          Select type
-        </option>
-        {Object.keys(ITEM_TYPES).map((refType) => {
-          if (currentItem.types.includes(refType) && refType !== type)
-            return null;
-          return (
-            <option key={refType} value={refType}>
-              {refType}
-            </option>
-          );
-        })}
-      </select>{" "}
-      {ITEM_TYPES[type] && (
-        <>
-          Subtypes:{" "}
-          {currentItem.subtypes[i].map((subtype, j) => (
-            <Fragment key={j}>
-              {j > 0 && ", "}
-              <span
-                className="click-to-remove"
-                onClick={() =>
-                  setCurrentItem((oldItem) => {
-                    const newItem = { ...oldItem };
-                    newItem.subtypes[i].splice(j, 1);
-                    return newItem;
-                  })
-                }
-              >
-                {subtype}
-              </span>
-            </Fragment>
-          ))}{" "}
-          <select
-            name={`type${i}Subtype`}
-            id={`type${i}Subtype`}
-            value={""}
-            onChange={(event) =>
-              setCurrentItem((oldItem) => {
-                const newItem = { ...oldItem };
-                newItem.subtypes[i].push(event.target.value);
-                newItem.subtypes[i].sort();
-                return newItem;
-              })
-            }
-          >
-            <option hidden value={""}>
-              Add subtype
-            </option>
-            {ITEM_TYPES[type].map((refSubtype) => {
-              if (currentItem.subtypes[i].includes(refSubtype)) return null;
-              return (
-                <option key={refSubtype} value={refSubtype}>
-                  {refSubtype}
-                </option>
-              );
-            })}
-          </select>
-        </>
-      )}{" "}
-      {i > 0 && (
-        <button
-          className="x-button"
-          title="Remove item type"
-          onClick={() =>
-            setCurrentItem((oldItem) => {
-              const newItem = { ...oldItem };
-              newItem.types.splice(i, 1);
-              newItem.subtypes.splice(i, 1);
-              return newItem;
-            })
-          }
-        >
-          X
-        </button>
-      )}
-    </span>
-  ));
-
-  const typeSection = editing ? (
-    <>
-      <label className="col-flex" htmlFor="">
-        <span>
-          Type: (First type determines sorting){" "}
-          <button
-            id="addItemType"
-            name="addItemType"
-            onClick={() =>
-              setCurrentItem((oldItem) => {
-                const newItem = { ...oldItem };
-                newItem.types.push("");
-                newItem.subtypes.push([]);
-                return newItem;
-              })
-            }
-          >
-            Add type
-          </button>
-        </span>
-        {typeSelector}
-      </label>
-    </>
-  ) : (
-    <p>
-      Type:{" "}
-      {currentItem.types.map(
-        (type, i) =>
-          `${i > 0 ? ", " : ""}${type}${
-            currentItem.subtypes[i]
-              ? ` (${currentItem.subtypes[i].join(", ")})`
-              : ""
-          }`
-      )}
-    </p>
-  );
-
-  const amountSection = (
+  amountSection = (
     <span>
       <label htmlFor="itemCount">Amount: </label>
       <input
@@ -367,7 +294,7 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
         onChange={(e) =>
           setCurrentItem((oldItem) => {
             const newItem = { ...oldItem };
-            newItem.count = e.target.value;
+            newItem.count = parseInt(e.target.value);
             return newItem;
           })
         }
@@ -375,522 +302,7 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
     </span>
   );
 
-  const equippedSection = typeof currentItem.toggles.Equipped === "boolean" && (
-    <span>
-      <label htmlFor={"equipped"}>Equipped: </label>
-      <button
-        id={"equipped"}
-        name={"equipped"}
-        onClick={() =>
-          setCurrentItem((oldItem) => {
-            const newItem = { ...oldItem };
-            newItem.toggles.Equipped = !newItem.toggles.Equipped;
-            return newItem;
-          })
-        }
-      >
-        {currentItem.toggles.Equipped ? "Yes" : "No"}
-      </button>
-    </span>
-  );
-
-  const attunedSection = (typeof currentItem.toggles.Attuned === "boolean" ||
-    editing) && (
-    <span>
-      {editing && (
-        <>
-          <label htmlFor={"attunable"}>Attunable: </label>
-          <button
-            id={"attunable"}
-            name={"attunable"}
-            onClick={() =>
-              setCurrentItem((oldItem) => {
-                const newItem = { ...oldItem };
-                if (typeof newItem.toggles.Attuned === "boolean") {
-                  newItem.toggles.Attuned = undefined;
-                } else {
-                  newItem.toggles.Attuned = false;
-                }
-                return newItem;
-              })
-            }
-          >
-            {typeof currentItem.toggles.Attuned === "boolean" ? "Yes" : "No"}
-          </button>{" "}
-        </>
-      )}
-      {typeof currentItem.toggles.Attuned === "boolean" && (
-        <>
-          <label htmlFor={"attuned"}>Attuned: </label>
-          <button
-            id={"attuned"}
-            name={"attuned"}
-            onClick={() =>
-              setCurrentItem((oldItem) => {
-                const newItem = { ...oldItem };
-                newItem.toggles.Attuned = !newItem.toggles.Attuned;
-                return newItem;
-              })
-            }
-          >
-            {currentItem.toggles.Attuned ? "Yes" : "No"}
-          </button>
-        </>
-      )}
-    </span>
-  );
-
-  if (!currentItem.profRequired) currentItem.profRequired = [];
-
-  const proficiencySection = (currentItem.profRequired.length > 0 ||
-    editing) && (
-    <p>
-      Requires proficiency in one of:{" "}
-      {editing ? (
-        <>
-          {currentItem.profRequired.map((prof, i) => (
-            <Fragment key={i}>
-              {i > 0 && ", "}
-              <span
-                className="click-to-remove"
-                onClick={() =>
-                  setCurrentItem((oldItem) => {
-                    const newItem = { ...oldItem };
-                    newItem.profRequired.splice(i, 1);
-                    return newItem;
-                  })
-                }
-              >
-                {prof}
-              </span>
-            </Fragment>
-          ))}{" "}
-          <select
-            name={`profAdder`}
-            id={`profAdder`}
-            value={""}
-            onChange={(event) =>
-              setCurrentItem((oldItem) => {
-                const newItem = { ...oldItem };
-                newItem.profRequired.push(event.target.value);
-                newItem.profRequired.sort();
-                return newItem;
-              })
-            }
-          >
-            <option hidden value={""}>
-              Add proficiency
-            </option>
-            {Object.keys(profTypes)
-              .sort()
-              .map((group) => (
-                <optgroup label={group} key={group}>
-                  {profTypes[group].map((prof) => {
-                    if (currentItem.profRequired.includes(prof)) return null;
-                    return (
-                      <option key={prof} value={prof}>
-                        {prof}
-                      </option>
-                    );
-                  })}
-                </optgroup>
-              ))}
-          </select>
-        </>
-      ) : (
-        currentItem.profRequired.join(", ")
-      )}
-    </p>
-  );
-
-  if (!currentItem.properties) currentItem.properties = [];
-
-  const propertiesSection = (currentItem.properties.length > 0 || editing) && (
-    <p>
-      Properties:{" "}
-      {editing ? (
-        <>
-          {currentItem.properties.map((property, i) => (
-            <Fragment key={i}>
-              {i > 0 && ", "}
-              <span
-                className="click-to-remove"
-                onClick={() =>
-                  setCurrentItem((oldItem) => {
-                    const newItem = { ...oldItem };
-                    if (newItem.properties[i] === "Versatile") {
-                      newItem.toggles["Two-Handed"] = undefined;
-                    }
-                    newItem.properties.splice(i, 1);
-                    return newItem;
-                  })
-                }
-                title={PROPERTIES[property]}
-              >
-                {property}
-              </span>
-              {property === "Versatile" && (
-                <>
-                  {" "}
-                  (
-                  <input
-                    className="dice-input"
-                    id="versatileDiceNumber"
-                    name="versatileDiceNumber"
-                    type="number"
-                    min={1}
-                    value={currentItem.versatileDice.number}
-                    onChange={(event) => {
-                      setCurrentItem((oldItem) => {
-                        const newItem = { ...oldItem };
-                        newItem.versatileDice.number = event.target.value;
-                        return newItem;
-                      });
-                    }}
-                  ></input>
-                  d
-                  <input
-                    className="dice-input"
-                    id="versatileDiceSides"
-                    name="versatileDiceSides"
-                    type="number"
-                    min={2}
-                    value={currentItem.versatileDice.sides}
-                    onChange={(event) => {
-                      setCurrentItem((oldItem) => {
-                        const newItem = { ...oldItem };
-                        newItem.versatileDice.sides = event.target.value;
-                        return newItem;
-                      });
-                    }}
-                  ></input>
-                  )
-                </>
-              )}
-            </Fragment>
-          ))}{" "}
-          <select
-            name={`propertyAdder`}
-            id={`propertyAdder`}
-            value={""}
-            onChange={(event) =>
-              setCurrentItem((oldItem) => {
-                const newItem = { ...oldItem };
-                newItem.properties.push(event.target.value);
-                newItem.properties.sort();
-                if (event.target.value === "Versatile") {
-                  newItem.versatileDice = { number: 1, sides: 2 };
-                  newItem.toggles["Two-Handed"] = false;
-                }
-                return newItem;
-              })
-            }
-          >
-            <option hidden value={""}>
-              Add property
-            </option>
-            {Object.keys(PROPERTIES)
-              .sort()
-              .map((property) => {
-                if (currentItem.properties.includes(property)) return null;
-                return (
-                  <option
-                    key={property}
-                    value={property}
-                    title={PROPERTIES[property]}
-                  >
-                    {property}
-                  </option>
-                );
-              })}
-          </select>
-        </>
-      ) : (
-        currentItem.properties.map((property, i) => (
-          <Fragment key={i}>
-            {i > 0 && ", "}
-            <span title={PROPERTIES[property]}>
-              {property}
-              {property === "Versatile" &&
-                ` (${currentItem.versatileDice.number}d${currentItem.versatileDice.sides})`}
-            </span>
-          </Fragment>
-        ))
-      )}
-    </p>
-  );
-
-  const getDamageSelector = (category) => {
-    if (!currentItem.types.includes("Weapon")) return null;
-    return currentItem.damage[category].map((damage, i) => (
-      <span key={i}>
-        <select
-          name={`baseDamage${i}Type`}
-          id={`baseDamage${i}Type`}
-          value={damage.type}
-          onChange={(event) =>
-            setCurrentItem((oldItem) => {
-              const newItem = { ...oldItem };
-              newItem.damage[category][i].type = event.target.value;
-              return newItem;
-            })
-          }
-        >
-          {DAMAGE_TYPES.map((type) => {
-            return (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            );
-          })}
-        </select>{" "}
-        <input
-          type="number"
-          name={`baseDamage${i}Flat`}
-          id={`baseDamage${i}Flat`}
-          value={damage.flat}
-          onChange={(event) =>
-            setCurrentItem((oldItem) => {
-              const newItem = { ...oldItem };
-              newItem.damage[category][i].flat = parseInt(event.target.value);
-              return newItem;
-            })
-          }
-        ></input>
-        {damage.dice.length > 0 && " + "}
-        {damage.dice.map((die, j) => (
-          <Fragment key={j}>
-            {j > 0 && " + "}
-            <input
-              className="dice-input"
-              id={`baseDamage${i}Die${j}Number`}
-              name={`baseDamage${i}Die${j}Number`}
-              type="number"
-              min={1}
-              value={die.number}
-              onChange={(event) =>
-                setCurrentItem((oldItem) => {
-                  const newItem = { ...oldItem };
-                  newItem.damage[category][i].dice[j].number = parseInt(
-                    event.target.value
-                  );
-                  return newItem;
-                })
-              }
-            ></input>
-            d
-            <input
-              className="dice-input"
-              id={`baseDamage${i}Die${j}Sides`}
-              name={`baseDamage${i}Die${j}Sides`}
-              type="number"
-              min={2}
-              value={die.sides}
-              onChange={(event) =>
-                setCurrentItem((oldItem) => {
-                  const newItem = { ...oldItem };
-                  newItem.damage[category][i].dice[j].sides = parseInt(
-                    event.target.value
-                  );
-                  return newItem;
-                })
-              }
-            ></input>{" "}
-            <button
-              className="x-button"
-              title="Remove damage die"
-              onClick={() =>
-                setCurrentItem((oldItem) => {
-                  const newItem = { ...oldItem };
-                  newItem.damage[category][i].dice.splice(j, 1);
-                  return newItem;
-                })
-              }
-            >
-              X
-            </button>
-          </Fragment>
-        ))}{" "}
-        <button
-          id="addDamageDie"
-          name="addDamageDie"
-          onClick={() =>
-            setCurrentItem((oldItem) => {
-              const newItem = { ...oldItem };
-              newItem.damage[category][i].dice.push({ number: 1, sides: 2 });
-              return newItem;
-            })
-          }
-        >
-          Add die
-        </button>{" "}
-        {i > 0 && (
-          <button
-            className="x-button"
-            title="Remove damage type"
-            onClick={() =>
-              setCurrentItem((oldItem) => {
-                const newItem = { ...oldItem };
-                newItem.damage[category].splice(i, 1);
-                return newItem;
-              })
-            }
-          >
-            X
-          </button>
-        )}
-      </span>
-    ));
-  };
-
-  const getDamageSection = (category) => {
-    let labelText = "";
-    if (category === "base") {
-      labelText =
-        "Base Damage: (Ability modifier will add to first type, versatile dice will replace first die)";
-    } else if (category === "activated") {
-      labelText = "Activated Damage:";
-    }
-    return (
-      <label className="col-flex" htmlFor="">
-        <span>
-          {labelText}{" "}
-          <button
-            id="addDamageType"
-            name="addDamageType"
-            onClick={() =>
-              setCurrentItem((oldItem) => {
-                const newItem = { ...oldItem };
-                newItem.damage[category].push(structuredClone(DAMAGE_TEMPLATE));
-                return newItem;
-              })
-            }
-          >
-            Add type
-          </button>
-        </span>
-        {getDamageSelector(category)}
-      </label>
-    );
-  };
-
-  const attackSection = currentItem.types.includes("Weapon") && (
-    <>
-      {editing ? (
-        <label>
-          Bonus Attack Modifier:{" "}
-          <input
-            id="attackMod"
-            name="attackMod"
-            type="number"
-            min={0}
-            value={currentItem.attackBonus}
-            onChange={(event) => {
-              setCurrentItem((oldItem) => {
-                const newItem = { ...oldItem };
-                newItem.attackBonus = parseInt(event.target.value);
-                return newItem;
-              });
-            }}
-          ></input>
-        </label>
-      ) : (
-        <p>
-          Attack Modifier: {combineBreakdown(attackModBreakdown)}
-          {` = ${attackMod}`}
-        </p>
-      )}
-
-      {editing ? (
-        getDamageSection("base")
-      ) : (
-        <p>
-          Damage: {combineBreakdown(damageBreakdown)}
-          {` = ${damage}`}
-        </p>
-      )}
-    </>
-  );
-
-  const twoHandedSection = typeof currentItem.toggles["Two-Handed"] ===
-    "boolean" && (
-    <span>
-      <label htmlFor={"twoHanded"}>Two-Handed: </label>
-      <button
-        id={"twoHanded"}
-        name={"twoHanded"}
-        onClick={() => {
-          setCurrentItem((oldItem) => {
-            const newItem = { ...oldItem };
-            newItem.toggles["Two-Handed"] = !newItem.toggles["Two-Handed"];
-            return newItem;
-          });
-        }}
-      >
-        {currentItem.toggles["Two-Handed"] ? "Yes" : "No"}
-      </button>
-    </span>
-  );
-
-  const activatedSection = (typeof currentItem.toggles.Activated ===
-    "boolean" ||
-    editing) && (
-    <>
-      <span>
-        {editing && (
-          <>
-            <label htmlFor={"activatable"}>Activatable: </label>
-            <button
-              id={"activatable"}
-              name={"activatable"}
-              onClick={() =>
-                setCurrentItem((oldItem) => {
-                  const newItem = { ...oldItem };
-                  if (typeof newItem.toggles.Activated === "boolean") {
-                    newItem.toggles.Activated = undefined;
-                    if (newItem.damage) newItem.damage.activated = undefined;
-                  } else {
-                    newItem.toggles.Activated = false;
-                    if (newItem.damage) newItem.damage.activated = [];
-                  }
-                  return newItem;
-                })
-              }
-            >
-              {typeof currentItem.toggles.Activated === "boolean"
-                ? "Yes"
-                : "No"}
-            </button>{" "}
-          </>
-        )}
-        {typeof currentItem.toggles.Activated === "boolean" && (
-          <>
-            <label htmlFor={"activated"}>Activated: </label>
-            <button
-              id={"activated"}
-              name={"activated"}
-              onClick={() =>
-                setCurrentItem((oldItem) => {
-                  const newItem = { ...oldItem };
-                  newItem.toggles.Activated = !newItem.toggles.Activated;
-                  return newItem;
-                })
-              }
-            >
-              {currentItem.toggles.Activated ? "Yes" : "No"}
-            </button>
-          </>
-        )}
-      </span>
-      {editing &&
-        typeof currentItem.toggles.Activated === "boolean" &&
-        currentItem.types.includes("Weapon") && (
-          <span>{getDamageSection("activated")}</span>
-        )}
-    </>
-  );
-
-  const descriptionSection = (
+  descriptionSection = (
     <>
       <p>Additional information:</p>
       {isJsonEditorEmpty(currentItem.description) && !editing ? (
@@ -914,10 +326,708 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
     </>
   );
 
+  if (isTreasure) {
+    valueSection = (
+      <div className="col-flex">
+        <label htmlFor="">Value: </label>
+        <div className="row-flex">
+          {currentItem.value.map((coin, i) => (
+            <span key={i}>
+              <label htmlFor={`val${coin[0].toUpperCase()}`}>
+                {coin[0].toUpperCase()}:{" "}
+              </label>
+              <input
+                type="number"
+                id={`val${coin[0].toUpperCase()}`}
+                name={`val${coin[0].toUpperCase()}`}
+                value={coin[1]}
+                min={0}
+                onChange={(e) =>
+                  setCurrentItem((oldItem) => {
+                    const newItem = { ...oldItem };
+                    newItem.value[i][1] = parseInt(e.target.value);
+                    return newItem;
+                  })
+                }
+              ></input>
+            </span>
+          ))}
+        </div>
+      </div>
+    );
+  } else {
+    let attackMod, attackModBreakdown, damage, damageBreakdown;
+    if (currentItem.types.includes("Weapon")) {
+      [[attackMod, attackModBreakdown], [damage, damageBreakdown]] =
+        character.getAttack(currentItem);
+    }
+
+    const typeSelector = currentItem.types.map((type, i) => (
+      <span key={i}>
+        <select
+          name={`type${i}`}
+          id={`type${i}`}
+          value={type}
+          onChange={(event) => {
+            setCurrentItem((oldItem) => {
+              const newItem = { ...oldItem };
+              const newType = event.target.value;
+              const oldType = newItem.types[i];
+              newItem.types[i] = newType;
+              newItem.subtypes[i] = ITEM_TYPES[newType] ? [] : null;
+              if (newType === "Weapon") {
+                newItem.damage = structuredClone({ base: [DAMAGE_TEMPLATE] });
+
+                if (typeof newItem.toggles.Activated === "boolean") {
+                  newItem.damage.activated = [];
+                }
+
+                newItem.attackBonus = 0;
+              } else if (oldType === "Weapon") {
+                newItem.damage = undefined;
+                newItem.attackBonus = undefined;
+              }
+              return newItem;
+            });
+          }}
+        >
+          <option hidden value={""}>
+            Select type
+          </option>
+          {Object.keys(ITEM_TYPES).map((refType) => {
+            if (currentItem.types.includes(refType) && refType !== type)
+              return null;
+            return (
+              <option key={refType} value={refType}>
+                {refType}
+              </option>
+            );
+          })}
+        </select>{" "}
+        {ITEM_TYPES[type] && (
+          <>
+            Subtypes:{" "}
+            {currentItem.subtypes[i].map((subtype, j) => (
+              <Fragment key={j}>
+                {j > 0 && ", "}
+                <span
+                  className="click-to-remove"
+                  onClick={() =>
+                    setCurrentItem((oldItem) => {
+                      const newItem = { ...oldItem };
+                      newItem.subtypes[i].splice(j, 1);
+                      return newItem;
+                    })
+                  }
+                >
+                  {subtype}
+                </span>
+              </Fragment>
+            ))}{" "}
+            <select
+              name={`type${i}Subtype`}
+              id={`type${i}Subtype`}
+              value={""}
+              onChange={(event) =>
+                setCurrentItem((oldItem) => {
+                  const newItem = { ...oldItem };
+                  newItem.subtypes[i].push(event.target.value);
+                  newItem.subtypes[i].sort();
+                  return newItem;
+                })
+              }
+            >
+              <option hidden value={""}>
+                Add subtype
+              </option>
+              {ITEM_TYPES[type].map((refSubtype) => {
+                if (currentItem.subtypes[i].includes(refSubtype)) return null;
+                return (
+                  <option key={refSubtype} value={refSubtype}>
+                    {refSubtype}
+                  </option>
+                );
+              })}
+            </select>
+          </>
+        )}{" "}
+        {i > 0 && (
+          <button
+            className="x-button"
+            title="Remove item type"
+            onClick={() =>
+              setCurrentItem((oldItem) => {
+                const newItem = { ...oldItem };
+                newItem.types.splice(i, 1);
+                newItem.subtypes.splice(i, 1);
+                return newItem;
+              })
+            }
+          >
+            X
+          </button>
+        )}
+      </span>
+    ));
+
+    typeSection = editing ? (
+      <>
+        <label className="col-flex" htmlFor="">
+          <span>
+            Type: (First type determines sorting){" "}
+            <button
+              id="addItemType"
+              name="addItemType"
+              onClick={() =>
+                setCurrentItem((oldItem) => {
+                  const newItem = { ...oldItem };
+                  newItem.types.push("");
+                  newItem.subtypes.push([]);
+                  return newItem;
+                })
+              }
+            >
+              Add type
+            </button>
+          </span>
+          {typeSelector}
+        </label>
+      </>
+    ) : (
+      <p>
+        Type:{" "}
+        {currentItem.types.map(
+          (type, i) =>
+            `${i > 0 ? ", " : ""}${type}${
+              currentItem.subtypes[i]
+                ? ` (${currentItem.subtypes[i].join(", ")})`
+                : ""
+            }`
+        )}
+      </p>
+    );
+
+    equippedSection = typeof currentItem.toggles.Equipped === "boolean" && (
+      <span>
+        <label htmlFor={"equipped"}>Equipped: </label>
+        <button
+          id={"equipped"}
+          name={"equipped"}
+          onClick={() =>
+            setCurrentItem((oldItem) => {
+              const newItem = { ...oldItem };
+              newItem.toggles.Equipped = !newItem.toggles.Equipped;
+              return newItem;
+            })
+          }
+        >
+          {currentItem.toggles.Equipped ? "Yes" : "No"}
+        </button>
+      </span>
+    );
+
+    attunedSection = (typeof currentItem.toggles.Attuned === "boolean" ||
+      editing) && (
+      <span>
+        {editing && (
+          <>
+            <label htmlFor={"attunable"}>Attunable: </label>
+            <button
+              id={"attunable"}
+              name={"attunable"}
+              onClick={() =>
+                setCurrentItem((oldItem) => {
+                  const newItem = { ...oldItem };
+                  if (typeof newItem.toggles.Attuned === "boolean") {
+                    newItem.toggles.Attuned = undefined;
+                  } else {
+                    newItem.toggles.Attuned = false;
+                  }
+                  return newItem;
+                })
+              }
+            >
+              {typeof currentItem.toggles.Attuned === "boolean" ? "Yes" : "No"}
+            </button>{" "}
+          </>
+        )}
+        {typeof currentItem.toggles.Attuned === "boolean" && (
+          <>
+            <label htmlFor={"attuned"}>Attuned: </label>
+            <button
+              id={"attuned"}
+              name={"attuned"}
+              onClick={() =>
+                setCurrentItem((oldItem) => {
+                  const newItem = { ...oldItem };
+                  newItem.toggles.Attuned = !newItem.toggles.Attuned;
+                  return newItem;
+                })
+              }
+            >
+              {currentItem.toggles.Attuned ? "Yes" : "No"}
+            </button>
+          </>
+        )}
+      </span>
+    );
+
+    if (!currentItem.profRequired) currentItem.profRequired = [];
+
+    proficiencySection = (currentItem.profRequired.length > 0 || editing) && (
+      <p>
+        Requires proficiency in one of:{" "}
+        {editing ? (
+          <>
+            {currentItem.profRequired.map((prof, i) => (
+              <Fragment key={i}>
+                {i > 0 && ", "}
+                <span
+                  className="click-to-remove"
+                  onClick={() =>
+                    setCurrentItem((oldItem) => {
+                      const newItem = { ...oldItem };
+                      newItem.profRequired.splice(i, 1);
+                      return newItem;
+                    })
+                  }
+                >
+                  {prof}
+                </span>
+              </Fragment>
+            ))}{" "}
+            <select
+              name={`profAdder`}
+              id={`profAdder`}
+              value={""}
+              onChange={(event) =>
+                setCurrentItem((oldItem) => {
+                  const newItem = { ...oldItem };
+                  newItem.profRequired.push(event.target.value);
+                  newItem.profRequired.sort();
+                  return newItem;
+                })
+              }
+            >
+              <option hidden value={""}>
+                Add proficiency
+              </option>
+              {Object.keys(profTypes)
+                .sort()
+                .map((group) => (
+                  <optgroup label={group} key={group}>
+                    {profTypes[group].map((prof) => {
+                      if (currentItem.profRequired.includes(prof)) return null;
+                      return (
+                        <option key={prof} value={prof}>
+                          {prof}
+                        </option>
+                      );
+                    })}
+                  </optgroup>
+                ))}
+            </select>
+          </>
+        ) : (
+          currentItem.profRequired.join(", ")
+        )}
+      </p>
+    );
+
+    if (!currentItem.properties) currentItem.properties = [];
+
+    propertiesSection = (currentItem.properties.length > 0 || editing) && (
+      <p>
+        Properties:{" "}
+        {editing ? (
+          <>
+            {currentItem.properties.map((property, i) => (
+              <Fragment key={i}>
+                {i > 0 && ", "}
+                <span
+                  className="click-to-remove"
+                  onClick={() =>
+                    setCurrentItem((oldItem) => {
+                      const newItem = { ...oldItem };
+                      if (newItem.properties[i] === "Versatile") {
+                        newItem.toggles["Two-Handed"] = undefined;
+                      }
+                      newItem.properties.splice(i, 1);
+                      return newItem;
+                    })
+                  }
+                  title={PROPERTIES[property]}
+                >
+                  {property}
+                </span>
+                {property === "Versatile" && (
+                  <>
+                    {" "}
+                    (
+                    <input
+                      className="dice-input"
+                      id="versatileDiceNumber"
+                      name="versatileDiceNumber"
+                      type="number"
+                      min={1}
+                      value={currentItem.versatileDice.number}
+                      onChange={(event) => {
+                        setCurrentItem((oldItem) => {
+                          const newItem = { ...oldItem };
+                          newItem.versatileDice.number = event.target.value;
+                          return newItem;
+                        });
+                      }}
+                    ></input>
+                    d
+                    <input
+                      className="dice-input"
+                      id="versatileDiceSides"
+                      name="versatileDiceSides"
+                      type="number"
+                      min={2}
+                      value={currentItem.versatileDice.sides}
+                      onChange={(event) => {
+                        setCurrentItem((oldItem) => {
+                          const newItem = { ...oldItem };
+                          newItem.versatileDice.sides = event.target.value;
+                          return newItem;
+                        });
+                      }}
+                    ></input>
+                    )
+                  </>
+                )}
+              </Fragment>
+            ))}{" "}
+            <select
+              name={`propertyAdder`}
+              id={`propertyAdder`}
+              value={""}
+              onChange={(event) =>
+                setCurrentItem((oldItem) => {
+                  const newItem = { ...oldItem };
+                  newItem.properties.push(event.target.value);
+                  newItem.properties.sort();
+                  if (event.target.value === "Versatile") {
+                    newItem.versatileDice = { number: 1, sides: 2 };
+                    newItem.toggles["Two-Handed"] = false;
+                  }
+                  return newItem;
+                })
+              }
+            >
+              <option hidden value={""}>
+                Add property
+              </option>
+              {Object.keys(PROPERTIES)
+                .sort()
+                .map((property) => {
+                  if (currentItem.properties.includes(property)) return null;
+                  return (
+                    <option
+                      key={property}
+                      value={property}
+                      title={PROPERTIES[property]}
+                    >
+                      {property}
+                    </option>
+                  );
+                })}
+            </select>
+          </>
+        ) : (
+          currentItem.properties.map((property, i) => (
+            <Fragment key={i}>
+              {i > 0 && ", "}
+              <span title={PROPERTIES[property]}>
+                {property}
+                {property === "Versatile" &&
+                  ` (${currentItem.versatileDice.number}d${currentItem.versatileDice.sides})`}
+              </span>
+            </Fragment>
+          ))
+        )}
+      </p>
+    );
+
+    const getDamageSelector = (category) => {
+      if (!currentItem.types.includes("Weapon")) return null;
+      return currentItem.damage[category].map((damage, i) => (
+        <span key={i}>
+          <select
+            name={`baseDamage${i}Type`}
+            id={`baseDamage${i}Type`}
+            value={damage.type}
+            onChange={(event) =>
+              setCurrentItem((oldItem) => {
+                const newItem = { ...oldItem };
+                newItem.damage[category][i].type = event.target.value;
+                return newItem;
+              })
+            }
+          >
+            {DAMAGE_TYPES.map((type) => {
+              return (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              );
+            })}
+          </select>{" "}
+          <input
+            type="number"
+            name={`baseDamage${i}Flat`}
+            id={`baseDamage${i}Flat`}
+            value={damage.flat}
+            onChange={(event) =>
+              setCurrentItem((oldItem) => {
+                const newItem = { ...oldItem };
+                newItem.damage[category][i].flat = parseInt(event.target.value);
+                return newItem;
+              })
+            }
+          ></input>
+          {damage.dice.length > 0 && " + "}
+          {damage.dice.map((die, j) => (
+            <Fragment key={j}>
+              {j > 0 && " + "}
+              <input
+                className="dice-input"
+                id={`baseDamage${i}Die${j}Number`}
+                name={`baseDamage${i}Die${j}Number`}
+                type="number"
+                min={1}
+                value={die.number}
+                onChange={(event) =>
+                  setCurrentItem((oldItem) => {
+                    const newItem = { ...oldItem };
+                    newItem.damage[category][i].dice[j].number = parseInt(
+                      event.target.value
+                    );
+                    return newItem;
+                  })
+                }
+              ></input>
+              d
+              <input
+                className="dice-input"
+                id={`baseDamage${i}Die${j}Sides`}
+                name={`baseDamage${i}Die${j}Sides`}
+                type="number"
+                min={2}
+                value={die.sides}
+                onChange={(event) =>
+                  setCurrentItem((oldItem) => {
+                    const newItem = { ...oldItem };
+                    newItem.damage[category][i].dice[j].sides = parseInt(
+                      event.target.value
+                    );
+                    return newItem;
+                  })
+                }
+              ></input>{" "}
+              <button
+                className="x-button"
+                title="Remove damage die"
+                onClick={() =>
+                  setCurrentItem((oldItem) => {
+                    const newItem = { ...oldItem };
+                    newItem.damage[category][i].dice.splice(j, 1);
+                    return newItem;
+                  })
+                }
+              >
+                X
+              </button>
+            </Fragment>
+          ))}{" "}
+          <button
+            id="addDamageDie"
+            name="addDamageDie"
+            onClick={() =>
+              setCurrentItem((oldItem) => {
+                const newItem = { ...oldItem };
+                newItem.damage[category][i].dice.push({ number: 1, sides: 2 });
+                return newItem;
+              })
+            }
+          >
+            Add die
+          </button>{" "}
+          {i > 0 && (
+            <button
+              className="x-button"
+              title="Remove damage type"
+              onClick={() =>
+                setCurrentItem((oldItem) => {
+                  const newItem = { ...oldItem };
+                  newItem.damage[category].splice(i, 1);
+                  return newItem;
+                })
+              }
+            >
+              X
+            </button>
+          )}
+        </span>
+      ));
+    };
+
+    const getDamageSection = (category) => {
+      let labelText = "";
+      if (category === "base") {
+        labelText =
+          "Base Damage: (Ability modifier will add to first type, versatile dice will replace first die)";
+      } else if (category === "activated") {
+        labelText = "Activated Damage:";
+      }
+      return (
+        <label className="col-flex" htmlFor="">
+          <span>
+            {labelText}{" "}
+            <button
+              id="addDamageType"
+              name="addDamageType"
+              onClick={() =>
+                setCurrentItem((oldItem) => {
+                  const newItem = { ...oldItem };
+                  newItem.damage[category].push(
+                    structuredClone(DAMAGE_TEMPLATE)
+                  );
+                  return newItem;
+                })
+              }
+            >
+              Add type
+            </button>
+          </span>
+          {getDamageSelector(category)}
+        </label>
+      );
+    };
+
+    attackSection = currentItem.types.includes("Weapon") && (
+      <>
+        {editing ? (
+          <label>
+            Bonus Attack Modifier:{" "}
+            <input
+              id="attackMod"
+              name="attackMod"
+              type="number"
+              min={0}
+              value={currentItem.attackBonus}
+              onChange={(event) => {
+                setCurrentItem((oldItem) => {
+                  const newItem = { ...oldItem };
+                  newItem.attackBonus = parseInt(event.target.value);
+                  return newItem;
+                });
+              }}
+            ></input>
+          </label>
+        ) : (
+          <p>
+            Attack Modifier: {combineBreakdown(attackModBreakdown)}
+            {` = ${attackMod}`}
+          </p>
+        )}
+
+        {editing ? (
+          getDamageSection("base")
+        ) : (
+          <p>
+            Damage: {combineBreakdown(damageBreakdown)}
+            {` = ${damage}`}
+          </p>
+        )}
+      </>
+    );
+
+    twoHandedSection = typeof currentItem.toggles["Two-Handed"] ===
+      "boolean" && (
+      <span>
+        <label htmlFor={"twoHanded"}>Two-Handed: </label>
+        <button
+          id={"twoHanded"}
+          name={"twoHanded"}
+          onClick={() => {
+            setCurrentItem((oldItem) => {
+              const newItem = { ...oldItem };
+              newItem.toggles["Two-Handed"] = !newItem.toggles["Two-Handed"];
+              return newItem;
+            });
+          }}
+        >
+          {currentItem.toggles["Two-Handed"] ? "Yes" : "No"}
+        </button>
+      </span>
+    );
+
+    activatedSection = (typeof currentItem.toggles.Activated === "boolean" ||
+      editing) && (
+      <>
+        <span>
+          {editing && (
+            <>
+              <label htmlFor={"activatable"}>Activatable: </label>
+              <button
+                id={"activatable"}
+                name={"activatable"}
+                onClick={() =>
+                  setCurrentItem((oldItem) => {
+                    const newItem = { ...oldItem };
+                    if (typeof newItem.toggles.Activated === "boolean") {
+                      newItem.toggles.Activated = undefined;
+                      if (newItem.damage) newItem.damage.activated = undefined;
+                    } else {
+                      newItem.toggles.Activated = false;
+                      if (newItem.damage) newItem.damage.activated = [];
+                    }
+                    return newItem;
+                  })
+                }
+              >
+                {typeof currentItem.toggles.Activated === "boolean"
+                  ? "Yes"
+                  : "No"}
+              </button>{" "}
+            </>
+          )}
+          {typeof currentItem.toggles.Activated === "boolean" && (
+            <>
+              <label htmlFor={"activated"}>Activated: </label>
+              <button
+                id={"activated"}
+                name={"activated"}
+                onClick={() =>
+                  setCurrentItem((oldItem) => {
+                    const newItem = { ...oldItem };
+                    newItem.toggles.Activated = !newItem.toggles.Activated;
+                    return newItem;
+                  })
+                }
+              >
+                {currentItem.toggles.Activated ? "Yes" : "No"}
+              </button>
+            </>
+          )}
+        </span>
+        {editing &&
+          typeof currentItem.toggles.Activated === "boolean" &&
+          currentItem.types.includes("Weapon") && (
+            <span>{getDamageSection("activated")}</span>
+          )}
+      </>
+    );
+  }
+
   const body = (
     <>
       {typeSection}
       {amountSection}
+      {valueSection}
       {equippedSection}
       {attunedSection}
       {proficiencySection}
@@ -929,11 +1039,16 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
     </>
   );
 
-  const footer = null;
+  const footer = isNew ? (
+    <>
+      <button onClick={closeModal}>Cancel</button>
+      <button onClick={saveAndClose}>Save</button>
+    </>
+  ) : null;
 
   return (
     <GenericModal
-      closeModal={saveAndClose}
+      closeModal={isNew ? () => {} : saveAndClose}
       header={header}
       body={body}
       footer={footer}

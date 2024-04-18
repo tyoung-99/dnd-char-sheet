@@ -102,6 +102,12 @@
 .col-6_7 {
   width: calc(100% * 6 / 7);
 }
+.col-1_8 {
+  width: calc(100% / 8);
+}
+.col-3_8 {
+  width: calc(100% * 3 / 8);
+}
 .col-1_10 {
   width: calc(100% / 10);
 }
@@ -193,4 +199,16 @@ p:has(> .hover-icon) {
 
 .wrap {
   flex-wrap: wrap;
+}
+
+.x-button {
+  background-color: white;
+  border: 1px solid black;
+  width: 1rem;
+  height: 1rem;
+  padding: 0;
+}
+.x-button:hover {
+  background-color: red;
+  color: white;
 }

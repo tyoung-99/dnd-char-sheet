@@ -42,14 +42,26 @@ const CharacterEquipmentTab = ({
     }
     itemizedInventory[type] = itemizedInventory[type].map((item, i) => (
       <Fragment key={i}>
-        <div className="row-flex">
+        <div className="row-flex item-entry">
           <div
             className="col-1_2 clickable"
             onClick={(e) => openModal(e, `item${type}${i}`)}
           >
             {item.name}
           </div>
-          <div className="col-1_2 text-center">{item.count}</div>
+          <div className="col-3_8 text-center">{item.count}</div>
+          <div className="col-1_8">
+            <button
+              className="x-button"
+              title="Remove item"
+              onClick={() => {
+                character.removeItem(item);
+                setCharChangeFlag((old) => !old);
+              }}
+            >
+              X
+            </button>
+          </div>
         </div>
         {currentModal === `item${type}${i}` && (
           <ItemModal
@@ -63,30 +75,65 @@ const CharacterEquipmentTab = ({
     ));
   }
   treasure = treasure.map((item, i) => {
-    const COIN_TYPES = [
+    const COIN_CONVERSIONS = [
       ["pp", 1000],
       ["gp", 100],
       ["ep", 50],
       ["sp", 10],
+      ["cp", 1],
     ];
-    let value = item.value * item.count;
+    let valOfOne = item.value.reduce((totalCP, current) => {
+      return (totalCP +=
+        COIN_CONVERSIONS.find((compare) => compare[0] === current[0])[1] *
+        current[1]);
+    }, 0);
+    let value = valOfOne * item.count;
+
     let coin = "cp";
     for (let i = 0; i < 4; ++i) {
-      if (value % COIN_TYPES[i][1] === 0) {
-        value = value / COIN_TYPES[i][1];
-        coin = COIN_TYPES[i][0];
+      if (value % COIN_CONVERSIONS[i][1] === 0) {
+        value = value / COIN_CONVERSIONS[i][1];
+        coin = COIN_CONVERSIONS[i][0];
         break;
       }
     }
 
     return (
-      <div key={i} className="row-flex">
-        <div className="col-1_3">{item.name}</div>
-        <div className="col-1_3 text-center">{item.count}</div>
-        <div className="col-1_3 text-center">
-          {value} {coin}
+      <Fragment key={i}>
+        <div className="row-flex item-entry">
+          <div
+            className="col-1_2 clickable"
+            onClick={(e) => openModal(e, `treasure${i}`)}
+          >
+            {item.name}
+          </div>
+          <div className="col-1_6 text-center">{item.count}</div>
+          <div className="col-1_6 text-center">
+            {value} {coin}
+          </div>
+          <div className="col-1_6">
+            <button
+              className="x-button"
+              title="Remove item"
+              onClick={() => {
+                character.removeItem(item);
+                setCharChangeFlag((old) => !old);
+              }}
+            >
+              X
+            </button>
+          </div>
         </div>
-      </div>
+        {currentModal === `treasure${i}` && (
+          <ItemModal
+            character={character}
+            setCharChangeFlag={setCharChangeFlag}
+            closeModal={closeModal}
+            item={item}
+            isTreasure={true}
+          />
+        )}
+      </Fragment>
     );
   });
 
@@ -138,7 +185,25 @@ const CharacterEquipmentTab = ({
         <div className="grid-tile col-end">
           <div className="row-flex">
             <h1 className="col-1_2">Item</h1>
-            <h1 className="col-1_2 text-center">Count</h1>
+            <h1 className="col-3_8 text-center">Amount</h1>
+            <div className="col-1_8">
+              <button
+                id="addItem"
+                name="addItem"
+                className="add-item"
+                onClick={(e) => openModal(e, `itemNew`)}
+              >
+                Add item
+              </button>
+              {currentModal === `itemNew` && (
+                <ItemModal
+                  character={character}
+                  setCharChangeFlag={setCharChangeFlag}
+                  closeModal={closeModal}
+                  item={null}
+                />
+              )}
+            </div>
           </div>
           {Object.keys(itemizedInventory).length === 0 ? (
             <p>-None-</p>
@@ -164,9 +229,28 @@ const CharacterEquipmentTab = ({
         </div>
         <div className="grid-tile col-end">
           <div className="row-flex">
-            <h1 className="col-1_3">Treasure</h1>
-            <h1 className="col-1_3 text-center">Count</h1>
-            <h1 className="col-1_3 text-center">Value</h1>
+            <h1 className="col-1_2">Treasure</h1>
+            <h1 className="col-1_6 text-center">Amount</h1>
+            <h1 className="col-1_6 text-center">Value</h1>
+            <div className="col-1_6">
+              <button
+                id="addItem"
+                name="addItem"
+                className="add-item"
+                onClick={(e) => openModal(e, `treasureNew`)}
+              >
+                Add treasure
+              </button>
+              {currentModal === `treasureNew` && (
+                <ItemModal
+                  character={character}
+                  setCharChangeFlag={setCharChangeFlag}
+                  closeModal={closeModal}
+                  item={null}
+                  isTreasure={true}
+                />
+              )}
+            </div>
           </div>
           {treasure.length === 0 ? <p>-None-</p> : treasure}
         </div>
