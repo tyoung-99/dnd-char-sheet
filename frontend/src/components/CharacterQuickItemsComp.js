@@ -54,7 +54,7 @@ const CharacterQuickItemsComp = ({
                     id={"activated"}
                     name={"activated"}
                     onClick={() => {
-                      character.toggleItemActive(item);
+                      character.itemToggle(item, "Activated");
                       setCharChangeFlag((old) => !old);
                     }}
                   >
@@ -69,7 +69,7 @@ const CharacterQuickItemsComp = ({
                     id={"twoHanded"}
                     name={"twoHanded"}
                     onClick={() => {
-                      character.toggleItemTwoHanded(item);
+                      character.itemToggle(item, "Two-Handed");
                       setCharChangeFlag((old) => !old);
                     }}
                   >

@@ -66,8 +66,35 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
     "Wondrous Item": null,
   };
 
+  const DAMAGE_TYPES = [
+    "bludgeoning",
+    "piercing",
+    "slashing",
+    "acid",
+    "cold",
+    "fire",
+    "force",
+    "lightning",
+    "necrotic",
+    "poison",
+    "psychic",
+    "radiant",
+    "thunder",
+  ];
+
+  const DAMAGE_TEMPLATE = {
+    dice: [
+      {
+        number: 1,
+        sides: 2,
+      },
+    ],
+    flat: 0,
+    type: "bludgeoning",
+  };
+
   const [editing, setEditing] = useState(false);
-  const [newItem, setNewItem] = useState(structuredClone(item));
+  const [currentItem, setCurrentItem] = useState(structuredClone(item));
 
   const [profTypes, setProfTypes] = useState([]);
 
@@ -87,7 +114,7 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
   }, []);
 
   const saveAndClose = () => {
-    character.updateItem(item, newItem);
+    character.replaceItem(item, currentItem);
     setCharChangeFlag((old) => !old);
     closeModal();
   };
@@ -101,7 +128,8 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
       }
 
       if (entry.val.dice.length > 0) {
-        entry.val.dice.forEach((die) => {
+        entry.val.dice.forEach((die, i) => {
+          if (i > 0) internalText += " + ";
           internalText += `${die.number}d${die.sides}`;
         });
         if (entry.val.flat) {
@@ -151,9 +179,9 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
             className="item-name"
             id="itemName"
             name="itemName"
-            value={newItem.name}
+            value={currentItem.name}
             onChange={(event) =>
-              setNewItem((oldItem) => {
+              setCurrentItem((oldItem) => {
                 const newItem = { ...oldItem };
                 newItem.name = event.target.value;
                 return newItem;
@@ -161,7 +189,7 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
             }
           ></input>
         ) : (
-          newItem.name
+          currentItem.name
         )}
       </h1>
       <img
@@ -177,22 +205,36 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
   );
 
   let attackMod, attackModBreakdown, damage, damageBreakdown;
-  if (newItem.types.includes("Weapon")) {
+  if (currentItem.types.includes("Weapon")) {
     [[attackMod, attackModBreakdown], [damage, damageBreakdown]] =
-      character.getAttack(item);
+      character.getAttack(currentItem);
   }
 
-  const typeSelector = newItem.types.map((type, i) => (
+  const typeSelector = currentItem.types.map((type, i) => (
     <span key={i}>
       <select
         name={`type${i}`}
         id={`type${i}`}
         value={type}
         onChange={(event) => {
-          setNewItem((oldItem) => {
+          setCurrentItem((oldItem) => {
             const newItem = { ...oldItem };
-            newItem.types[i] = event.target.value;
-            newItem.subtypes[i] = ITEM_TYPES[event.target.value] ? [] : null;
+            const newType = event.target.value;
+            const oldType = newItem.types[i];
+            newItem.types[i] = newType;
+            newItem.subtypes[i] = ITEM_TYPES[newType] ? [] : null;
+            if (newType === "Weapon") {
+              newItem.damage = structuredClone({ base: [DAMAGE_TEMPLATE] });
+
+              if (typeof newItem.toggles.Activated === "boolean") {
+                newItem.damage.activated = [];
+              }
+
+              newItem.attackBonus = 0;
+            } else if (oldType === "Weapon") {
+              newItem.damage = undefined;
+              newItem.attackBonus = undefined;
+            }
             return newItem;
           });
         }}
@@ -201,7 +243,8 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
           Select type
         </option>
         {Object.keys(ITEM_TYPES).map((refType) => {
-          if (newItem.types.includes(refType) && refType !== type) return null;
+          if (currentItem.types.includes(refType) && refType !== type)
+            return null;
           return (
             <option key={refType} value={refType}>
               {refType}
@@ -212,13 +255,13 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
       {ITEM_TYPES[type] && (
         <>
           Subtypes:{" "}
-          {newItem.subtypes[i].map((subtype, j) => (
+          {currentItem.subtypes[i].map((subtype, j) => (
             <Fragment key={j}>
               {j > 0 && ", "}
               <span
                 className="click-to-remove"
                 onClick={() =>
-                  setNewItem((oldItem) => {
+                  setCurrentItem((oldItem) => {
                     const newItem = { ...oldItem };
                     newItem.subtypes[i].splice(j, 1);
                     return newItem;
@@ -234,7 +277,7 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
             id={`type${i}Subtype`}
             value={""}
             onChange={(event) =>
-              setNewItem((oldItem) => {
+              setCurrentItem((oldItem) => {
                 const newItem = { ...oldItem };
                 newItem.subtypes[i].push(event.target.value);
                 newItem.subtypes[i].sort();
@@ -246,7 +289,7 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
               Add subtype
             </option>
             {ITEM_TYPES[type].map((refSubtype) => {
-              if (newItem.subtypes[i].includes(refSubtype)) return null;
+              if (currentItem.subtypes[i].includes(refSubtype)) return null;
               return (
                 <option key={refSubtype} value={refSubtype}>
                   {refSubtype}
@@ -259,8 +302,9 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
       {i > 0 && (
         <button
           className="x-button"
+          title="Remove item type"
           onClick={() =>
-            setNewItem((oldItem) => {
+            setCurrentItem((oldItem) => {
               const newItem = { ...oldItem };
               newItem.types.splice(i, 1);
               newItem.subtypes.splice(i, 1);
@@ -278,16 +322,15 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
     <>
       <label className="col-flex" htmlFor="">
         <span>
-          Type: (First type determines sorting)
+          Type: (First type determines sorting){" "}
           <button
-            className="add-type"
-            id="addType"
-            name="addType"
+            id="addItemType"
+            name="addItemType"
             onClick={() =>
-              setNewItem((oldItem) => {
+              setCurrentItem((oldItem) => {
                 const newItem = { ...oldItem };
-                oldItem.types.push("");
-                oldItem.subtypes.push([]);
+                newItem.types.push("");
+                newItem.subtypes.push([]);
                 return newItem;
               })
             }
@@ -301,10 +344,12 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
   ) : (
     <p>
       Type:{" "}
-      {newItem.types.map(
+      {currentItem.types.map(
         (type, i) =>
           `${i > 0 ? ", " : ""}${type}${
-            newItem.subtypes[i] ? ` (${newItem.subtypes[i].join(", ")})` : ""
+            currentItem.subtypes[i]
+              ? ` (${currentItem.subtypes[i].join(", ")})`
+              : ""
           }`
       )}
     </p>
@@ -317,10 +362,10 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
         type="number"
         id="itemCount"
         name="itemCount"
-        value={newItem.count}
+        value={currentItem.count}
         min={0}
         onChange={(e) =>
-          setNewItem((oldItem) => {
+          setCurrentItem((oldItem) => {
             const newItem = { ...oldItem };
             newItem.count = e.target.value;
             return newItem;
@@ -330,26 +375,26 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
     </span>
   );
 
-  const equippedSection = typeof newItem.toggles.Equipped === "boolean" && (
+  const equippedSection = typeof currentItem.toggles.Equipped === "boolean" && (
     <span>
       <label htmlFor={"equipped"}>Equipped: </label>
       <button
         id={"equipped"}
         name={"equipped"}
         onClick={() =>
-          setNewItem((oldItem) => {
+          setCurrentItem((oldItem) => {
             const newItem = { ...oldItem };
             newItem.toggles.Equipped = !newItem.toggles.Equipped;
             return newItem;
           })
         }
       >
-        {newItem.toggles.Equipped ? "Yes" : "No"}
+        {currentItem.toggles.Equipped ? "Yes" : "No"}
       </button>
     </span>
   );
 
-  const attunedSection = (typeof newItem.toggles.Attuned === "boolean" ||
+  const attunedSection = (typeof currentItem.toggles.Attuned === "boolean" ||
     editing) && (
     <span>
       {editing && (
@@ -359,7 +404,7 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
             id={"attunable"}
             name={"attunable"}
             onClick={() =>
-              setNewItem((oldItem) => {
+              setCurrentItem((oldItem) => {
                 const newItem = { ...oldItem };
                 if (typeof newItem.toggles.Attuned === "boolean") {
                   newItem.toggles.Attuned = undefined;
@@ -370,45 +415,46 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
               })
             }
           >
-            {typeof newItem.toggles.Attuned === "boolean" ? "Yes" : "No"}
+            {typeof currentItem.toggles.Attuned === "boolean" ? "Yes" : "No"}
           </button>{" "}
         </>
       )}
-      {typeof newItem.toggles.Attuned === "boolean" && (
+      {typeof currentItem.toggles.Attuned === "boolean" && (
         <>
           <label htmlFor={"attuned"}>Attuned: </label>
           <button
             id={"attuned"}
             name={"attuned"}
             onClick={() =>
-              setNewItem((oldItem) => {
+              setCurrentItem((oldItem) => {
                 const newItem = { ...oldItem };
                 newItem.toggles.Attuned = !newItem.toggles.Attuned;
                 return newItem;
               })
             }
           >
-            {newItem.toggles.Attuned ? "Yes" : "No"}
+            {currentItem.toggles.Attuned ? "Yes" : "No"}
           </button>
         </>
       )}
     </span>
   );
 
-  if (!newItem.profRequired) newItem.profRequired = [];
+  if (!currentItem.profRequired) currentItem.profRequired = [];
 
-  const proficiencySection = (newItem.profRequired.length > 0 || editing) && (
+  const proficiencySection = (currentItem.profRequired.length > 0 ||
+    editing) && (
     <p>
       Requires proficiency in one of:{" "}
       {editing ? (
         <>
-          {newItem.profRequired.map((prof, i) => (
+          {currentItem.profRequired.map((prof, i) => (
             <Fragment key={i}>
               {i > 0 && ", "}
               <span
                 className="click-to-remove"
                 onClick={() =>
-                  setNewItem((oldItem) => {
+                  setCurrentItem((oldItem) => {
                     const newItem = { ...oldItem };
                     newItem.profRequired.splice(i, 1);
                     return newItem;
@@ -424,7 +470,7 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
             id={`profAdder`}
             value={""}
             onChange={(event) =>
-              setNewItem((oldItem) => {
+              setCurrentItem((oldItem) => {
                 const newItem = { ...oldItem };
                 newItem.profRequired.push(event.target.value);
                 newItem.profRequired.sort();
@@ -440,7 +486,7 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
               .map((group) => (
                 <optgroup label={group} key={group}>
                   {profTypes[group].map((prof) => {
-                    if (newItem.profRequired.includes(prof)) return null;
+                    if (currentItem.profRequired.includes(prof)) return null;
                     return (
                       <option key={prof} value={prof}>
                         {prof}
@@ -452,25 +498,25 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
           </select>
         </>
       ) : (
-        newItem.profRequired.join(", ")
+        currentItem.profRequired.join(", ")
       )}
     </p>
   );
 
-  if (!newItem.properties) newItem.properties = [];
+  if (!currentItem.properties) currentItem.properties = [];
 
-  const propertiesSection = (newItem.properties.length > 0 || editing) && (
+  const propertiesSection = (currentItem.properties.length > 0 || editing) && (
     <p>
       Properties:{" "}
       {editing ? (
         <>
-          {newItem.properties.map((property, i) => (
+          {currentItem.properties.map((property, i) => (
             <Fragment key={i}>
               {i > 0 && ", "}
               <span
                 className="click-to-remove"
                 onClick={() =>
-                  setNewItem((oldItem) => {
+                  setCurrentItem((oldItem) => {
                     const newItem = { ...oldItem };
                     if (newItem.properties[i] === "Versatile") {
                       newItem.toggles["Two-Handed"] = undefined;
@@ -482,19 +528,20 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
                 title={PROPERTIES[property]}
               >
                 {property}
-              </span>{" "}
+              </span>
               {property === "Versatile" && (
                 <>
+                  {" "}
                   (
                   <input
-                    id="versatile-dice-number"
-                    name="versatile-dice-number"
                     className="dice-input"
+                    id="versatileDiceNumber"
+                    name="versatileDiceNumber"
                     type="number"
                     min={1}
-                    value={newItem.versatileDice.number}
+                    value={currentItem.versatileDice.number}
                     onChange={(event) => {
-                      setNewItem((oldItem) => {
+                      setCurrentItem((oldItem) => {
                         const newItem = { ...oldItem };
                         newItem.versatileDice.number = event.target.value;
                         return newItem;
@@ -503,14 +550,14 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
                   ></input>
                   d
                   <input
-                    id="versatile-dice-sides"
-                    name="versatile-dice-sides"
                     className="dice-input"
+                    id="versatileDiceSides"
+                    name="versatileDiceSides"
                     type="number"
                     min={2}
-                    value={newItem.versatileDice.sides}
+                    value={currentItem.versatileDice.sides}
                     onChange={(event) => {
-                      setNewItem((oldItem) => {
+                      setCurrentItem((oldItem) => {
                         const newItem = { ...oldItem };
                         newItem.versatileDice.sides = event.target.value;
                         return newItem;
@@ -527,7 +574,7 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
             id={`propertyAdder`}
             value={""}
             onChange={(event) =>
-              setNewItem((oldItem) => {
+              setCurrentItem((oldItem) => {
                 const newItem = { ...oldItem };
                 newItem.properties.push(event.target.value);
                 newItem.properties.sort();
@@ -545,7 +592,7 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
             {Object.keys(PROPERTIES)
               .sort()
               .map((property) => {
-                if (newItem.properties.includes(property)) return null;
+                if (currentItem.properties.includes(property)) return null;
                 return (
                   <option
                     key={property}
@@ -559,13 +606,13 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
           </select>
         </>
       ) : (
-        newItem.properties.map((property, i) => (
+        currentItem.properties.map((property, i) => (
           <Fragment key={i}>
             {i > 0 && ", "}
             <span title={PROPERTIES[property]}>
               {property}
               {property === "Versatile" &&
-                ` (${newItem.versatileDice.number}d${newItem.versatileDice.sides})`}
+                ` (${currentItem.versatileDice.number}d${currentItem.versatileDice.sides})`}
             </span>
           </Fragment>
         ))
@@ -573,20 +620,199 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
     </p>
   );
 
-  const attackSection = newItem.types.includes("Weapon") && (
+  const getDamageSelector = (category) => {
+    if (!currentItem.types.includes("Weapon")) return null;
+    return currentItem.damage[category].map((damage, i) => (
+      <span key={i}>
+        <select
+          name={`baseDamage${i}Type`}
+          id={`baseDamage${i}Type`}
+          value={damage.type}
+          onChange={(event) =>
+            setCurrentItem((oldItem) => {
+              const newItem = { ...oldItem };
+              newItem.damage[category][i].type = event.target.value;
+              return newItem;
+            })
+          }
+        >
+          {DAMAGE_TYPES.map((type) => {
+            return (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            );
+          })}
+        </select>{" "}
+        <input
+          type="number"
+          name={`baseDamage${i}Flat`}
+          id={`baseDamage${i}Flat`}
+          value={damage.flat}
+          onChange={(event) =>
+            setCurrentItem((oldItem) => {
+              const newItem = { ...oldItem };
+              newItem.damage[category][i].flat = parseInt(event.target.value);
+              return newItem;
+            })
+          }
+        ></input>
+        {damage.dice.length > 0 && " + "}
+        {damage.dice.map((die, j) => (
+          <Fragment key={j}>
+            {j > 0 && " + "}
+            <input
+              className="dice-input"
+              id={`baseDamage${i}Die${j}Number`}
+              name={`baseDamage${i}Die${j}Number`}
+              type="number"
+              min={1}
+              value={die.number}
+              onChange={(event) =>
+                setCurrentItem((oldItem) => {
+                  const newItem = { ...oldItem };
+                  newItem.damage[category][i].dice[j].number = parseInt(
+                    event.target.value
+                  );
+                  return newItem;
+                })
+              }
+            ></input>
+            d
+            <input
+              className="dice-input"
+              id={`baseDamage${i}Die${j}Sides`}
+              name={`baseDamage${i}Die${j}Sides`}
+              type="number"
+              min={2}
+              value={die.sides}
+              onChange={(event) =>
+                setCurrentItem((oldItem) => {
+                  const newItem = { ...oldItem };
+                  newItem.damage[category][i].dice[j].sides = parseInt(
+                    event.target.value
+                  );
+                  return newItem;
+                })
+              }
+            ></input>{" "}
+            <button
+              className="x-button"
+              title="Remove damage die"
+              onClick={() =>
+                setCurrentItem((oldItem) => {
+                  const newItem = { ...oldItem };
+                  newItem.damage[category][i].dice.splice(j, 1);
+                  return newItem;
+                })
+              }
+            >
+              X
+            </button>
+          </Fragment>
+        ))}{" "}
+        <button
+          id="addDamageDie"
+          name="addDamageDie"
+          onClick={() =>
+            setCurrentItem((oldItem) => {
+              const newItem = { ...oldItem };
+              newItem.damage[category][i].dice.push({ number: 1, sides: 2 });
+              return newItem;
+            })
+          }
+        >
+          Add die
+        </button>{" "}
+        {i > 0 && (
+          <button
+            className="x-button"
+            title="Remove damage type"
+            onClick={() =>
+              setCurrentItem((oldItem) => {
+                const newItem = { ...oldItem };
+                newItem.damage[category].splice(i, 1);
+                return newItem;
+              })
+            }
+          >
+            X
+          </button>
+        )}
+      </span>
+    ));
+  };
+
+  const getDamageSection = (category) => {
+    let labelText = "";
+    if (category === "base") {
+      labelText =
+        "Base Damage: (Ability modifier will add to first type, versatile dice will replace first die)";
+    } else if (category === "activated") {
+      labelText = "Activated Damage:";
+    }
+    return (
+      <label className="col-flex" htmlFor="">
+        <span>
+          {labelText}{" "}
+          <button
+            id="addDamageType"
+            name="addDamageType"
+            onClick={() =>
+              setCurrentItem((oldItem) => {
+                const newItem = { ...oldItem };
+                newItem.damage[category].push(structuredClone(DAMAGE_TEMPLATE));
+                return newItem;
+              })
+            }
+          >
+            Add type
+          </button>
+        </span>
+        {getDamageSelector(category)}
+      </label>
+    );
+  };
+
+  const attackSection = currentItem.types.includes("Weapon") && (
     <>
-      <p>
-        Attack Modifier: {combineBreakdown(attackModBreakdown)}
-        {` = ${attackMod}`}
-      </p>
-      <p>
-        Damage: {combineBreakdown(damageBreakdown)}
-        {` = ${damage}`}
-      </p>
+      {editing ? (
+        <label>
+          Bonus Attack Modifier:{" "}
+          <input
+            id="attackMod"
+            name="attackMod"
+            type="number"
+            min={0}
+            value={currentItem.attackBonus}
+            onChange={(event) => {
+              setCurrentItem((oldItem) => {
+                const newItem = { ...oldItem };
+                newItem.attackBonus = parseInt(event.target.value);
+                return newItem;
+              });
+            }}
+          ></input>
+        </label>
+      ) : (
+        <p>
+          Attack Modifier: {combineBreakdown(attackModBreakdown)}
+          {` = ${attackMod}`}
+        </p>
+      )}
+
+      {editing ? (
+        getDamageSection("base")
+      ) : (
+        <p>
+          Damage: {combineBreakdown(damageBreakdown)}
+          {` = ${damage}`}
+        </p>
+      )}
     </>
   );
 
-  const twoHandedSection = typeof newItem.toggles["Two-Handed"] ===
+  const twoHandedSection = typeof currentItem.toggles["Two-Handed"] ===
     "boolean" && (
     <span>
       <label htmlFor={"twoHanded"}>Two-Handed: </label>
@@ -594,72 +820,80 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
         id={"twoHanded"}
         name={"twoHanded"}
         onClick={() => {
-          character.toggleItemTwoHanded(item);
-          setNewItem((oldItem) => {
+          setCurrentItem((oldItem) => {
             const newItem = { ...oldItem };
             newItem.toggles["Two-Handed"] = !newItem.toggles["Two-Handed"];
             return newItem;
           });
         }}
       >
-        {newItem.toggles["Two-Handed"] ? "Yes" : "No"}
+        {currentItem.toggles["Two-Handed"] ? "Yes" : "No"}
       </button>
     </span>
   );
 
-  const activatedSection = (typeof newItem.toggles.Activated === "boolean" ||
+  const activatedSection = (typeof currentItem.toggles.Activated ===
+    "boolean" ||
     editing) && (
-    <span>
-      {editing && (
-        <>
-          <label htmlFor={"activatable"}>Activatable: </label>
-          <button
-            id={"activatable"}
-            name={"activatable"}
-            onClick={() =>
-              setNewItem((oldItem) => {
-                character.toggleItemActivatable(item);
-                const newItem = { ...oldItem };
-                if (typeof newItem.toggles.Activated === "boolean") {
-                  newItem.toggles.Activated = undefined;
-                } else {
-                  newItem.toggles.Activated = false;
-                  newItem.damage.activated = [];
-                }
-                return newItem;
-              })
-            }
-          >
-            {typeof newItem.toggles.Activated === "boolean" ? "Yes" : "No"}
-          </button>{" "}
-        </>
-      )}
-      {typeof newItem.toggles.Activated === "boolean" && (
-        <>
-          <label htmlFor={"activated"}>Activated: </label>
-          <button
-            id={"activated"}
-            name={"activated"}
-            onClick={() => {
-              character.toggleItemActive(item);
-              setNewItem((oldItem) => {
-                const newItem = { ...oldItem };
-                newItem.toggles.Activated = !newItem.toggles.Activated;
-                return newItem;
-              });
-            }}
-          >
-            {newItem.toggles.Activated ? "Yes" : "No"}
-          </button>
-        </>
-      )}
-    </span>
+    <>
+      <span>
+        {editing && (
+          <>
+            <label htmlFor={"activatable"}>Activatable: </label>
+            <button
+              id={"activatable"}
+              name={"activatable"}
+              onClick={() =>
+                setCurrentItem((oldItem) => {
+                  const newItem = { ...oldItem };
+                  if (typeof newItem.toggles.Activated === "boolean") {
+                    newItem.toggles.Activated = undefined;
+                    if (newItem.damage) newItem.damage.activated = undefined;
+                  } else {
+                    newItem.toggles.Activated = false;
+                    if (newItem.damage) newItem.damage.activated = [];
+                  }
+                  return newItem;
+                })
+              }
+            >
+              {typeof currentItem.toggles.Activated === "boolean"
+                ? "Yes"
+                : "No"}
+            </button>{" "}
+          </>
+        )}
+        {typeof currentItem.toggles.Activated === "boolean" && (
+          <>
+            <label htmlFor={"activated"}>Activated: </label>
+            <button
+              id={"activated"}
+              name={"activated"}
+              onClick={() =>
+                setCurrentItem((oldItem) => {
+                  const newItem = { ...oldItem };
+                  newItem.toggles.Activated = !newItem.toggles.Activated;
+                  return newItem;
+                })
+              }
+            >
+              {currentItem.toggles.Activated ? "Yes" : "No"}
+            </button>
+          </>
+        )}
+      </span>
+      {editing &&
+        typeof currentItem.toggles.Activated === "boolean" &&
+        currentItem.types.includes("Weapon") && (
+          <span>{getDamageSection("activated")}</span>
+        )}
+    </>
   );
 
   const descriptionSection = (
     <>
       <p>Additional information:</p>
-      {isJsonEditorEmpty(newItem.description) && !editing ? (
+      {isJsonEditorEmpty(currentItem.description) && !editing ? (
         <p>-None-</p>
       ) : (
         <EditorConvertToJSON
@@ -668,13 +902,13 @@ const ItemModal = ({ character, setCharChangeFlag, closeModal, item }) => {
           wrapperClassName={editing && "wysiwyg-textbox-wrapper"}
           editorClassName="wysiwyg-textbox-editor"
           onBlur={(contentJSON) =>
-            setNewItem((oldItem) => {
+            setCurrentItem((oldItem) => {
               const newItem = { ...oldItem };
               newItem.description = contentJSON;
               return newItem;
             })
           }
-          defaultTextJSON={newItem.description}
+          defaultTextJSON={currentItem.description}
         />
       )}
     </>

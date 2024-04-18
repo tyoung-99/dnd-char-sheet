@@ -330,31 +330,17 @@ class Character {
     this.queueSave();
   }
 
-  updateItem(oldItem, newItem) {
+  replaceItem(oldItem, newItem) {
     const index = this.equipment.findIndex(
       (checkItem) => checkItem === oldItem
     );
     this.equipment[index] = newItem;
     this.queueSave();
+    return this.equipment[index];
   }
 
-  toggleItemActive(item) {
-    item.toggles.Activated = !item.toggles.Activated;
-    this.queueSave();
-  }
-
-  toggleItemActivatable(item) {
-    if (typeof item.toggles.Activated === "boolean") {
-      item.toggles.Activated = undefined;
-    } else {
-      item.toggles.Activated = false;
-      item.damage.activated = [];
-    }
-    this.queueSave();
-  }
-
-  toggleItemTwoHanded(item) {
-    item.toggles["Two-Handed"] = !item.toggles["Two-Handed"];
+  itemToggle(item, toggleName) {
+    item.toggles[toggleName] = !item.toggles[toggleName];
     this.queueSave();
   }
 
