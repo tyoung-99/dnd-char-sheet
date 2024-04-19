@@ -2,6 +2,7 @@
 
 import { Fragment } from "react";
 import ItemModal from "../../components/modals/ItemModal";
+import NumInputComp from "../../components/NumInputComp";
 import "../../styling/pages/page-tabs/CharacterEquipmentTab.css";
 
 const CharacterEquipmentTab = ({
@@ -12,6 +13,8 @@ const CharacterEquipmentTab = ({
   closeModal,
   currentModal,
 }) => {
+  const COIN_NAMES = ["cp", "sp", "ep", "gp", "pp"];
+
   let itemizedInventory = character.getItems();
   let treasure = character.getTreasure();
   const attunable = [];
@@ -220,11 +223,53 @@ const CharacterEquipmentTab = ({
       <div className="col-flex col-1_2">
         <div className="grid-tile">
           <div className="row-flex coins">
-            <h1 className="col-1_6 coin-entry">{character.coins.sp} SP</h1>
-            <h1 className="col-1_6 coin-entry">{character.coins.cp} CP</h1>
-            <h1 className="col-1_6 coin-entry">{character.coins.ep} EP</h1>
-            <h1 className="col-1_6 coin-entry">{character.coins.gp} GP</h1>
-            <h1 className="col-1_6 coin-entry">{character.coins.pp} PP</h1>
+            {COIN_NAMES.map((coinName) => (
+              <span className="col-1_5 coin-entry col-flex">
+                <input
+                  type="number"
+                  id={`coins${coinName.toUpperCase()}`}
+                  name={`coins${coinName.toUpperCase()}`}
+                  min={0}
+                  value={character.coins[coinName]}
+                  onChange={(event) => {
+                    const newCoins = { ...character.coins };
+                    newCoins[coinName] = event.target.value;
+                    character.setCoins(newCoins);
+                    setCharChangeFlag((old) => !old);
+                  }}
+                ></input>
+                <span className="row-flex">
+                  <span className="button-holder">
+                    <NumInputComp
+                      buttonText={"+"}
+                      callback={(amount) => {
+                        const newCoins = { ...character.coins };
+                        newCoins[coinName] += amount;
+                        character.setCoins(newCoins);
+                        setCharChangeFlag((old) => !old);
+                      }}
+                      alignLeft={true}
+                    />
+                  </span>
+                  <label htmlFor={`coins${coinName.toUpperCase()}`}>
+                    {coinName.toUpperCase()}
+                  </label>
+                  <span className="button-holder">
+                    <NumInputComp
+                      buttonText={"-"}
+                      callback={(amount) => {
+                        const newCoins = { ...character.coins };
+                        newCoins[coinName] -= amount;
+                        if (newCoins[coinName] < 0) newCoins[coinName] = 0;
+                        character.setCoins(newCoins);
+                        setCharChangeFlag((old) => !old);
+                      }}
+                      alignLeft={false}
+                    />
+                  </span>
+                </span>
+              </span>
+            ))}
           </div>
         </div>
         <div className="grid-tile col-end">
