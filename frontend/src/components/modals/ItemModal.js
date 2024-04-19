@@ -156,7 +156,7 @@ const ItemModal = ({
 
   const isNew = !item;
 
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(isNew);
   const [currentItem, setCurrentItem] = useState(
     structuredClone(isNew ? ITEM_TEMPLATE : item)
   );
@@ -327,10 +327,10 @@ const ItemModal = ({
   );
 
   if (isTreasure) {
-    valueSection = (
+    valueSection = editing ? (
       <div className="col-flex">
         <label htmlFor="">Value: </label>
-        <div className="row-flex">
+        <div>
           {currentItem.value.map((coin, i) => (
             <span key={i}>
               <label htmlFor={`val${coin[0].toUpperCase()}`}>
@@ -349,11 +349,23 @@ const ItemModal = ({
                     return newItem;
                   })
                 }
-              ></input>
+              ></input>{" "}
             </span>
           ))}
         </div>
       </div>
+    ) : (
+      <p>
+        Value:{" "}
+        {currentItem.value.reduce((totalStr, coin) => {
+          if (coin[1] > 0) {
+            if (totalStr !== "") totalStr += ", ";
+            totalStr += `${coin[1]} ${coin[0].toUpperCase()}`;
+          }
+
+          return totalStr;
+        }, "")}
+      </p>
     );
   } else {
     let attackMod, attackModBreakdown, damage, damageBreakdown;
