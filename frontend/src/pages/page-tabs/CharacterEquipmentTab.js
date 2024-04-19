@@ -13,7 +13,13 @@ const CharacterEquipmentTab = ({
   closeModal,
   currentModal,
 }) => {
-  const COIN_NAMES = ["cp", "sp", "ep", "gp", "pp"];
+  const COIN_CONVERSIONS = [
+    ["cp", 1],
+    ["sp", 10],
+    ["ep", 50],
+    ["gp", 100],
+    ["pp", 1000],
+  ];
 
   let itemizedInventory = character.getItems();
   let treasure = character.getTreasure();
@@ -77,23 +83,19 @@ const CharacterEquipmentTab = ({
       </Fragment>
     ));
   }
+
+  let treasureSumCP = 0;
   treasure = treasure.map((item, i) => {
-    const COIN_CONVERSIONS = [
-      ["pp", 1000],
-      ["gp", 100],
-      ["ep", 50],
-      ["sp", 10],
-      ["cp", 1],
-    ];
     let valOfOne = item.value.reduce((totalCP, current) => {
       return (totalCP +=
         COIN_CONVERSIONS.find((compare) => compare[0] === current[0])[1] *
         current[1]);
     }, 0);
     let value = valOfOne * item.count;
+    treasureSumCP += value;
 
     let coin = "cp";
-    for (let i = 0; i < 4; ++i) {
+    for (let i = 4; i > 0; i--) {
       if (value % COIN_CONVERSIONS[i][1] === 0) {
         value = value / COIN_CONVERSIONS[i][1];
         coin = COIN_CONVERSIONS[i][0];
@@ -139,6 +141,12 @@ const CharacterEquipmentTab = ({
       </Fragment>
     );
   });
+
+  const treasureSums = [0, 0, 0, 0, 0];
+  for (let i = 4; i >= 0; i--) {
+    treasureSums[i] = parseInt(treasureSumCP / COIN_CONVERSIONS[i][1]);
+    treasureSumCP = treasureSumCP % COIN_CONVERSIONS[i][1];
+  }
 
   attuned = attuned.concat(["", "", ""]);
   attuned.length = 3;
@@ -223,8 +231,8 @@ const CharacterEquipmentTab = ({
       <div className="col-flex col-1_2">
         <div className="grid-tile">
           <div className="row-flex coins">
-            {COIN_NAMES.map((coinName) => (
-              <span className="col-1_5 coin-entry col-flex">
+            {COIN_CONVERSIONS.map(([coinName, _]) => (
+              <span key={coinName} className="col-1_5 coin-entry col-flex">
                 <input
                   type="number"
                   id={`coins${coinName.toUpperCase()}`}
@@ -298,6 +306,13 @@ const CharacterEquipmentTab = ({
             </div>
           </div>
           {treasure.length === 0 ? <p>-None-</p> : treasure}
+          <h1>
+            Total:{" "}
+            {treasureSums.map(
+              (amount, i) =>
+                `${i > 0 ? ", " : ""}${amount} ${COIN_CONVERSIONS[i][0]}`
+            )}
+          </h1>
         </div>
       </div>
     </div>
