@@ -10,8 +10,11 @@ const Collapsible = ({ open, children, title }) => {
 
   return (
     <>
-      <button className="collapsibleCard" onClick={() => toggleOpen()}>
-        <div className="row-flex collapsibleHeading">
+      <button className="collapsibleCard">
+        <div
+          className="row-flex collapsibleHeading"
+          onClick={() => toggleOpen()}
+        >
           <div className="collapsibleTitle">{title}</div>
           <div className="collapsibleOpenIcon">{isOpen ? "-" : "+"}</div>
         </div>

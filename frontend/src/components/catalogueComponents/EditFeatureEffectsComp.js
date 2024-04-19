@@ -1,12 +1,7 @@
-import { useState } from "react";
 import LanguageEffectComp from "./featureEffectsComponents/LanguageEffectComp";
 import Collapsible from "../Collapsible";
 
-const EditFeatureEffectsComp = (racialFeature) => {
-  const [effects, setEffects] = useState(
-    racialFeature.effects ? racialFeature.effects : []
-  );
-
+const EditFeatureEffectsComp = ({ effects, setEffects }) => {
   const addEffect = (category) => {
     setEffects([
       ...effects,
@@ -17,8 +12,10 @@ const EditFeatureEffectsComp = (racialFeature) => {
     ]);
   };
 
-  const deleteEffect = () => {
-    //tbd
+  const deleteEffect = (index) => {
+    setEffects((prevEffects) =>
+      prevEffects.filter((effects, i) => i !== index)
+    );
   };
 
   return (
@@ -33,18 +30,23 @@ const EditFeatureEffectsComp = (racialFeature) => {
           <option value="" selected disabled hidden>
             Add Effect
           </option>
-          {categoryOptions.map((optionName, index) => (
-            <option key={index} value={optionName}>
-              {optionName}
-            </option>
-          ))}
+          {categoryOptions
+            .filter(
+              (category) =>
+                !effects.some((effect) => effect.category === category)
+            )
+            .map((optionName, index) => (
+              <option key={index} value={optionName}>
+                {optionName}
+              </option>
+            ))}
         </select>
       </div>
       {effects.map((effect, index) => (
         <>
           <div className="row-flex">
             <Collapsible title={effect.category}>
-              {getContentsByCategory(effect.category)}
+              {getComponentByCategory(effect, setEffects)}
             </Collapsible>
             <div>
               <button
@@ -69,10 +71,10 @@ const categoryOptions = [
   "Feat",
 ];
 
-const getContentsByCategory = (category) => {
-  switch (category) {
+const getComponentByCategory = (effect, setEffects) => {
+  switch (effect.category) {
     case "Language":
-      return <LanguageEffectComp />;
+      return <LanguageEffectComp effect={effect} setEffects={setEffects} />;
     case "AbilityScore":
       return "AbilityScore component";
     case "SkillProficiency":
@@ -83,4 +85,5 @@ const getContentsByCategory = (category) => {
       return "";
   }
 };
+
 export default EditFeatureEffectsComp;

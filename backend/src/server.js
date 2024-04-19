@@ -30,8 +30,10 @@ import {
   deleteRacialFeature,
   updateRace,
   updateSubrace,
+  updateRacialFeature,
   insertRace,
   insertSubrace,
+  insertRacialFeature,
 } from "./handleRaces.js";
 import { getFeats, getFeatsFromList, getOneFeat } from "./handleFeats.js";
 import {
@@ -179,8 +181,7 @@ app.delete("/api/subraces/:raceId/delete/:parentId", async (req, res) => {
 app.delete("/api/racialFeatures/:id/delete", async (req, res) => {
   const { id } = req.params;
   await deleteRacialFeature(db, id);
-  // const racialFeatures = await getAllRacialFeatures(db);
-  res.send("Nothing"); // may change later idk
+  res.send(await getAllRacialFeatures(db));
 });
 app.put("/api/races/:raceId/update", async (req, res) => {
   const { raceId } = req.params;
@@ -192,6 +193,21 @@ app.put("/api/subraces/:raceId/update", async (req, res) => {
   const { name, displayName, source, features } = req.body;
   await updateSubrace(db, raceId, name, displayName, source, features);
 });
+app.put("/api/racialFeature/:racialFeatureId/update", async (req, res) => {
+  const { racialFeatureId } = req.params;
+  const { name, displayName, description, effects, replaces, invisible } =
+    req.body;
+  await updateRacialFeature(
+    db,
+    racialFeatureId,
+    name,
+    displayName,
+    description,
+    effects,
+    replaces,
+    invisible
+  );
+});
 app.post("/api/races/insert", async (req, res) => {
   const { name, source, features } = req.body;
   await insertRace(db, name, source, features);
@@ -201,6 +217,20 @@ app.post("/api/subraces/insert", async (req, res) => {
   const { name, displayName, parentRace, source, features } = req.body;
   await insertSubrace(db, name, displayName, parentRace, source, features);
   res.json(await getSubracesFromParent(db, parentRace));
+});
+app.post("/api/racialFeature/insert", async (req, res) => {
+  const { name, displayName, description, effects, replaces, invisible } =
+    req.body;
+  await insertRacialFeature(
+    db,
+    name,
+    displayName,
+    description,
+    effects,
+    replaces,
+    invisible
+  );
+  res.json(await getAllRacialFeatures(db));
 });
 
 // Feats

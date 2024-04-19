@@ -102,6 +102,31 @@ export const updateSubrace = async (
   );
 };
 
+export const updateRacialFeature = async (
+  db,
+  id,
+  name,
+  displayName,
+  description,
+  effects,
+  replaces,
+  invisible
+) => {
+  await db.collection("racialFeatures").updateOne(
+    { _id: ObjectId.createFromHexString(id) },
+    {
+      $set: {
+        name: name,
+        displayName: displayName,
+        description: description,
+        effects: effects,
+        replaces: replaces,
+        invisible: invisible,
+      },
+    }
+  );
+};
+
 export const insertRace = async (db, name, source, features) => {
   await db.collection("races").insertOne({
     name: name,
@@ -124,5 +149,24 @@ export const insertSubrace = async (
     parentRace: parentRace,
     source: source,
     features: features,
+  });
+};
+
+export const insertRacialFeature = async (
+  db,
+  name,
+  displayName,
+  description,
+  effects,
+  replaces,
+  invisible
+) => {
+  await db.collection("racialFeatures").insertOne({
+    name: name,
+    displayName: displayName,
+    description: description,
+    effects: effects,
+    replaces: replaces,
+    invisible: invisible,
   });
 };

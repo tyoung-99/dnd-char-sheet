@@ -194,3 +194,7 @@ p:has(> .hover-icon) {
 .wrap {
   flex-wrap: wrap;
 }
+
+.no-scroll {
+  overflow-y: hidden;
+}

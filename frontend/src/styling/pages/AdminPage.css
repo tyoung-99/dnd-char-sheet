@@ -131,3 +131,19 @@
 .admin-center {
   justify-content: center;
 }
+
+.almost-full-width {
+  width: 90%;
+}
+
+.no-resize {
+  resize: vertical;
+}
+
+.feature-description {
+  width: 40rem;
+}
+
+.effects-choices {
+  width: 2rem;
+}

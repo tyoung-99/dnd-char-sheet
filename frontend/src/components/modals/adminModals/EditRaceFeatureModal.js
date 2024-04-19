@@ -2,8 +2,13 @@ import GenericModal from "../GenericModal";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import EditFeatureEffectsComp from "../../catalogueComponents/EditFeatureEffectsComp";
+import EditorConvertToJSON from "../../EditorConvertToJSON";
 
-const EditRaceFeatureModal = ({ racialFeature, closeModal }) => {
+const EditRaceFeatureModal = ({
+  racialFeature,
+  closeModal,
+  addNewRacialFeature,
+}) => {
   const [name, setName] = useState(
     racialFeature.name ? racialFeature.name : "New Racial Feature"
   );
@@ -11,10 +16,20 @@ const EditRaceFeatureModal = ({ racialFeature, closeModal }) => {
     racialFeature.displayName ? racialFeature.displayName : "Display Name"
   );
   const [description, setDescription] = useState(
-    racialFeature.description ? racialFeature.description : ""
+    racialFeature.description ? racialFeature.description : {}
   );
   const [isReplaced, setIsReplaced] = useState(
-    racialFeature.replaces.length === 0 ? false : true
+    racialFeature.replaces
+      ? racialFeature.replaces.length === 0
+        ? false
+        : true
+      : false
+  );
+  const [visibility, setVisibility] = useState(
+    racialFeature.invisible ? !racialFeature.invisible : true
+  );
+  const [effects, setEffects] = useState(
+    racialFeature.effects ? racialFeature.effects : []
   );
   const [racialFeatures, setRacialFeatures] = useState([]);
   const [replacedFeatures, setReplacedFeatures] = useState([]);
@@ -74,6 +89,33 @@ const EditRaceFeatureModal = ({ racialFeature, closeModal }) => {
     ]);
   };
 
+  const saveRacialFeature = async () => {
+    const newReplacedFeatures = replacedFeatures.map((feature) => feature.id);
+
+    const RacialFeatureData = {
+      name: name,
+      displayName: displayName,
+      description: description,
+      effects: effects,
+      replaces: newReplacedFeatures,
+      invisible: !visibility,
+    };
+    // updates the on screen info without need of backend return
+    racialFeature.name = name;
+    racialFeature.displayName = displayName;
+    racialFeature.description = description;
+    racialFeature.effects = effects;
+    racialFeature.replaces = newReplacedFeatures;
+    racialFeature.invisible = !visibility;
+    // function addNewRacial Feature only is passed to this modal when user used create button. Handles post
+    addNewRacialFeature
+      ? addNewRacialFeature(RacialFeatureData)
+      : await axios.put(
+          `/api/racialFeature/${racialFeature._id}/update`,
+          RacialFeatureData
+        );
+  };
+
   const header = null;
   const body = (
     <>
@@ -98,19 +140,27 @@ const EditRaceFeatureModal = ({ racialFeature, closeModal }) => {
           {displayName}
         </div>
       </div>
+      <div className="row-flex">
+        <input
+          type="checkbox"
+          id="visible"
+          name="visible"
+          checked={visibility}
+          onChange={() => setVisibility((prev) => !prev)}
+        ></input>
+        <label>Make Visible on Features Tab</label>
+      </div>
       <hr></hr>
       <h2>Description</h2>
-      <div className="row-flex">
-        <textarea
-          rows="6"
-          cols="75"
-          name="Description"
-          spellCheck="true"
-          placeholder="Enter Description"
-          onChange={(event) => setDescription(event.currentTarget.textContent)}
-          value={description}
-        ></textarea>
+      <div className="feature-description">
+        <EditorConvertToJSON
+          wrapperClassName="wysiwyg-textbox-wrapper"
+          editorClassName="wysiwyg-textbox-editor"
+          onBlur={(contentJSON) => setDescription(contentJSON)}
+          defaultTextJSON={description}
+        />
       </div>
+
       <hr></hr>
       <input
         type="checkbox"
@@ -167,7 +217,7 @@ const EditRaceFeatureModal = ({ racialFeature, closeModal }) => {
           </div>
         </>
       )}
-      <EditFeatureEffectsComp racialFeature={racialFeature} />
+      <EditFeatureEffectsComp effects={effects} setEffects={setEffects} />
     </>
   );
 
@@ -176,7 +226,7 @@ const EditRaceFeatureModal = ({ racialFeature, closeModal }) => {
       <button onClick={closeModal}>Cancel</button>
       <button
         onClick={() => {
-          // save function;
+          saveRacialFeature();
           closeModal();
         }}
       >

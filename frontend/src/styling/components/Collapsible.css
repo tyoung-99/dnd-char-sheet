@@ -6,9 +6,12 @@
 }
 .collapsibleHeading {
   justify-content: space-between;
-  background-color: #bebebe;
+  background-color: #dadada;
   padding: 0.5rem;
   align-items: center;
+}
+.collapsibleHeading:hover {
+  background-color: #c0c0c0;
 }
 .collapsibleTitle {
   color: black;

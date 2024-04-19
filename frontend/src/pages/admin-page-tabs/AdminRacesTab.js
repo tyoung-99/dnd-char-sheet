@@ -3,6 +3,7 @@ import axios from "axios";
 import CatalogueRaceListComp from "../../components/catalogueComponents/CatalogueRaceListComp";
 import CatalogueRacialFeaturesComp from "../../components/catalogueComponents/CatalogueRacialFeaturesComp";
 import EditRaceModal from "../../components/modals/adminModals/EditRaceModal";
+import EditRaceFeatureModal from "../../components/modals/adminModals/EditRaceFeatureModal";
 
 const AdminRacesTab = () => {
   const [raceList, setRaceList] = useState([]);
@@ -24,9 +25,14 @@ const AdminRacesTab = () => {
     return <div>Loading...</div>;
   }
 
-  const addRace = async (newData) => {
+  const addNewRace = async (newData) => {
     const response = await axios.post(`/api/races/insert`, newData);
     setRaceList(response.data);
+  };
+
+  const addNewRacialFeature = async (newData) => {
+    const response = await axios.post(`/api/racialFeature/insert`, newData);
+    setRaceFeatures(response.data);
   };
 
   const deleteRace = async (id) => {
@@ -45,7 +51,7 @@ const AdminRacesTab = () => {
 
   const deleteRaceFeature = async (id) => {
     try {
-      const response = await axios.delete(`/api/races/${id}/delete`);
+      const response = await axios.delete(`/api/racialFeatures/${id}/delete`);
       setRaceFeatures(response.data);
     } catch (error) {
       console.log("Error deleting racial feature, id:", id);
@@ -68,7 +74,11 @@ const AdminRacesTab = () => {
           +
         </button>
         {currentModal === "createRace" && (
-          <EditRaceModal race={{}} closeModal={closeModal} addRace={addRace} />
+          <EditRaceModal
+            race={{}}
+            closeModal={closeModal}
+            addNewRace={addNewRace}
+          />
         )}
       </div>
       <div className="row-flex wrap">
@@ -84,7 +94,19 @@ const AdminRacesTab = () => {
       </div>
       <div className="row-flex">
         <h1>Racial Features</h1>
-        <button className="admin-create">+</button>
+        <button
+          className="admin-create"
+          onClick={() => setCurrentModal("createRacialFeature")}
+        >
+          +
+        </button>
+        {currentModal === "createRacialFeature" && (
+          <EditRaceFeatureModal
+            racialFeature={{}}
+            closeModal={closeModal}
+            addNewRacialFeature={addNewRacialFeature}
+          />
+        )}
       </div>
       <div className="row-flex wrap">
         <CatalogueRacialFeaturesComp

@@ -2,7 +2,7 @@ import GenericModal from "../GenericModal";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-const EditRaceModal = ({ race, closeModal, addRace }) => {
+const EditRaceModal = ({ race, closeModal, addNewRace }) => {
   const [name, setName] = useState(race.name ? race.name : "New Race");
   const [currentSource, setCurrentSource] = useState(
     race.source ? race.source : "Pick a src"
@@ -70,17 +70,20 @@ const EditRaceModal = ({ race, closeModal, addRace }) => {
 
   const saveRace = async () => {
     const newFeatures = addedRacialFeatures.map((feature) => feature.id);
-    const newData = {
+    const newRaceData = {
       name: name,
       source: currentSource,
       features: newFeatures,
     };
+    // updates the on screen info without need of backend return
     race.name = name;
     race.source = currentSource;
     race.features = newFeatures;
-    addRace
-      ? addRace(newData)
-      : await axios.put(`/api/races/${race._id}/update`, newData);
+    // addNewRace is a function that calls the backend to post a new race
+    // it only is passed to this modal when user used create button
+    addNewRace
+      ? addNewRace(newRaceData)
+      : await axios.put(`/api/races/${race._id}/update`, newRaceData);
   };
 
   const header = null;

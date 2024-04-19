@@ -32,7 +32,7 @@ const CharacterBackstoryComp = ({
       <h1>Backstory</h1>
       <EditorConvertToJSON
         wrapperClassName="wysiwyg-textbox-wrapper"
-        editorClassName="wysiwyg-textbox-editor"
+        editorClassName="wysiwyg-textbox-editor no-scroll"
         onBlur={(contentJSON) => updateBackstory(contentJSON)}
         defaultTextJSON={backstory}
       />
