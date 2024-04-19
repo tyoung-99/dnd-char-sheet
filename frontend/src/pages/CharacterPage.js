@@ -302,6 +302,7 @@ const CharacterPage = () => {
                   character.restoreHitPoints(amount);
                   setCharChangeFlag((old) => !old);
                 }} // Can't pass directly or "this" points to wrong element
+                alignLeft={true}
               />
             </div>
             <div>
@@ -311,6 +312,7 @@ const CharacterPage = () => {
                   character.dealDamage(amount);
                   setCharChangeFlag((old) => !old);
                 }}
+                alignLeft={true}
               />
             </div>
             <div>
@@ -320,6 +322,7 @@ const CharacterPage = () => {
                   character.replaceTempHitPoints(amount);
                   setCharChangeFlag((old) => !old);
                 }}
+                alignLeft={true}
               />
             </div>
           </div>

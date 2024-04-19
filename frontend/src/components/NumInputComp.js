@@ -3,7 +3,7 @@
 import "../styling/components/NumInputComp.css";
 import { useState, useRef } from "react";
 
-const NumInputComp = ({ buttonText, callback }) => {
+const NumInputComp = ({ buttonText, callback, alignLeft }) => {
   const [isOpen, setIsOpen] = useState(false);
   const input = useRef(null);
 
@@ -28,7 +28,13 @@ const NumInputComp = ({ buttonText, callback }) => {
             className="catch-outside-clicks"
             onClick={() => setIsOpen(false)}
           ></div>
-          <div className="num-input-popup">
+          <div
+            className={`num-input-popup ${
+              alignLeft
+                ? "num-input-popup-align-left"
+                : "num-input-popup-align-right"
+            }`}
+          >
             <input
               type="number"
               id="inputAmount"
